@@ -5,6 +5,7 @@ describe Flamethrower::Server do
     @server = Object.new
     @server.extend Flamethrower::Server
     @server.stub!(:send_data)
+    @server.stub!(:puts)
     @server.current_user = "blake"
   end
 
@@ -26,4 +27,5 @@ describe Flamethrower::Server do
       @server.post_init
     end
   end
+
 end

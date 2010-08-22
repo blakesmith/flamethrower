@@ -17,5 +17,10 @@ module Flamethrower
       send_userlist
     end
 
+    def say(msg)
+      send_data msg
+      puts msg
+    end
+
   end
 end
