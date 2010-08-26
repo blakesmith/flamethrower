@@ -13,7 +13,7 @@ describe Flamethrower::Server do
 
     it "sends an auto-join" do
       ":nick!user@host JOIN :channel"
-      @server.should_receive(:send_data).with("JOIN #flamethrower")
+      @server.should_receive(:send_data).with(":nick!user@host JOIN :#flamethrower")
       @server.post_init
     end
 

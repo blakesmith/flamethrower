@@ -5,7 +5,7 @@ module Flamethrower
     end
 
     def send_join
-      say "JOIN ##{channel}"
+      say ":#{@current_user.nick}!#{@current_user.user}@#{@current_user.host} JOIN :##{channel}"
     end
 
     def send_topic
