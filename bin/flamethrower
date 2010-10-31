@@ -4,6 +4,5 @@ $:.unshift File.join(File.dirname(__FILE__), "../lib")
 
 require 'flamethrower'
 
-EventMachine::run do
-  EventMachine::start_server "0.0.0.0", 6667, Flamethrower::Server
-end
+server = Flamethrower::EventServer.new
+server.start

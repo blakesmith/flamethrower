@@ -5,13 +5,12 @@ module Flamethrower
 
     attr_accessor :campfire_users, :current_user
 
-    def init
+    def initialize
       @campfire_users ||= []
       @current_user ||= Flamethrower::IrcUser.new :user => 'blake', :nick => 'blake', :host => 'localhost', :realname => 'Blake Smith'
     end
 
     def post_init
-      init
       send_motd
       send_join
       send_topic
