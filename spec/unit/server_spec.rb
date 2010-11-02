@@ -36,6 +36,16 @@ describe Flamethrower::Server do
     end
   end
 
+  describe "#receive_data" do
+    it "calls the dispatcher with a new Message" do
+      incoming = "COMMAND params"
+      msg = Flamethrower::Message.new(incoming)
+      Flamethrower::Message.should_receive(:new).with(incoming).and_return(msg)
+      @server.dispatcher.should_receive(:handle_message).with(msg)
+      @server.receive_data(incoming)
+    end
+  end
+
   context "when a user connects" do
 
     it "sends motd" do

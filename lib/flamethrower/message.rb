@@ -10,6 +10,14 @@ module Flamethrower
       {:command => terms.first, :params => strip_prefixes(params)}
     end
 
+    def command
+      parse[:command]
+    end
+
+    def parameters
+      parse[:params]
+    end
+
     protected
 
     def strip_prefixes(params)

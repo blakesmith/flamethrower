@@ -3,11 +3,12 @@ module Flamethrower
     include Flamethrower::IRCcommands
     include Flamethrower::Tindercommands
 
-    attr_accessor :campfire_users, :current_user
+    attr_accessor :campfire_users, :current_user, :dispatcher
 
     def initialize
       @campfire_users ||= []
       @current_user ||= Flamethrower::IrcUser.new :user => 'blake', :nick => 'blake', :host => 'localhost', :realname => 'Blake Smith'
+      @dispatcher ||= Flamethrower::Dispatcher.new
     end
 
     def post_init
@@ -21,6 +22,10 @@ module Flamethrower
       send_data "#{msg}\r\n"
       puts msg
       msg
+    end
+
+    def receive_data(msg)
+      dispatcher.handle_message(Flamethrower::Message.new(msg))
     end
 
     def send_messages(*messages)

@@ -1,6 +1,16 @@
 require File.join(File.dirname(__FILE__), "../spec_helper")
 
 describe Flamethrower::Message do
+  it "returns the params from the @message hash" do
+    message = Flamethrower::Message.new("COMMAND param")
+    message.command.should == "COMMAND"
+  end
+
+  it "returns the command from the @message hash" do
+    message = Flamethrower::Message.new("COMMAND param")
+    message.parameters.should == ["param"] 
+  end
+
   describe "USER" do
     it "should break a string into command and params" do
       message = Flamethrower::Message.new("USER guest tolmoon tolsun :Ronnie Reagan\r\n")
