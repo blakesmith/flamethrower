@@ -1,11 +1,11 @@
 require 'rubygems'
-require 'spec/rake/spectask'
+require 'rspec/core/rake_task'
 
-Spec::Rake::SpecTask.new(:spec) do |t|
-  t.spec_files = Dir.glob('spec/**/*_spec.rb')
-  t.spec_opts << '--format specdoc'
-#  t.rcov = true
-end
-
+desc 'Default: run specs.'
 task :default => :spec
+
+desc "Run specs"
+RSpec::Core::RakeTask.new do |t|
+  t.pattern = "./spec/**/*_spec.rb" 
+end
 
