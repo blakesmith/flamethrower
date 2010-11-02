@@ -11,5 +11,11 @@ describe Flamethrower::Dispatcher do
       @dispatcher.should_receive(:user).with(message)
       @dispatcher.handle_message(message)
     end
+
+    it "doesn't send the message to the handler method if the method doesn't exist" do
+      message = Flamethrower::Message.new("BOGUS stuff")
+      @dispatcher.should_not_receive(:BOGUS)
+      @dispatcher.handle_message(message)
+    end
   end
 end

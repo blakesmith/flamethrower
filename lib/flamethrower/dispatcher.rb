@@ -1,12 +1,13 @@
 module Flamethrower
   class Dispatcher
     def handle_message(message)
-      send(message.command.downcase, message)
+      method = message.command.downcase
+      send(method, message) if protected_methods.include?(method)
     end
 
     protected
 
-    def user(*args)
+    def user(message)
     end
   end
 end
