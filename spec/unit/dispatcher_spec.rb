@@ -50,4 +50,28 @@ describe Flamethrower::Dispatcher do
     end
   end
 
+  context "after a nick and user has been set" do
+    before do
+      @user_message = Flamethrower::Message.new("USER guest tolmoon tolsun :Ronnie Reagan\r\n")
+      @nick_message = Flamethrower::Message.new("NICK WiZ\r\n")
+    end
+
+    describe "nick sent first" do
+      it "sends the motd, join" do
+        @dispatcher.server.should_receive(:after_connect)
+        @dispatcher.handle_message(@nick_message)
+        @dispatcher.handle_message(@user_message)
+      end
+
+    end
+
+    describe "user sent first" do
+      it "sends the motd" do
+        @dispatcher.server.should_receive(:after_connect)
+        @dispatcher.handle_message(@user_message)
+        @dispatcher.handle_message(@nick_message)
+      end
+    end
+  end
+
 end

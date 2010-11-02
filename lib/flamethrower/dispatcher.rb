@@ -20,11 +20,17 @@ module Flamethrower
       server.current_user.hostname = hostname unless server.current_user.hostname
       server.current_user.servername = servername unless server.current_user.servername
       server.current_user.realname = realname unless server.current_user.realname
+      if server.current_user.nick_set? && server.current_user.user_set?
+        server.after_connect
+      end
     end
 
     def handle_nick(message)
       nickname = *message.parameters
       server.current_user.nickname = nickname
+      if server.current_user.nick_set? && server.current_user.user_set?
+        server.after_connect
+      end
     end
   end
 end

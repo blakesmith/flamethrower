@@ -31,4 +31,26 @@ describe Flamethrower::IrcUser do
     end
   end
 
+  describe "#nick_set?" do
+    it "returns true if nickname is set" do
+      user = Flamethrower::IrcUser.new :nickname => "nick"
+      user.nick_set?.should be_true
+    end
+
+    it "returns false if nickname is not set" do
+      Flamethrower::IrcUser.new.nick_set?.should be_false
+    end
+  end
+
+  describe "#user_set?" do
+    it "returns true if username, hostname, realname, servername are set" do
+      user = Flamethrower::IrcUser.new :username => "user", :hostname => "host", :realname => "realname", :servername => "servername"
+      user.user_set?.should be_true
+    end
+
+    it "returns true if username, hostname, realname, servername are set" do
+      Flamethrower::IrcUser.new.user_set?.should be_false
+    end
+  end
+
 end

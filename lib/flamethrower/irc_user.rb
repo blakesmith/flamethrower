@@ -10,5 +10,13 @@ module Flamethrower
       @realname = options[:realname]
       @servername = options[:servername]
     end
+
+    def nick_set?
+      !!@nickname
+    end
+
+    def user_set?
+      !!@username && !!@hostname && !!@realname && !!@servername
+    end
   end
 end

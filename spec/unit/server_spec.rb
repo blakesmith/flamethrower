@@ -46,26 +46,26 @@ describe Flamethrower::Server do
     end
   end
 
-  context "when a user connects" do
+  context "#after_connect" do
 
     it "sends motd" do
       @server.should_receive(:send_motd)
-      @server.post_init
+      @server.after_connect
     end
 
     it "sends an auto-join" do
       @server.should_receive(:send_join)
-      @server.post_init
+      @server.after_connect
     end
 
     it "sends the current topic" do
       @server.should_receive(:send_topic)
-      @server.post_init
+      @server.after_connect
     end
 
     it "sends a list of userlist" do
       @server.should_receive(:send_userlist)
-      @server.post_init
+      @server.after_connect
     end
   end
 

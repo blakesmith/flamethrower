@@ -11,7 +11,7 @@ module Flamethrower
       @dispatcher ||= Flamethrower::Dispatcher.new(self)
     end
 
-    def post_init
+    def after_connect
       send_motd
       send_join
       send_topic
