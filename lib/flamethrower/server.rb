@@ -7,7 +7,7 @@ module Flamethrower
 
     def initialize
       @campfire_users ||= []
-      @current_user ||= Flamethrower::IrcUser.new :user => 'blake', :nick => 'blake', :host => 'localhost', :realname => 'Blake Smith'
+      @current_user ||= Flamethrower::IrcUser.new
       @dispatcher ||= Flamethrower::Dispatcher.new(self)
     end
 
