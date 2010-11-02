@@ -5,7 +5,7 @@ describe Flamethrower::Server do
     @server = Flamethrower::MockServer.new
     @server.stub!(:send_data)
     @server.stub!(:puts)
-    @server.current_user = Flamethrower::IrcUser.new :user => 'user', :nick => 'nick', :host => 'host', :realname => 'realname'
+    @server.current_user = Flamethrower::IrcUser.new :username => 'user', :nickname => 'nick', :hostname => 'host', :realname => 'realname'
   end
 
   describe "#send_message" do

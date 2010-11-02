@@ -1,13 +1,14 @@
 module Flamethrower
   class IrcUser
 
-    attr_accessor :user, :nick, :host, :realname
+    attr_accessor :username, :nickname, :hostname, :realname, :servername
 
     def initialize(options={})
-      @user = options[:user]
-      @nick = options[:nick]
-      @host = options[:host]
+      @username = options[:username]
+      @nickname = options[:nickname]
+      @hostname = options[:hostname]
       @realname = options[:realname]
+      @servername = options[:servername]
     end
   end
 end
