@@ -63,6 +63,11 @@ describe Flamethrower::Dispatcher do
         @dispatcher.handle_message(@user_message)
       end
 
+      it "doesn't send after_connect if only the nick has been sent" do
+        @dispatcher.server.should_not_receive(:after_connect)
+        @dispatcher.handle_message(@nick_message)
+      end
+
     end
 
     describe "user sent first" do
@@ -71,6 +76,12 @@ describe Flamethrower::Dispatcher do
         @dispatcher.handle_message(@user_message)
         @dispatcher.handle_message(@nick_message)
       end
+
+      it "doesn't send after_connect if only the nick has been sent" do
+        @dispatcher.server.should_not_receive(:after_connect)
+        @dispatcher.handle_message(@user_message)
+      end
+
     end
   end
 
