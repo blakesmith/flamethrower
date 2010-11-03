@@ -2,6 +2,7 @@ $:.unshift File.join(File.dirname(__FILE__), "flamethrower")
 
 require 'rubygems'
 require 'eventmachine'
+require 'logger'
 
 require 'irc_commands'
 require 'tinder_commands'
