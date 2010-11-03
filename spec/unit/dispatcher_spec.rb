@@ -49,6 +49,12 @@ describe Flamethrower::Dispatcher do
         @dispatcher.server.should_receive(:send_message).with("MODE &flamethrower +t")
         @dispatcher.handle_message(message)
       end
+
+      it "responds with the user mode if the mode isn't for a channel" do
+        message = Flamethrower::Message.new("MODE blake +i\r\n")
+        @dispatcher.server.should_receive(:send_message)
+        @dispatcher.handle_message(message)
+      end
     end
   end
 

@@ -33,7 +33,7 @@ module Flamethrower
     end
 
     def handle_mode(message)
-      server.send_message("MODE #{server.channel} +t")
+      server.send_message("MODE #{server.channel} +t") if message.parameters.first == server.channel
     end
   end
 end
