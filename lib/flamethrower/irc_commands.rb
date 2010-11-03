@@ -13,10 +13,7 @@ module Flamethrower
     end
 
     def send_join
-      send_messages do |messages|
-        messages << ":#{@current_user.nickname}!#{@current_user.username}@#{@current_user.hostname} JOIN :#{channel}"
-        messages << "#{@current_user.hostname} MODE #{channel} +t"
-      end
+      send_message ":#{@current_user.nickname}!#{@current_user.username}@#{@current_user.hostname} JOIN :#{channel}"
     end
 
     def send_topic

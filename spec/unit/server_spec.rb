@@ -80,10 +80,7 @@ describe Flamethrower::Server do
     end
 
     it "should have the correct JOIN format" do
-      @server.send_join.should == [
-        ":nick!user@host JOIN :&flamethrower",
-        "host MODE &flamethrower +t"
-      ]
+      @server.send_join.should == ":nick!user@host JOIN :&flamethrower"
     end
 
     it "should have the correct TOPIC format" do

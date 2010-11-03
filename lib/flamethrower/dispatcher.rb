@@ -13,7 +13,6 @@ module Flamethrower
 
     protected
 
-
     def handle_user(message)
       username, hostname, servername, realname = *message.parameters
       server.current_user.username = username unless server.current_user.username
@@ -31,6 +30,10 @@ module Flamethrower
       if server.current_user.nick_set? && server.current_user.user_set?
         server.after_connect
       end
+    end
+
+    def handle_mode(message)
+      server.send_message("MODE #{server.channel} +t")
     end
   end
 end

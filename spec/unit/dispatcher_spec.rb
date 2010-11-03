@@ -2,8 +2,8 @@ require File.join(File.dirname(__FILE__), "../spec_helper")
 
 describe Flamethrower::Dispatcher do
   before do
-    server = Flamethrower::MockServer.new
-    @dispatcher = Flamethrower::Dispatcher.new(server)
+    @server = Flamethrower::MockServer.new
+    @dispatcher = Flamethrower::Dispatcher.new(@server)
   end
 
   describe "#handle_message" do
@@ -39,6 +39,16 @@ describe Flamethrower::Dispatcher do
       @dispatcher.server.current_user.hostname.should == "tolmoon"
       @dispatcher.server.current_user.servername.should == "tolsun"
       @dispatcher.server.current_user.realname.should == "Ronnie Reagan"
+    end
+  end
+
+  describe "#mode" do
+    context "channel mode" do
+      it "responds to mode with a static channel mode" do
+        message = Flamethrower::Message.new("MODE &flamethrower\r\n")
+        @dispatcher.server.should_receive(:send_message).with("MODE &flamethrower +t")
+        @dispatcher.handle_message(message)
+      end
     end
   end
 
