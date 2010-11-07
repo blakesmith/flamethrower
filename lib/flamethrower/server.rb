@@ -3,11 +3,12 @@ module Flamethrower
     include Flamethrower::IRCcommands
     include Flamethrower::Tindercommands
 
-    attr_accessor :campfire_users, :current_user, :dispatcher, :log
+    attr_accessor :campfire_users, :current_user, :dispatcher, :log, :channels
 
     def initialize(log = Logger.new(STDOUT))
       @log = log
       @campfire_users ||= []
+      @channels = []
       @current_user ||= Flamethrower::IrcUser.new
       @dispatcher ||= Flamethrower::Dispatcher.new(self)
     end

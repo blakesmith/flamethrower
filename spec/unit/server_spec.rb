@@ -53,8 +53,15 @@ describe Flamethrower::Server do
     end
   end
 
+  describe "channels" do
+    it "stores the list of channels on the server" do
+      channel = Flamethrower::IrcChannel.new("#flamethrower")
+      @server.channels << channel
+      @server.channels.should include(channel)
+    end
+  end
+
   describe "IRCcommands" do
-    
     it "should have the correct MOTD format" do
       @server.send_motd.should == [
         ":host 375 nick :MOTD",
@@ -63,16 +70,14 @@ describe Flamethrower::Server do
       ]
     end
 
-    it "should have the correct JOIN format" do
-      @server.send_join.should == ":nick!user@host JOIN :&flamethrower"
-    end
-
     it "should have the correct TOPIC format" do
-      @server.send_topic.should == ":host 332 nick &flamethrower :Welcome to Flamethrower"
+      channel = Flamethrower::IrcChannel.new("#flamethrower")
+      channel.topic = "A topic"
+      @server.send_topic(channel).should == ":host 332 nick #flamethrower :A topic"
     end
 
     it "should have the correct USERLIST format" do
-      @server.send_userlist(["bob"]).should == [
+      @server.send_userlist("&flamethrower", ["bob"]).should == [
         ":host 353 nick = &flamethrower :@nick bob",
         ":host 366 nick &flamethrower :/End of /NAMES list"
       ]

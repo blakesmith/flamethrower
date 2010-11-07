@@ -33,13 +33,19 @@ module Flamethrower
     end
 
     def handle_mode(message)
-      if message.parameters.first == server.channel
-        server.send_message("MODE #{server.channel} +t")
+      if server.channels.map(&:name).include?(message.parameters.first)
+        server.send_message("MODE #{message.parameters.first} +t")
       elsif message.parameters.first == server.current_user.nickname
         server.send_message(":#{server.current_user.hostname} 221 #{server.current_user.nickname} +i")
       else
         server.send_message(":#{server.current_user.hostname} PLACEHOLDER #{server.current_user.nickname} +i")
       end
+    end
+
+    def handle_join(message)
+      channel = *message.parameters
+      server.send_topic(channel)
+      server.send_userlist(channel, server.campfire_users)
     end
   end
 end

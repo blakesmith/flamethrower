@@ -45,8 +45,9 @@ describe Flamethrower::Dispatcher do
   describe "#mode" do
     context "channel mode" do
       it "responds to mode with a static channel mode" do
-        message = Flamethrower::Message.new("MODE &flamethrower\r\n")
-        @dispatcher.server.should_receive(:send_message).with("MODE &flamethrower +t")
+        @server.channels << Flamethrower::IrcChannel.new("#flamethrower")
+        message = Flamethrower::Message.new("MODE #flamethrower\r\n")
+        @dispatcher.server.should_receive(:send_message).with("MODE #flamethrower +t")
         @dispatcher.handle_message(message)
       end
 
@@ -73,6 +74,15 @@ describe Flamethrower::Dispatcher do
       message = Flamethrower::Message.new("NICK WiZ\r\n")
       @dispatcher.handle_message(message)
       @dispatcher.server.current_user.nickname.should == "WiZ"
+    end
+  end
+
+  describe "#join" do
+    it "responds with a topic and userlist if sent a join" do
+      message = Flamethrower::Message.new("JOIN #flamethrower\r\n")
+      @server.should_receive(:send_topic).with("#flamethrower")
+      @server.should_receive(:send_userlist)
+      @dispatcher.handle_message(message)
     end
   end
 
