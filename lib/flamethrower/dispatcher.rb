@@ -11,6 +11,12 @@ module Flamethrower
       send(method, message) if protected_methods.include?(method)
     end
 
+    private
+
+    def find_channel(name)
+      server.channels.detect {|channel| channel.name == name}
+    end
+
     protected
 
     def handle_user(message)
@@ -43,9 +49,14 @@ module Flamethrower
     end
 
     def handle_join(message)
-      channel = *message.parameters
-      server.send_topic(channel)
-      server.send_userlist(channel, server.campfire_users)
+      if server.channels.map(&:name).include?(message.parameters.first)
+        channel = find_channel(message.parameters.first)
+        channel.users << server.current_user
+        server.send_topic(channel)
+        server.send_userlist(channel, server.campfire_users)
+      else
+        server.send_message(":#{server.current_user.hostname} 475")
+      end
     end
   end
 end

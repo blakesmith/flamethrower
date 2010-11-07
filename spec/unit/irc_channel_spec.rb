@@ -13,4 +13,10 @@ describe Flamethrower::IrcChannel do
     @channel.topic = "The topic"
     @channel.topic.should == "The topic"
   end
+
+  it "returns the current user list" do
+    user = Flamethrower::IrcUser.new
+    @channel.users << user
+    @channel.users.should include(user)
+  end
 end

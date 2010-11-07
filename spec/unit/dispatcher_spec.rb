@@ -2,7 +2,9 @@ require File.join(File.dirname(__FILE__), "../spec_helper")
 
 describe Flamethrower::Dispatcher do
   before do
-    @server = Flamethrower::MockServer.new
+    @server = Flamethrower::MockServer.new(Logger.new("/dev/null"))
+    @channel = Flamethrower::IrcChannel.new("#flamethrower")
+    @server.channels << @channel
     @dispatcher = Flamethrower::Dispatcher.new(@server)
   end
 
@@ -80,8 +82,26 @@ describe Flamethrower::Dispatcher do
   describe "#join" do
     it "responds with a topic and userlist if sent a join" do
       message = Flamethrower::Message.new("JOIN #flamethrower\r\n")
-      @server.should_receive(:send_topic).with("#flamethrower")
+      @server.should_receive(:send_topic).with(@channel)
       @server.should_receive(:send_userlist)
+      @dispatcher.handle_message(message)
+    end
+
+    it "adds the current user to the channel" do
+      user = Flamethrower::IrcUser.new :username => "user", :nickname => "nick", :hostname => "host", :realname => "realname", :servername => "servername"
+      @server.current_user = user
+      message = Flamethrower::Message.new("JOIN #flamethrower\r\n")
+      @dispatcher.handle_message(message)
+      @channel.users.should include(user)
+    end
+
+    it "responds with ERR_BADCHANNELKEY a channel that doesn't exist" do
+      user = Flamethrower::IrcUser.new :username => "user", :nickname => "nick", :hostname => "host", :realname => "realname", :servername => "servername"
+      @server.current_user = user
+      message = Flamethrower::Message.new("JOIN #foobar\r\n")
+      @server.should_receive(:send_message).with(":#{user.hostname} 475")
+      @server.should_not_receive(:send_topic)
+      @server.should_not_receive(:send_userlist)
       @dispatcher.handle_message(message)
     end
   end
