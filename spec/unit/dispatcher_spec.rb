@@ -51,8 +51,18 @@ describe Flamethrower::Dispatcher do
       end
 
       it "responds with the user mode if the mode isn't for a channel" do
-        message = Flamethrower::Message.new("MODE blake +i\r\n")
-        @dispatcher.server.should_receive(:send_message)
+        user = Flamethrower::IrcUser.new :username => "user", :nickname => "nick", :hostname => "host", :realname => "realname", :servername => "servername"
+        @server.current_user = user
+        message = Flamethrower::Message.new("MODE #{user.nickname} +i\r\n")
+        @dispatcher.server.should_receive(:send_message).with(":#{user.hostname} 221 #{user.nickname} +i")
+        @dispatcher.handle_message(message)
+      end
+
+      it "responds with unknown command if the mode is neither a server nor the current user" do
+        user = Flamethrower::IrcUser.new :username => "user", :nickname => "nick", :hostname => "host", :realname => "realname", :servername => "servername"
+        @server.current_user = user
+        message = Flamethrower::Message.new("MODE foo\r\n")
+        @dispatcher.server.should_receive(:send_message).with(":#{user.hostname} PLACEHOLDER #{user.nickname} +i")
         @dispatcher.handle_message(message)
       end
     end

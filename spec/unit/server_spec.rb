@@ -47,24 +47,8 @@ describe Flamethrower::Server do
   end
 
   context "#after_connect" do
-
     it "sends motd" do
       @server.should_receive(:send_motd)
-      @server.after_connect
-    end
-
-    it "sends an auto-join" do
-      @server.should_receive(:send_join)
-      @server.after_connect
-    end
-
-    it "sends the current topic" do
-      @server.should_receive(:send_topic)
-      @server.after_connect
-    end
-
-    it "sends a list of userlist" do
-      @server.should_receive(:send_userlist)
       @server.after_connect
     end
   end

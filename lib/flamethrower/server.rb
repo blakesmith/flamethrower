@@ -14,9 +14,6 @@ module Flamethrower
 
     def after_connect
       send_motd
-      send_join
-      send_topic
-      send_userlist(@campfire_users)
     end
 
     def send_message(msg)

@@ -33,7 +33,13 @@ module Flamethrower
     end
 
     def handle_mode(message)
-      server.send_message("MODE #{server.channel} +t") if message.parameters.first == server.channel
+      if message.parameters.first == server.channel
+        server.send_message("MODE #{server.channel} +t")
+      elsif message.parameters.first == server.current_user.nickname
+        server.send_message(":#{server.current_user.hostname} 221 #{server.current_user.nickname} +i")
+      else
+        server.send_message(":#{server.current_user.hostname} PLACEHOLDER #{server.current_user.nickname} +i")
+      end
     end
   end
 end
