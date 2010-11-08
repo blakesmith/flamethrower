@@ -44,7 +44,7 @@ module Flamethrower
       elsif message.parameters.first == server.current_user.nickname
         server.send_message(":#{server.current_user.hostname} 221 #{server.current_user.nickname} +i")
       else
-        server.send_message(":#{server.current_user.hostname} PLACEHOLDER #{server.current_user.nickname} +i")
+        server.send_message(":#{server.current_user.hostname} 421 #{server.current_user.nickname}")
       end
     end
 

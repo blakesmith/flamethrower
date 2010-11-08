@@ -66,7 +66,7 @@ describe Flamethrower::Dispatcher do
 
       it "responds with unknown command if the mode is neither a server nor the current user" do
         message = Flamethrower::Message.new("MODE foo\r\n")
-        @dispatcher.server.should_receive(:send_message).with(":#{@user.hostname} PLACEHOLDER #{@user.nickname} +i")
+        @dispatcher.server.should_receive(:send_message).with(":#{@user.hostname} 421 #{@user.nickname}")
         @dispatcher.handle_message(message)
       end
     end
