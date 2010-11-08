@@ -77,9 +77,10 @@ describe Flamethrower::Server do
     end
 
     it "should have the correct USERLIST format" do
-      @server.send_userlist("&flamethrower", ["bob"]).should == [
-        ":host 353 nick = &flamethrower :@nick bob",
-        ":host 366 nick &flamethrower :/End of /NAMES list"
+      channel = Flamethrower::IrcChannel.new("#flamethrower")
+      @server.send_userlist(channel, ["bob"]).should == [
+        ":host 353 nick = #flamethrower :@nick bob",
+        ":host 366 nick #flamethrower :/End of /NAMES list"
       ]
     end
   end

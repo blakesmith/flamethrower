@@ -15,8 +15,8 @@ module Flamethrower
     def send_userlist(channel, users)
       send_messages do |messages|
         display_users = (["@#{@current_user.nickname}"] + users).join("\s")
-        messages << ":#{@current_user.hostname} 353 #{@current_user.nickname} = #{channel} :#{display_users}"
-        messages << ":#{@current_user.hostname} 366 #{@current_user.nickname} #{channel} :/End of /NAMES list"
+        messages << ":#{@current_user.hostname} 353 #{@current_user.nickname} = #{channel.name} :#{display_users}"
+        messages << ":#{@current_user.hostname} 366 #{@current_user.nickname} #{channel.name} :/End of /NAMES list"
       end
     end
   end

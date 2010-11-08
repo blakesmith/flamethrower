@@ -45,27 +45,28 @@ describe Flamethrower::Dispatcher do
   end
 
   describe "#mode" do
+    before do
+      @user = Flamethrower::IrcUser.new :username => "user", :nickname => "nick", :hostname => "host", :realname => "realname", :servername => "servername"
+      @server.current_user = @user
+    end
+
     context "channel mode" do
       it "responds to mode with a static channel mode" do
         @server.channels << Flamethrower::IrcChannel.new("#flamethrower")
         message = Flamethrower::Message.new("MODE #flamethrower\r\n")
-        @dispatcher.server.should_receive(:send_message).with("MODE #flamethrower +t")
+        @dispatcher.server.should_receive(:send_message).with(":host 324 nick #flamethrower +t")
         @dispatcher.handle_message(message)
       end
 
       it "responds with the user mode if the mode isn't for a channel" do
-        user = Flamethrower::IrcUser.new :username => "user", :nickname => "nick", :hostname => "host", :realname => "realname", :servername => "servername"
-        @server.current_user = user
-        message = Flamethrower::Message.new("MODE #{user.nickname} +i\r\n")
-        @dispatcher.server.should_receive(:send_message).with(":#{user.hostname} 221 #{user.nickname} +i")
+        message = Flamethrower::Message.new("MODE #{@user.nickname} +i\r\n")
+        @dispatcher.server.should_receive(:send_message).with(":#{@user.hostname} 221 #{@user.nickname} +i")
         @dispatcher.handle_message(message)
       end
 
       it "responds with unknown command if the mode is neither a server nor the current user" do
-        user = Flamethrower::IrcUser.new :username => "user", :nickname => "nick", :hostname => "host", :realname => "realname", :servername => "servername"
-        @server.current_user = user
         message = Flamethrower::Message.new("MODE foo\r\n")
-        @dispatcher.server.should_receive(:send_message).with(":#{user.hostname} PLACEHOLDER #{user.nickname} +i")
+        @dispatcher.server.should_receive(:send_message).with(":#{@user.hostname} PLACEHOLDER #{@user.nickname} +i")
         @dispatcher.handle_message(message)
       end
     end
