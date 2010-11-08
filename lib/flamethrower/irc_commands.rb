@@ -9,15 +9,21 @@ module Flamethrower
     end
 
     def send_topic(channel)
-      send_message ":#{@current_user.hostname} 332 #{@current_user.nickname} #{channel.name} :#{channel.topic}"
+      send_message reply(332, "#{channel.name} :#{channel.topic}")
     end
 
     def send_userlist(channel, users)
       send_messages do |messages|
         display_users = (["@#{@current_user.nickname}"] + users).join("\s")
-        messages << ":#{@current_user.hostname} 353 #{@current_user.nickname} = #{channel.name} :#{display_users}"
-        messages << ":#{@current_user.hostname} 366 #{@current_user.nickname} #{channel.name} :/End of /NAMES list"
+        messages << reply(353, "= #{channel.name} :#{display_users}")
+        messages << reply(366, "#{channel.name} :/End of /NAMES list")
       end
+    end
+
+    private
+
+    def reply(code, message)
+      ":#{@current_user.hostname} #{code} #{@current_user.nickname} #{message}"
     end
   end
 end
