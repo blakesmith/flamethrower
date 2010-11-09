@@ -4,6 +4,7 @@ require 'rubygems'
 require 'eventmachine'
 require 'logger'
 
+require 'irc_codes'
 require 'irc_commands'
 require 'tinder_commands'
 require 'server'

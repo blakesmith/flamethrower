@@ -1,31 +1,33 @@
 module Flamethrower
-  module IRCcommands
+  module IrcCommands
+    include Flamethrower::IrcCodes
+
     def send_motd
       send_messages do |messages|
-        messages << reply(375, ":MOTD")
-        messages << reply(372, ":Welcome to Flamethrower")
-        messages << reply(376, ":/End of /MOTD command")
+        messages << reply(RPL_MOTDSTART, ":MOTD")
+        messages << reply(RPL_MOTD, ":Welcome to Flamethrower")
+        messages << reply(RPL_ENDOFMOTD, ":/End of /MOTD command")
       end
     end
 
     def send_topic(channel)
-      send_message reply(332, "#{channel.name} :#{channel.topic}")
+      send_message reply(RPL_TOPIC, "#{channel.name} :#{channel.topic}")
     end
 
     def send_userlist(channel, users)
       send_messages do |messages|
         display_users = (["@#{@current_user.nickname}"] + users).join("\s")
-        messages << reply(353, "= #{channel.name} :#{display_users}")
-        messages << reply(366, "#{channel.name} :/End of /NAMES list")
+        messages << reply(RPL_NAMEREPLY, "= #{channel.name} :#{display_users}")
+        messages << reply(RPL_ENDOFNAMES, "#{channel.name} :/End of /NAMES list")
       end
     end
 
     def send_channel_mode(channel)
-      send_message reply(324, "#{channel.name} +t")
+      send_message reply(RPL_CHANNELMODEIS, "#{channel.name} +t")
     end
 
     def send_user_mode
-      send_message reply(221, "+i")
+      send_message reply(RPL_UMODEIS, "+i")
     end
 
     def reply(code, message)

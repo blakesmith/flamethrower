@@ -1,6 +1,6 @@
 module Flamethrower
   module Server
-    include Flamethrower::IRCcommands
+    include Flamethrower::IrcCommands
     include Flamethrower::Tindercommands
 
     attr_accessor :campfire_users, :current_user, :dispatcher, :log, :channels
