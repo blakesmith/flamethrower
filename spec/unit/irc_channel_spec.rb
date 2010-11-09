@@ -19,4 +19,8 @@ describe Flamethrower::IrcChannel do
     @channel.users << user
     @channel.users.should include(user)
   end
+
+  it "returns the channel mode from an array of modes" do
+    @channel.mode.should == "+t"
+  end
 end

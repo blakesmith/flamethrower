@@ -23,11 +23,11 @@ module Flamethrower
     end
 
     def send_channel_mode(channel)
-      send_message reply(RPL_CHANNELMODEIS, "#{channel.name} +t")
+      send_message reply(RPL_CHANNELMODEIS, "#{channel.name} #{channel.mode}")
     end
 
     def send_user_mode
-      send_message reply(RPL_UMODEIS, "+i")
+      send_message reply(RPL_UMODEIS, @current_user.mode)
     end
 
     def reply(code, message)

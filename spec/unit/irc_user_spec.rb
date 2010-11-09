@@ -53,4 +53,8 @@ describe Flamethrower::IrcUser do
     end
   end
 
+  it "displays user mode given an array of modes" do
+    @user.mode.should == "+i"
+  end
+
 end
