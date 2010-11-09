@@ -52,21 +52,23 @@ describe Flamethrower::Dispatcher do
 
     context "channel mode" do
       it "responds to mode with a static channel mode" do
-        @server.channels << Flamethrower::IrcChannel.new("#flamethrower")
+        channel = Flamethrower::IrcChannel.new("#flamethrower")
+        @server.channels << channel
+        @dispatcher.stub(:find_channel).and_return(channel)
         message = Flamethrower::Message.new("MODE #flamethrower\r\n")
-        @dispatcher.server.should_receive(:send_message).with(":host 324 nick #flamethrower +t")
+        @dispatcher.server.should_receive(:send_channel_mode).with(channel)
         @dispatcher.handle_message(message)
       end
 
       it "responds with the user mode if the mode isn't for a channel" do
         message = Flamethrower::Message.new("MODE #{@user.nickname} +i\r\n")
-        @dispatcher.server.should_receive(:send_message).with(":#{@user.hostname} 221 #{@user.nickname} +i")
+        @dispatcher.server.should_receive(:send_user_mode)
         @dispatcher.handle_message(message)
       end
 
       it "responds with unknown command if the mode is neither a server nor the current user" do
         message = Flamethrower::Message.new("MODE foo\r\n")
-        @dispatcher.server.should_receive(:send_message).with(":#{@user.hostname} 421 #{@user.nickname}")
+        @dispatcher.server.should_receive(:send_message).with(":#{@user.hostname} 421")
         @dispatcher.handle_message(message)
       end
     end

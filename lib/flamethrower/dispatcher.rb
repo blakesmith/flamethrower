@@ -40,11 +40,12 @@ module Flamethrower
 
     def handle_mode(message)
       if server.channels.map(&:name).include?(message.parameters.first)
-        server.send_message(":#{server.current_user.hostname} 324 #{server.current_user.nickname} #{message.parameters.first} +t")
+        channel = find_channel(message.parameters.first)
+        server.send_channel_mode(channel)
       elsif message.parameters.first == server.current_user.nickname
-        server.send_message(":#{server.current_user.hostname} 221 #{server.current_user.nickname} +i")
+        server.send_user_mode
       else
-        server.send_message(":#{server.current_user.hostname} 421 #{server.current_user.nickname}")
+        server.send_message(server.error(421))
       end
     end
 
@@ -55,7 +56,7 @@ module Flamethrower
         server.send_topic(channel)
         server.send_userlist(channel, server.campfire_users)
       else
-        server.send_message(":#{server.current_user.hostname} 475")
+        server.send_message(server.error(475))
       end
     end
   end

@@ -2,9 +2,9 @@ module Flamethrower
   module IRCcommands
     def send_motd
       send_messages do |messages|
-        messages << ":#{@current_user.hostname} 375 #{@current_user.nickname} :MOTD"
-        messages << ":#{@current_user.hostname} 372 #{@current_user.nickname} :Welcome to Flamethrower"
-        messages << ":#{@current_user.hostname} 376 #{@current_user.nickname} :/End of /MOTD command"
+        messages << reply(375, ":MOTD")
+        messages << reply(372, ":Welcome to Flamethrower")
+        messages << reply(376, ":/End of /MOTD command")
       end
     end
 
@@ -20,10 +20,20 @@ module Flamethrower
       end
     end
 
-    private
+    def send_channel_mode(channel)
+      send_message reply(324, "#{channel.name} +t")
+    end
+
+    def send_user_mode
+      send_message reply(221, "+i")
+    end
 
     def reply(code, message)
       ":#{@current_user.hostname} #{code} #{@current_user.nickname} #{message}"
+    end
+
+    def error(code)
+      ":#{@current_user.hostname} #{code}"
     end
   end
 end

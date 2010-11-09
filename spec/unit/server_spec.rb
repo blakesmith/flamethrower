@@ -5,7 +5,8 @@ describe Flamethrower::Server do
     @server = Flamethrower::MockServer.new
     @server.log = Logger.new("/dev/null")
     @server.stub!(:send_data)
-    @server.current_user = Flamethrower::IrcUser.new :username => 'user', :nickname => 'nick', :hostname => 'host', :realname => 'realname'
+    @user = Flamethrower::IrcUser.new :username => 'user', :nickname => 'nick', :hostname => 'host', :realname => 'realname'
+    @server.current_user = @user
   end
 
   describe "#send_message" do
@@ -68,6 +69,15 @@ describe Flamethrower::Server do
         ":host 372 nick :Welcome to Flamethrower",
         ":host 376 nick :/End of /MOTD command"
       ]
+    end
+
+    it "should send the channel mode" do
+      channel = Flamethrower::IrcChannel.new("#flamethrower")
+      @server.send_channel_mode(channel).should == ":host 324 nick #flamethrower +t"
+    end
+
+    it "should send the current user mode" do
+      @server.send_user_mode.should == ":host 221 nick +i"
     end
 
     it "should have the correct TOPIC format" do
