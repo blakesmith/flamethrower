@@ -14,10 +14,24 @@ describe Flamethrower::CampfireConnection do
 
   describe "#store_messages" do
     it "iterates over each stream item and sends to the campfire dispatcher" do
-      items = ["one"]
-      @connection.stream.stub(:each_item).and_yield(items.first)
+      item = "one"
+      @connection.stream.stub(:each_item).and_yield(item)
       @connection.store_messages
-      @connection.messages.should == items
+      @connection.messages.pop.should == item
+    end
+  end
+
+  describe "#retrieve_messages" do
+    it "returns all the messages in the message buffer" do
+      @connection.messages << "one"
+      @connection.messages << "two"
+      @connection.retrieve_messages.should == ["one", "two"]
+    end
+
+    it "pops the messages from the messages array" do
+      @connection.messages << "one"
+      @connection.retrieve_messages.should == ["one"]
+      @connection.messages.size.should == 0
     end
   end
 end

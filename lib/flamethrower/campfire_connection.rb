@@ -1,12 +1,12 @@
 module Flamethrower
   class CampfireConnection
-    attr_reader :stream, :messages
+    attr_reader :stream
+    attr_accessor :messages
 
     def initialize(room_num, token)
       @room_num = room_num
       @token = token
-      @messages = []
-      @mutex = Mutex.new
+      @messages = Queue.new
     end
 
     def connect
@@ -17,9 +17,15 @@ module Flamethrower
 
     def store_messages
       @stream.each_item do |item| 
-        @mutex.synchronize do
-          @messages << item 
-        end
+	@messages << item 
+      end
+    end
+
+    def retrieve_messages
+      Array.new.tap do |new_array|
+	until @messages.empty?
+	  new_array << @messages.pop
+	end
       end
     end
   end
