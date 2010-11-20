@@ -2,36 +2,50 @@ require File.join(File.dirname(__FILE__), "../spec_helper")
 
 describe Flamethrower::CampfireRoom do
   before do
-    @connection = Flamethrower::CampfireRoom.new(1234, "mytoken")
+    @room = Flamethrower::CampfireRoom.new("mytoken", "id" => 1234, "topic" => "some topic", "name" => "some name")
+  end
+
+  describe "params" do
+    it "has number" do
+      @room.number.should == 1234
+    end
+    
+    it "has topic" do
+      @room.topic.should == "some topic"
+    end
+
+    it "has name" do
+      @room.name.should == "some name"
+    end
   end
 
   describe "#connect" do
     it "initializes the twitter jsonstream with the right options" do
       Twitter::JSONStream.should_receive(:connect).with(:path => "/room/1234/live.json", :host => "streaming.campfirenow.com", :auth => "mytoken:x")
-      @connection.connect
+      @room.connect
     end
   end
 
   describe "#store_messages" do
     it "iterates over each stream item and sends to the campfire dispatcher" do
       item = "one"
-      @connection.stream.stub(:each_item).and_yield(item)
-      @connection.store_messages
-      @connection.messages.pop.should == item
+      @room.stream.stub(:each_item).and_yield(item)
+      @room.store_messages
+      @room.messages.pop.should == item
     end
   end
 
   describe "#retrieve_messages" do
     it "returns all the messages in the message buffer" do
-      @connection.messages << "one"
-      @connection.messages << "two"
-      @connection.retrieve_messages.should == ["one", "two"]
+      @room.messages << "one"
+      @room.messages << "two"
+      @room.retrieve_messages.should == ["one", "two"]
     end
 
     it "pops the messages from the messages array" do
-      @connection.messages << "one"
-      @connection.retrieve_messages.should == ["one"]
-      @connection.messages.size.should == 0
+      @room.messages << "one"
+      @room.retrieve_messages.should == ["one"]
+      @room.messages.size.should == 0
     end
   end
 end
