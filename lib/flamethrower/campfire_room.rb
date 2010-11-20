@@ -1,5 +1,5 @@
 module Flamethrower
-  class CampfireConnection
+  class CampfireRoom
     attr_reader :stream
     attr_accessor :messages
 

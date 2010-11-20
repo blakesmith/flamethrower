@@ -1,8 +1,8 @@
 require File.join(File.dirname(__FILE__), "../spec_helper")
 
-describe Flamethrower::CampfireConnection do
+describe Flamethrower::CampfireRoom do
   before do
-    @connection = Flamethrower::CampfireConnection.new(1234, "mytoken")
+    @connection = Flamethrower::CampfireRoom.new(1234, "mytoken")
   end
 
   describe "#connect" do
