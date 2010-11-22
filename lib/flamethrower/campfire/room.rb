@@ -3,7 +3,7 @@ module Flamethrower
     class Room
       include Flamethrower::Campfire::RestApi
 
-      attr_reader :stream
+      attr_reader :stream, :token
       attr_accessor :messages, :number, :name, :topic, :users
 
       def initialize(domain, token, params = {})
@@ -17,7 +17,7 @@ module Flamethrower
       end
 
       def fetch_room_info
-        response = http.get("/room/#{@number}.json")
+        response = campfire_get("/room/#{@number}.json")
         json = JSON.parse(response.body)
         json['room']['users'].each do |user|
           @users << Flamethrower::Campfire::User.new(user)

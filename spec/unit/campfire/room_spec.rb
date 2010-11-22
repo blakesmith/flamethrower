@@ -21,9 +21,15 @@ describe Flamethrower::Campfire::Room do
 
   describe "#fetch_room_info" do
     it "retrieves a list of users and stores them as user objects" do
-      FakeWeb.register_uri(:get, "https://mydomain.campfirenow.com/room/347348.json", :body => json_fixture("room"), :status => ["200", "OK"])
+      FakeWeb.register_uri(:get, "https://mytoken:x@mydomain.campfirenow.com/room/347348.json", :body => json_fixture("room"), :status => ["200", "OK"])
       @room.fetch_room_info
       @room.users.all? {|u| u.is_a?(Flamethrower::Campfire::User)}.should be_true
+    end
+
+    it "makes the http request with a token in basic auth" do
+      FakeWeb.register_uri(:get, "https://mytoken:x@mydomain.campfirenow.com/room/347348.json", :body => json_fixture("room"), :status => ["200", "OK"])
+      @room.fetch_room_info
+      FakeWeb.last_request['authorization'].should == "Basic #{Base64::encode64("#{@room.token}:x").chomp}"
     end
   end
 

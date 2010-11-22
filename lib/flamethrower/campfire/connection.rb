@@ -1,6 +1,8 @@
 module Flamethrower
   module Campfire
     class Connection
+      attr_reader :token
+
       include Flamethrower::Campfire::RestApi
 
       def initialize(domain, token)
@@ -9,7 +11,7 @@ module Flamethrower
       end
 
       def rooms
-        response = http.get("/rooms.json")
+        response = campfire_get("/rooms.json")
         Array.new.tap do |rooms|
           case response
           when Net::HTTPSuccess

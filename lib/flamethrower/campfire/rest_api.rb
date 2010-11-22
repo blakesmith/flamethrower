@@ -13,6 +13,12 @@ module Flamethrower
         end
       end
 
+      def campfire_get(path)
+        get = Net::HTTP::Get.new(path)
+        get.basic_auth @token, 'x'
+        http.request(get)
+      end
+
     end
   end
 end
