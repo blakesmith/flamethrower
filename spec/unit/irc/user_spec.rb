@@ -1,13 +1,13 @@
-require File.join(File.dirname(__FILE__), "../spec_helper")
+require File.join(File.dirname(__FILE__), "../../spec_helper")
 
-describe Flamethrower::IrcUser do
+describe Flamethrower::Irc::User do
   before do
-    @user = Flamethrower::IrcUser.new
+    @user = Flamethrower::Irc::User.new
   end
 
   context "storing initial arguments" do
     before do
-      @initial_user = Flamethrower::IrcUser.new :username => "user", :nickname => "nick", :hostname => "host", :realname => "realname", :servername => "servername"
+      @initial_user = Flamethrower::Irc::User.new :username => "user", :nickname => "nick", :hostname => "host", :realname => "realname", :servername => "servername"
     end
 
     it "should have user" do
@@ -33,23 +33,23 @@ describe Flamethrower::IrcUser do
 
   describe "#nick_set?" do
     it "returns true if nickname is set" do
-      user = Flamethrower::IrcUser.new :nickname => "nick"
+      user = Flamethrower::Irc::User.new :nickname => "nick"
       user.nick_set?.should be_true
     end
 
     it "returns false if nickname is not set" do
-      Flamethrower::IrcUser.new.nick_set?.should be_false
+      Flamethrower::Irc::User.new.nick_set?.should be_false
     end
   end
 
   describe "#user_set?" do
     it "returns true if username, hostname, realname, servername are set" do
-      user = Flamethrower::IrcUser.new :username => "user", :hostname => "host", :realname => "realname", :servername => "servername"
+      user = Flamethrower::Irc::User.new :username => "user", :hostname => "host", :realname => "realname", :servername => "servername"
       user.user_set?.should be_true
     end
 
     it "returns true if username, hostname, realname, servername are set" do
-      Flamethrower::IrcUser.new.user_set?.should be_false
+      Flamethrower::Irc::User.new.user_set?.should be_false
     end
   end
 

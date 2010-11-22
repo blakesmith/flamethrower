@@ -5,7 +5,7 @@ describe Flamethrower::Server do
     @server = Flamethrower::MockServer.new
     @server.log = Logger.new("/dev/null")
     @server.stub!(:send_data)
-    @user = Flamethrower::IrcUser.new :username => 'user', :nickname => 'nick', :hostname => 'host', :realname => 'realname'
+    @user = Flamethrower::Irc::User.new :username => 'user', :nickname => 'nick', :hostname => 'host', :realname => 'realname'
     @server.current_user = @user
   end
 
@@ -56,7 +56,7 @@ describe Flamethrower::Server do
 
   describe "channels" do
     it "stores the list of channels on the server" do
-      channel = Flamethrower::IrcChannel.new("#flamethrower")
+      channel = Flamethrower::Irc::Channel.new("#flamethrower")
       @server.channels << channel
       @server.channels.should include(channel)
     end
@@ -72,7 +72,7 @@ describe Flamethrower::Server do
     end
 
     it "should send the channel mode" do
-      channel = Flamethrower::IrcChannel.new("#flamethrower")
+      channel = Flamethrower::Irc::Channel.new("#flamethrower")
       @server.send_channel_mode(channel).should == ":host 324 nick #flamethrower +t"
     end
 
@@ -81,13 +81,13 @@ describe Flamethrower::Server do
     end
 
     it "should have the correct TOPIC format" do
-      channel = Flamethrower::IrcChannel.new("#flamethrower")
+      channel = Flamethrower::Irc::Channel.new("#flamethrower")
       channel.topic = "A topic"
       @server.send_topic(channel).should == ":host 332 nick #flamethrower :A topic"
     end
 
     it "should have the correct USERLIST format" do
-      channel = Flamethrower::IrcChannel.new("#flamethrower")
+      channel = Flamethrower::Irc::Channel.new("#flamethrower")
       @server.send_userlist(channel, ["bob"]).should == [
         ":host 353 nick = #flamethrower :@nick bob",
         ":host 366 nick #flamethrower :/End of /NAMES list"

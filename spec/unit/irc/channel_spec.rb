@@ -1,8 +1,8 @@
-require File.join(File.dirname(__FILE__), "../spec_helper")
+require File.join(File.dirname(__FILE__), "../../spec_helper")
 
-describe Flamethrower::IrcChannel do
+describe Flamethrower::Irc::Channel do
   before do
-    @channel = Flamethrower::IrcChannel.new("#flamethrower")
+    @channel = Flamethrower::Irc::Channel.new("#flamethrower")
   end
 
   it "returns the current channel name" do
@@ -15,7 +15,7 @@ describe Flamethrower::IrcChannel do
   end
 
   it "returns the current user list" do
-    user = Flamethrower::IrcUser.new
+    user = Flamethrower::Irc::User.new
     @channel.users << user
     @channel.users.should include(user)
   end

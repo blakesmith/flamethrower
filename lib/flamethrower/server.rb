@@ -1,7 +1,6 @@
 module Flamethrower
   module Server
-    include Flamethrower::IrcCommands
-    include Flamethrower::Tindercommands
+    include Flamethrower::Irc::Commands
 
     attr_accessor :campfire_users, :current_user, :dispatcher, :log, :channels
 
@@ -9,7 +8,7 @@ module Flamethrower
       @log = log
       @campfire_users ||= []
       @channels = []
-      @current_user ||= Flamethrower::IrcUser.new
+      @current_user ||= Flamethrower::Irc::User.new
       @dispatcher ||= Flamethrower::Dispatcher.new(self)
     end
 

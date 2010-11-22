@@ -1,8 +1,8 @@
-require File.join(File.dirname(__FILE__), "../spec_helper")
+require File.join(File.dirname(__FILE__), "../../spec_helper")
 
-describe Flamethrower::CampfireConnection do
+describe Flamethrower::Campfire::Connection do
   before do
-    @connection = Flamethrower::CampfireConnection.new("mydomain", "mytoken")
+    @connection = Flamethrower::Campfire::Connection.new("mydomain", "mytoken")
     FakeWeb.allow_net_connect = false
   end
 

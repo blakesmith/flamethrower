@@ -45,7 +45,7 @@ module Flamethrower
       elsif message.parameters.first == server.current_user.nickname
         server.send_user_mode
       else
-        server.send_message(server.error(Flamethrower::IrcCodes::ERR_UNKNOWNCOMMAND))
+        server.send_message(server.error(Flamethrower::Irc::Codes::ERR_UNKNOWNCOMMAND))
       end
     end
 
@@ -56,7 +56,7 @@ module Flamethrower
         server.send_topic(channel)
         server.send_userlist(channel, server.campfire_users)
       else
-        server.send_message(server.error(Flamethrower::IrcCodes::ERR_BADCHANNELKEY))
+        server.send_message(server.error(Flamethrower::Irc::Codes::ERR_BADCHANNELKEY))
       end
     end
   end

@@ -3,7 +3,7 @@ require File.join(File.dirname(__FILE__), "../spec_helper")
 describe Flamethrower::Dispatcher do
   before do
     @server = Flamethrower::MockServer.new(Logger.new("/dev/null"))
-    @channel = Flamethrower::IrcChannel.new("#flamethrower")
+    @channel = Flamethrower::Irc::Channel.new("#flamethrower")
     @server.channels << @channel
     @dispatcher = Flamethrower::Dispatcher.new(@server)
   end
@@ -46,13 +46,13 @@ describe Flamethrower::Dispatcher do
 
   describe "#mode" do
     before do
-      @user = Flamethrower::IrcUser.new :username => "user", :nickname => "nick", :hostname => "host", :realname => "realname", :servername => "servername"
+      @user = Flamethrower::Irc::User.new :username => "user", :nickname => "nick", :hostname => "host", :realname => "realname", :servername => "servername"
       @server.current_user = @user
     end
 
     context "channel mode" do
       it "responds to mode with a static channel mode" do
-        channel = Flamethrower::IrcChannel.new("#flamethrower")
+        channel = Flamethrower::Irc::Channel.new("#flamethrower")
         @server.channels << channel
         @dispatcher.stub(:find_channel).and_return(channel)
         message = Flamethrower::Message.new("MODE #flamethrower\r\n")
@@ -91,7 +91,7 @@ describe Flamethrower::Dispatcher do
     end
 
     it "adds the current user to the channel" do
-      user = Flamethrower::IrcUser.new :username => "user", :nickname => "nick", :hostname => "host", :realname => "realname", :servername => "servername"
+      user = Flamethrower::Irc::User.new :username => "user", :nickname => "nick", :hostname => "host", :realname => "realname", :servername => "servername"
       @server.current_user = user
       message = Flamethrower::Message.new("JOIN #flamethrower\r\n")
       @dispatcher.handle_message(message)
@@ -99,7 +99,7 @@ describe Flamethrower::Dispatcher do
     end
 
     it "responds with ERR_BADCHANNELKEY a channel that doesn't exist" do
-      user = Flamethrower::IrcUser.new :username => "user", :nickname => "nick", :hostname => "host", :realname => "realname", :servername => "servername"
+      user = Flamethrower::Irc::User.new :username => "user", :nickname => "nick", :hostname => "host", :realname => "realname", :servername => "servername"
       @server.current_user = user
       message = Flamethrower::Message.new("JOIN #foobar\r\n")
       @server.should_receive(:send_message).with(":#{user.hostname} 475")

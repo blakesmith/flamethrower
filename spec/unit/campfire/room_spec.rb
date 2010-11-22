@@ -1,8 +1,8 @@
-require File.join(File.dirname(__FILE__), "../spec_helper")
+require File.join(File.dirname(__FILE__), "../../spec_helper")
 
-describe Flamethrower::CampfireRoom do
+describe Flamethrower::Campfire::Room do
   before do
-    @room = Flamethrower::CampfireRoom.new("mydomain", "mytoken", "id" => 347348, "topic" => "some topic", "name" => "some name")
+    @room = Flamethrower::Campfire::Room.new("mydomain", "mytoken", "id" => 347348, "topic" => "some topic", "name" => "some name")
   end
 
   describe "params" do
