@@ -2,12 +2,12 @@ require File.join(File.dirname(__FILE__), "../spec_helper")
 
 describe Flamethrower::CampfireRoom do
   before do
-    @room = Flamethrower::CampfireRoom.new("mytoken", "id" => 1234, "topic" => "some topic", "name" => "some name")
+    @room = Flamethrower::CampfireRoom.new("mydomain", "mytoken", "id" => 347348, "topic" => "some topic", "name" => "some name")
   end
 
   describe "params" do
     it "has number" do
-      @room.number.should == 1234
+      @room.number.should == 347348
     end
     
     it "has topic" do
@@ -19,9 +19,17 @@ describe Flamethrower::CampfireRoom do
     end
   end
 
+  describe "#fetch_room_info" do
+    it "retrieves a list of users and stores them as user objects" do
+      FakeWeb.register_uri(:get, "https://mydomain.campfirenow.com/room/347348.json", :body => json_fixture("room"), :status => ["200", "OK"])
+      @room.fetch_room_info
+      @room.users.all? {|u| u.is_a?(Flamethrower::Campfire::User)}.should be_true
+    end
+  end
+
   describe "#connect" do
     it "initializes the twitter jsonstream with the right options" do
-      Twitter::JSONStream.should_receive(:connect).with(:path => "/room/1234/live.json", :host => "streaming.campfirenow.com", :auth => "mytoken:x")
+      Twitter::JSONStream.should_receive(:connect).with(:path => "/room/347348/live.json", :host => "streaming.campfirenow.com", :auth => "mytoken:x")
       @room.connect
     end
   end

@@ -1,6 +1,10 @@
 $:.unshift File.join(File.dirname(__FILE__), "flamethrower")
 
 require 'rubygems'
+require 'bundler'
+
+Bundler.setup
+
 require 'eventmachine'
 require 'twitter/json_stream'
 require 'logger'
@@ -9,6 +13,8 @@ require 'json'
 require 'irc_codes'
 require 'irc_commands'
 require 'tinder_commands'
+require 'campfire_rest_api'
+require 'campfire/user'
 require 'campfire_connection'
 require 'campfire_room'
 require 'server'

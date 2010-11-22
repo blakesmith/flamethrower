@@ -1,9 +1,10 @@
 module Flamethrower
   class CampfireConnection
+    include Flamethrower::Campfire::RestApi
+
     def initialize(domain, token)
       @domain = domain
       @token = token
-      @host = "#{domain}.campfirenow.com"
     end
 
     def rooms
@@ -13,17 +14,11 @@ module Flamethrower
         when Net::HTTPSuccess
           json = JSON.parse(response.body)
           json['rooms'].each do |room|
-            rooms << CampfireRoom.new(@token, room)
+            rooms << CampfireRoom.new(@domain, @token, room)
           end
         end
       end
     end
 
-    private
-    def http
-      Net::HTTP.new(@host, 443).tap do |http|
-        http.use_ssl = true
-      end
-    end
   end
 end
