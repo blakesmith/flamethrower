@@ -4,12 +4,12 @@ module Flamethrower
       include Flamethrower::Campfire::RestApi
 
       attr_reader :stream, :token
-      attr_accessor :messages, :number, :name, :topic, :users
+      attr_accessor :inbound_messages, :number, :name, :topic, :users
 
       def initialize(domain, token, params = {})
         @domain = domain
         @token = token
-        @messages = Queue.new
+        @inbound_messages = Queue.new
         @number = params['id']
         @name = params['name']
         @topic = params['topic']
@@ -30,19 +30,19 @@ module Flamethrower
                                     :auth => "#{@token}:x")
       end
 
-      def store_messages
+      def fetch_messages
         @stream.each_item do |item| 
           params = JSON.parse(item)
           params['user'] = @users.first {|u| u.number == params['user']['id'] }
           params['room'] = self
-          @messages << Flamethrower::Campfire::Message.new(params)
+          @inbound_messages << Flamethrower::Campfire::Message.new(params)
         end
       end
 
       def retrieve_messages
         Array.new.tap do |new_array|
-          until @messages.empty?
-            new_array << @messages.pop
+          until @inbound_messages.empty?
+            new_array << @inbound_messages.pop
           end
         end
       end

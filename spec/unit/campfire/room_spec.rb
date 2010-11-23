@@ -43,7 +43,7 @@ describe Flamethrower::Campfire::Room do
     end
   end
 
-  describe "#store_messages" do
+  describe "#fetch_messages" do
     before do
       Twitter::JSONStream.stub(:connect).and_return("stream")
       item = json_fixture("message")
@@ -52,39 +52,39 @@ describe Flamethrower::Campfire::Room do
     end
 
     it "iterates over each stream item and sends to the message queue" do
-      @room.store_messages
-      @room.messages.size.should == 1
+      @room.fetch_messages
+      @room.inbound_messages.size.should == 1
     end
 
     it "maps the message body to a message object with the right body" do
-      @room.store_messages
-      @room.messages.pop.body.should == "Wait for the message."
+      @room.fetch_messages
+      @room.inbound_messages.pop.body.should == "Wait for the message."
     end
 
     it "maps the message sender to the right user" do
       user = Flamethrower::Campfire::User.new('name' => "bob", 'id' => 734581)
       @room.users << user
-      @room.store_messages
-      @room.messages.pop.user.should == user
+      @room.fetch_messages
+      @room.inbound_messages.pop.user.should == user
     end
 
     it "maps the message room to the right room" do
-      @room.store_messages
-      @room.messages.pop.room.should == @room
+      @room.fetch_messages
+      @room.inbound_messages.pop.room.should == @room
     end
   end
 
   describe "#retrieve_messages" do
     it "returns all the messages in the message buffer" do
-      @room.messages << "one"
-      @room.messages << "two"
+      @room.inbound_messages << "one"
+      @room.inbound_messages << "two"
       @room.retrieve_messages.should == ["one", "two"]
     end
 
     it "pops the messages from the messages array" do
-      @room.messages << "one"
+      @room.inbound_messages << "one"
       @room.retrieve_messages.should == ["one"]
-      @room.messages.size.should == 0
+      @room.inbound_messages.size.should == 0
     end
   end
 
