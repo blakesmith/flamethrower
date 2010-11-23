@@ -31,6 +31,7 @@ describe Flamethrower::Campfire::Room do
       @room.fetch_room_info
       FakeWeb.last_request['authorization'].should == "Basic #{Base64::encode64("#{@room.token}:x").chomp}"
     end
+
   end
 
   describe "#connect" do
@@ -60,6 +61,41 @@ describe Flamethrower::Campfire::Room do
       @room.messages << "one"
       @room.retrieve_messages.should == ["one"]
       @room.messages.size.should == 0
+    end
+  end
+
+  describe "#to_irc" do
+    it "returns an irc channel object" do
+      @room.to_irc.is_a?(Flamethrower::Irc::Channel).should be_true
+    end
+
+    context "channel name" do
+      it "maps the campfire room name to the channel name" do
+        @room.name = "somename"
+        @room.to_irc.name.should == "#somename"
+      end
+
+      it "downcases channel names" do
+        @room.name = "Somename"
+        @room.to_irc.name.should == "#somename"
+      end
+
+      it "separates replaces name spaces with underscores" do
+        @room.name = "Some Name 1"
+        @room.to_irc.name.should == "#some_name_1"
+      end
+    end
+
+    context "populating users" do
+      it "fills the irc channel's user array with mapped campfire users" do
+        @room.users = [Flamethrower::Campfire::User.new('name' => "bob")]
+        @room.to_irc.users.first.is_a?(Flamethrower::Irc::User).should be_true
+      end
+
+      it "returns the memoized irc channel if to_irc has already been called" do
+        channel = @room.to_irc
+        @room.to_irc.should == channel
+      end
     end
   end
 end

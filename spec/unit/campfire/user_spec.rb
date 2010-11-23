@@ -8,4 +8,17 @@ describe Flamethrower::Campfire::User do
   it "should have name" do
     @user.name.should == "Bob Jackson"
   end
+
+  describe "#to_irc" do
+    it "sets the username and nickname to the campfire user's name" do
+      @user.name = "bob"
+      @user.to_irc.nickname.should == "bob"
+      @user.to_irc.username.should == "bob"
+    end
+
+    it "joins spaced names with underscores" do
+      @user.to_irc.nickname.should == "Bob_Jackson"
+      @user.to_irc.username.should == "Bob_Jackson"
+    end
+  end
 end
