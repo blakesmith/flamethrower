@@ -3,6 +3,7 @@ require File.join(File.dirname(__FILE__), "../../spec_helper")
 describe Flamethrower::Campfire::Room do
   before do
     @room = Flamethrower::Campfire::Room.new("mydomain", "mytoken", "id" => 347348, "topic" => "some topic", "name" => "some name")
+    @user = Flamethrower::Campfire::User.new('name' => "bob", 'id' => 734581)
   end
 
   describe "params" do
@@ -62,15 +63,30 @@ describe Flamethrower::Campfire::Room do
     end
 
     it "maps the message sender to the right user" do
-      user = Flamethrower::Campfire::User.new('name' => "bob", 'id' => 734581)
-      @room.users << user
+      @room.users << @user
       @room.fetch_messages
-      @room.inbound_messages.pop.user.should == user
+      @room.inbound_messages.pop.user.should == @user
     end
 
     it "maps the message room to the right room" do
       @room.fetch_messages
       @room.inbound_messages.pop.room.should == @room
+    end
+  end
+
+  describe "#say" do
+    it "queues a campfire message given a message body" do
+      message = Flamethrower::Campfire::Message.new('body' => 'Hello there', 'user' => @user, 'room' => @room)
+      @room.say('Hello there')
+      popped_message = @room.outbound_messages.pop
+      popped_message.body.should == 'Hello there'
+    end
+
+    it "takes an optional message type" do
+      message = Flamethrower::Campfire::Message.new('type' => 'TextMessage', 'body' => 'Hello there', 'user' => @user, 'room' => @room)
+      @room.say('Hello there', 'TextMessage')
+      popped_message = @room.outbound_messages.pop
+      popped_message.message_type.should == 'TextMessage'
     end
   end
 

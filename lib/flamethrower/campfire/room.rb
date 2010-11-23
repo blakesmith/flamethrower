@@ -4,12 +4,13 @@ module Flamethrower
       include Flamethrower::Campfire::RestApi
 
       attr_reader :stream, :token
-      attr_accessor :inbound_messages, :number, :name, :topic, :users
+      attr_accessor :inbound_messages, :outbound_messages, :number, :name, :topic, :users
 
       def initialize(domain, token, params = {})
         @domain = domain
         @token = token
         @inbound_messages = Queue.new
+        @outbound_messages = Queue.new
         @number = params['id']
         @name = params['name']
         @topic = params['topic']
@@ -22,6 +23,11 @@ module Flamethrower
         json['room']['users'].each do |user|
           @users << Flamethrower::Campfire::User.new(user)
         end
+      end
+
+      def say(body, message_type='TextMessage')
+        params = {'body' => body, 'type' => message_type}
+        @outbound_messages << Flamethrower::Campfire::Message.new(params)
       end
 
       def connect
