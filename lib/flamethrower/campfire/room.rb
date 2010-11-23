@@ -32,7 +32,10 @@ module Flamethrower
 
       def store_messages
         @stream.each_item do |item| 
-          @messages << item
+          params = JSON.parse(item)
+          params['user'] = @users.first {|u| u.number == params['user']['id'] }
+          params['room'] = self
+          @messages << Flamethrower::Campfire::Message.new(params)
         end
       end
 

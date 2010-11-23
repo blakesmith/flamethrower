@@ -1,10 +1,11 @@
 module Flamethrower
   module Campfire
     class User
-      attr_accessor :name
+      attr_accessor :name, :number
 
       def initialize(params = {})
         @name = params['name']
+        @number = params['id']
       end
 
       def to_irc

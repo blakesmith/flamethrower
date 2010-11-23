@@ -17,6 +17,7 @@ require 'irc/channel'
 
 require 'campfire/rest_api'
 require 'campfire/user'
+require 'campfire/message'
 require 'campfire/connection'
 require 'campfire/room'
 

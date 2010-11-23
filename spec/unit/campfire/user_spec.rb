@@ -2,11 +2,15 @@ require File.join(File.dirname(__FILE__), "../../spec_helper")
 
 describe Flamethrower::Campfire::User do
   before do
-    @user = Flamethrower::Campfire::User.new('name' => "Bob Jackson")
+    @user = Flamethrower::Campfire::User.new('name' => "Bob Jackson", 'id' => 1234)
   end
 
   it "should have name" do
     @user.name.should == "Bob Jackson"
+  end
+
+  it "should have the user number (id)" do
+    @user.number.should == 1234
   end
 
   describe "#to_irc" do
