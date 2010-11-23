@@ -45,6 +45,15 @@ module Flamethrower
         end
       end
 
+      def post_messages
+        until @outbound_messages.empty?
+          message = @outbound_messages.pop
+          json = {"message" => {"body" => message.body, "type" => message.message_type}}.to_json
+          response = campfire_post("/room/#{@number}/speak.json", json)
+        end
+        @outbound_messages << message unless response.is_a?(Net::HTTPCreated)
+      end
+
       def retrieve_messages
         Array.new.tap do |new_array|
           until @inbound_messages.empty?

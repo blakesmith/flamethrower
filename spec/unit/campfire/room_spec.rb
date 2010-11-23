@@ -90,6 +90,33 @@ describe Flamethrower::Campfire::Room do
     end
   end
 
+  describe "#post_messages" do
+    it "pops the message off the queue and posts it to the campfire api" do
+      FakeWeb.register_uri(:post, "https://mytoken:x@mydomain.campfirenow.com/room/347348/speak.json", :body => json_fixture("speak_message"), :status => ["201", "Updated"])
+      message = Flamethrower::Campfire::Message.new('type' => 'TextMessage', 'body' => 'Hello there', 'user' => @user, 'room' => @room)
+      @room.outbound_messages << message
+      @room.post_messages
+      @room.outbound_messages.size.should == 0
+    end
+
+    it "re queues the message if it fails to post to the campfire API" do
+      FakeWeb.register_uri(:post, "https://mytoken:x@mydomain.campfirenow.com/room/347348/speak.json", :status => ["400", "Bad Request"])
+      message = Flamethrower::Campfire::Message.new('type' => 'TextMessage', 'body' => 'Hello there', 'user' => @user, 'room' => @room)
+      @room.outbound_messages << message
+      @room.post_messages
+      @room.outbound_messages.size.should == 1
+    end
+
+    it "sends the right json" do
+      FakeWeb.register_uri(:post, "https://mytoken:x@mydomain.campfirenow.com/room/347348/speak.json", :body => json_fixture("speak_message"), :status => ["201", "Updated"])
+      message = Flamethrower::Campfire::Message.new('type' => 'TextMessage', 'body' => 'Hello there', 'user' => @user, 'room' => @room)
+      @room.outbound_messages << message
+      expected_json = {"message"=>{"body"=>"Hello there", "type"=>"TextMessage"}}.to_json
+      @room.should_receive(:campfire_post).with("/room/#{@room.number}/speak.json", expected_json)
+      @room.post_messages
+    end
+  end
+
   describe "#retrieve_messages" do
     it "returns all the messages in the message buffer" do
       @room.inbound_messages << "one"
