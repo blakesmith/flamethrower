@@ -12,6 +12,7 @@ describe Flamethrower::Campfire::Connection do
       room = @connection.rooms.first
       room.number.should == 347348
       room.name.should == "Room 1"
+      room.topic.should == "some topic"
     end
 
     it "makes the http request with a token in basic auth" do
