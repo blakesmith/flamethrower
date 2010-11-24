@@ -107,6 +107,22 @@ describe Flamethrower::Campfire::Room do
       @room.outbound_messages.size.should == 1
     end
 
+    it "marks the message as failed when not able to deliver" do
+      FakeWeb.register_uri(:post, "https://mytoken:x@mydomain.campfirenow.com/room/347348/speak.json", :status => ["400", "Bad Request"])
+      message = Flamethrower::Campfire::Message.new('type' => 'TextMessage', 'body' => 'Hello there', 'user' => @user, 'room' => @room)
+      @room.outbound_messages << message
+      @room.post_messages
+      message.status.should == "failed"
+    end
+
+    it "marks the message as delivered if successfully posted to campfire" do
+      FakeWeb.register_uri(:post, "https://mytoken:x@mydomain.campfirenow.com/room/347348/speak.json", :body => json_fixture("speak_message"), :status => ["201", "Updated"])
+      message = Flamethrower::Campfire::Message.new('type' => 'TextMessage', 'body' => 'Hello there', 'user' => @user, 'room' => @room)
+      @room.outbound_messages << message
+      @room.post_messages
+      message.status.should == "delivered"
+    end
+
     it "sends the right json" do
       FakeWeb.register_uri(:post, "https://mytoken:x@mydomain.campfirenow.com/room/347348/speak.json", :body => json_fixture("speak_message"), :status => ["201", "Updated"])
       message = Flamethrower::Campfire::Message.new('type' => 'TextMessage', 'body' => 'Hello there', 'user' => @user, 'room' => @room)

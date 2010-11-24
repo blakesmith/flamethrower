@@ -51,7 +51,13 @@ module Flamethrower
           json = {"message" => {"body" => message.body, "type" => message.message_type}}.to_json
           response = campfire_post("/room/#{@number}/speak.json", json)
         end
-        @outbound_messages << message unless response.is_a?(Net::HTTPCreated)
+        case response
+        when Net::HTTPCreated
+          message.mark_delivered!
+        else
+          message.mark_failed!
+          @outbound_messages << message unless response.is_a?(Net::HTTPCreated)
+        end
       end
 
       def retrieve_messages

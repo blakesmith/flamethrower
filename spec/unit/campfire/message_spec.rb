@@ -12,4 +12,20 @@ describe Flamethrower::Campfire::Message do
   it "should have the message type" do
     @message.message_type.should == "TextMessage"
   end
+
+  describe "#mark_delivered!" do
+    it "sets the status to delivered" do
+      @message.status.should_not == "delivered"
+      @message.mark_delivered!
+      @message.status.should == "delivered"
+    end
+  end
+
+  describe "#mark_failed!" do
+    it "sets the status to failed" do
+      @message.status.should_not == "delivered"
+      @message.mark_failed!
+      @message.status.should == "failed"
+    end
+  end
 end
