@@ -2,7 +2,43 @@
 
 $:.unshift File.join(File.dirname(__FILE__), "../lib")
 
-require 'flamethrower'
+help = <<HELP
+Flamethrower is a campfire irc gateway that allows you to talk in campfire with irc.
 
-server = Flamethrower::EventServer.new
+Command line usage:
+  flamethrower -c /path/to/config.yml
+  flamethrower -t <campfire_api_token> -d campfiredomain
+HELP
+
+require 'flamethrower'
+require 'optparse'
+
+options = {}
+opts = OptionParser.new do |opts|
+  opts.banner = help
+
+  opts.on("-c", "--config [CONFIG]", "Set the config.yml file") do |config|
+    options['config'] = config
+  end
+
+  opts.on("-t", "--token [TOKEN]", "Set the campfire API token value") do |token|
+    options['token'] = token
+  end
+
+  opts.on("-d", "--domain [DOMAIN]", "Set the campfire domain") do |domain|
+    options['domain'] = domain
+  end
+
+  opts.on("-h", "--host [HOST]", "Sets the listening host") do |host|
+    options['host'] = host
+  end
+
+  opts.on("-p" "--port [PORT]", "Sets the listening port") do |port|
+    options['port'] = port.to_i
+  end
+end
+
+opts.parse!
+
+server = Flamethrower::EventServer.new(options['host'], options['port'])
 server.start

@@ -6,9 +6,9 @@ module Flamethrower
   end
 
   class EventServer
-    def initialize(host="0.0.0.0", port = 6667)
-      @host = host
-      @port = port
+    def initialize(host, port)
+      @host = host || "0.0.0.0"
+      @port = port || 6667
     end
 
     def start
