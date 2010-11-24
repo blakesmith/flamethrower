@@ -13,6 +13,10 @@ describe Flamethrower::Campfire::Message do
     @message.message_type.should == "TextMessage"
   end
 
+  it "initializes the status to 'pending'" do
+    @message.status.should == "pending"
+  end
+
   describe "#mark_delivered!" do
     it "sets the status to delivered" do
       @message.status.should_not == "delivered"

@@ -8,6 +8,7 @@ module Flamethrower
         @user = params['user']
         @room = params['room']
         @message_type = params['type']
+        @status = "pending"
       end
 
       def mark_delivered!
