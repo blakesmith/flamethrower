@@ -1,7 +1,7 @@
 module Flamethrower
   module Campfire
     class Connection
-      attr_reader :token
+      attr_reader :token, :domain
 
       include Flamethrower::Campfire::RestApi
 

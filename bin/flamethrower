@@ -40,5 +40,5 @@ end
 
 opts.parse!
 
-server = Flamethrower::EventServer.new(options['host'], options['port'])
+server = Flamethrower::EventServer.new(options['host'], options['port'], options['domain'], options['token'])
 server.start

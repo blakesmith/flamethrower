@@ -6,9 +6,12 @@ module Flamethrower
   end
 
   class EventServer
-    def initialize(host, port)
+    attr_reader :host, :port, :campfire_connection
+
+    def initialize(host, port, domain, token)
       @host = host || "0.0.0.0"
       @port = port || 6667
+      @campfire_connection = Flamethrower::Campfire::Connection.new(domain, token)
     end
 
     def start
