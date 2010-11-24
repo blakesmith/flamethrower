@@ -5,9 +5,10 @@ $:.unshift File.join(File.dirname(__FILE__), "../lib")
 help = <<HELP
 Flamethrower is a campfire irc gateway that allows you to talk in campfire with irc.
 
-Command line usage:
+Basic command line usage:
   flamethrower -c /path/to/config.yml
   flamethrower -t <campfire_api_token> -d campfiredomain
+
 HELP
 
 require 'flamethrower'
@@ -33,7 +34,7 @@ opts = OptionParser.new do |opts|
     options['host'] = host
   end
 
-  opts.on("-p" "--port [PORT]", "Sets the listening port") do |port|
+  opts.on("-p", "--port [PORT]", "Sets the listening port") do |port|
     options['port'] = port.to_i
   end
 end
