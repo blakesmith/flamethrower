@@ -40,5 +40,16 @@ end
 
 opts.parse!
 
+if options['config']
+  case File.exists?(options['config'])
+  when true
+    require 'yaml'
+    yaml = YAML.load_file(options['config'])
+    yaml.each {|k, v| options[k] = v}
+  when false
+    puts "Unable to find the specified file! Check the path?"
+  end
+end
+
 server = Flamethrower::EventServer.new(options['host'], options['port'], options['domain'], options['token'])
 server.start
