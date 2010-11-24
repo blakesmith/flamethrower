@@ -54,7 +54,7 @@ module Flamethrower
         channel = find_channel(message.parameters.first)
         channel.users << server.current_user
         server.send_topic(channel)
-        server.send_userlist(channel, server.campfire_users)
+        server.send_userlist(channel)
       else
         server.send_message(server.error(Flamethrower::Irc::Codes::ERR_BADCHANNELKEY))
       end

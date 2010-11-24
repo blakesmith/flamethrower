@@ -6,7 +6,6 @@ module Flamethrower
 
     def initialize(log = Logger.new(STDOUT))
       @log = log
-      @campfire_users ||= []
       @channels = []
       @current_user ||= Flamethrower::Irc::User.new
       @dispatcher ||= Flamethrower::Dispatcher.new(self)

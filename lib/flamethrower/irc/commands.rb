@@ -15,9 +15,9 @@ module Flamethrower
         send_message reply(RPL_TOPIC, "#{channel.name} :#{channel.topic}")
       end
 
-      def send_userlist(channel, users)
+      def send_userlist(channel)
         send_messages do |messages|
-          display_users = (["@#{@current_user.nickname}"] + users).join("\s")
+          display_users = (["@#{@current_user.nickname}"] + channel.users).join("\s")
           messages << reply(RPL_NAMEREPLY, "= #{channel.name} :#{display_users}")
           messages << reply(RPL_ENDOFNAMES, "#{channel.name} :/End of /NAMES list")
         end
