@@ -11,12 +11,19 @@ describe Flamethrower::Campfire::Room do
       @room.number.should == 347348
     end
     
+    it "has name" do
+      @room.name.should == "some name"
+    end
+  end
+
+  describe "#topic" do
     it "has topic" do
       @room.topic.should == "some topic"
     end
 
-    it "has name" do
-      @room.name.should == "some name"
+    it "displays 'No topic' if the topic is nil" do
+      @room.topic = nil
+      @room.topic.should == "No topic"
     end
   end
 
@@ -154,6 +161,10 @@ describe Flamethrower::Campfire::Room do
 
     it "references the same room when doing conversions" do
       @room.to_irc.to_campfire.should == @room
+    end
+
+    it "sends the current campfire topic" do
+      @room.to_irc.topic.should == @room.topic
     end
 
     context "channel name" do

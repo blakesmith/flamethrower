@@ -4,7 +4,7 @@ module Flamethrower
       include Flamethrower::Campfire::RestApi
 
       attr_reader :stream, :token
-      attr_accessor :inbound_messages, :outbound_messages, :number, :name, :topic, :users
+      attr_accessor :inbound_messages, :outbound_messages, :number, :name, :users
 
       def initialize(domain, token, params = {})
         @domain = domain
@@ -15,6 +15,14 @@ module Flamethrower
         @name = params['name']
         @topic = params['topic']
         @users = []
+      end
+
+      def topic=(topic)
+        @topic = topic
+      end
+
+      def topic
+        @topic || "No topic"
       end
 
       def fetch_room_info
@@ -73,8 +81,10 @@ module Flamethrower
       def to_irc
         name = "##{@name.downcase.gsub("\s", "_")}"
         @irc_channel ||= Flamethrower::Irc::Channel.new(name, self)
-        @irc_channel.users = @users.map(&:to_irc)
-        @irc_channel
+        @irc_channel.tap do |channel|
+          channel.users = @users.map(&:to_irc)
+          channel.topic = topic
+        end
       end
     end
   end

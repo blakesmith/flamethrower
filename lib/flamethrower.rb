@@ -5,6 +5,7 @@ require 'bundler'
 
 Bundler.setup
 
+require 'net/https'
 require 'eventmachine'
 require 'twitter/json_stream'
 require 'logger'

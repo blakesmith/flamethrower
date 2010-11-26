@@ -8,8 +8,8 @@ module Flamethrower
 
       private
       def http
-        Net::HTTP.new(host, 443).tap do |http|
-          http.use_ssl = true
+        Net::HTTP.new(host, 443).tap do |connection|
+          connection.use_ssl = true
         end
       end
 
