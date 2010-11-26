@@ -2,17 +2,19 @@ module Flamethrower
   module Server
     include Flamethrower::Irc::Commands
 
-    attr_accessor :campfire_connection, :current_user, :dispatcher, :log, :channels
+    attr_accessor :campfire_connection, :current_user, :dispatcher, :log, :irc_channels
 
     def initialize(options = {})
       @log = options[:log] || Logger.new(STDOUT)
-      @channels = []
+      @irc_channels = []
       @current_user ||= Flamethrower::Irc::User.new
       @dispatcher ||= Flamethrower::Dispatcher.new(self)
     end
 
     def after_connect
       send_motd
+      populate_irc_channels
+      send_channel_list
     end
 
     def send_message(msg)
@@ -32,6 +34,10 @@ module Flamethrower
     def send_messages(*messages)
       yield(messages) if block_given?
       messages.each {|msg| send_message(msg)}
+    end
+
+    def populate_irc_channels
+      @irc_channels = campfire_connection.rooms.map(&:to_irc)
     end
 
   end

@@ -7,12 +7,22 @@ module Flamethrower
         send_messages do |messages|
           messages << reply(RPL_MOTDSTART, ":MOTD")
           messages << reply(RPL_MOTD, ":Welcome to Flamethrower")
-          messages << reply(RPL_ENDOFMOTD, ":/End of /MOTD command")
+          messages << reply(RPL_MOTD, ":Fetching channel list from campfire...")
         end
       end
 
       def send_topic(channel)
         send_message reply(RPL_TOPIC, "#{channel.name} :#{channel.topic}")
+      end
+
+      def send_channel_list
+        send_messages do |messages|
+          messages << reply(RPL_MOTD, ":Active channels:")
+          @irc_channels.each do |channel|
+            messages << reply(RPL_MOTD, ":#{channel.name} - #{channel.topic}")
+          end
+          messages << reply(RPL_ENDOFMOTD, ":End of channel list /MOTD")
+        end
       end
 
       def send_userlist(channel)

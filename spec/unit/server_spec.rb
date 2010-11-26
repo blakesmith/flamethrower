@@ -52,13 +52,23 @@ describe Flamethrower::Server do
       @server.should_receive(:send_motd)
       @server.after_connect
     end
+
+    it "populates the channel list" do
+      @server.should_receive(:populate_irc_channels)
+      @server.after_connect
+    end
+
+    it "sends the channel list" do
+      @server.should_receive(:send_channel_list)
+      @server.after_connect
+    end
   end
 
-  describe "channels" do
-    it "stores the list of channels on the server" do
+  describe "irc_channels" do
+    it "stores the list of irc_channels on the server" do
       channel = Flamethrower::Irc::Channel.new("#flamethrower")
-      @server.channels << channel
-      @server.channels.should include(channel)
+      @server.irc_channels << channel
+      @server.irc_channels.should include(channel)
     end
   end
 
@@ -67,7 +77,7 @@ describe Flamethrower::Server do
       @server.send_motd.should == [
         ":host 375 nick :MOTD",
         ":host 372 nick :Welcome to Flamethrower",
-        ":host 376 nick :/End of /MOTD command"
+        ":host 372 nick :Fetching channel list from campfire..."
       ]
     end
 
@@ -93,6 +103,31 @@ describe Flamethrower::Server do
         ":host 353 nick = #flamethrower :@nick bob",
         ":host 366 nick #flamethrower :/End of /NAMES list"
       ]
+    end
+
+    describe "#send_channel_list" do
+      it "sends the right motd message with the channel list" do
+        channel = Flamethrower::Irc::Channel.new("#flamethrower")
+        channel.topic = "Flamethrower topic"
+        channel2 = Flamethrower::Irc::Channel.new("#room_1")
+        channel2.topic = "Room 1 topic"
+        @server.irc_channels = [channel, channel2]
+        @server.send_channel_list.should == [
+          ":host 372 nick :Active channels:",
+          ":host 372 nick :#flamethrower - Flamethrower topic",
+          ":host 372 nick :#room_1 - Room 1 topic",
+          ":host 376 nick :End of channel list /MOTD"
+        ]
+      end
+    end
+
+    describe "#populate_irc_channels" do
+      it "populates the server irc_channels from the associated campfire channels" do
+        FakeWeb.register_uri(:get, "https://mytoken:x@mydomain.campfirenow.com/rooms.json", :body => json_fixture("rooms"), :status => ["200", "OK"])
+        @server.populate_irc_channels
+        @server.irc_channels.count.should == 1
+        @server.irc_channels.first.name.should == "#room_1"
+      end
     end
   end
 

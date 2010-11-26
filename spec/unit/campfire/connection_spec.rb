@@ -26,4 +26,5 @@ describe Flamethrower::Campfire::Connection do
       @connection.rooms.should == []
     end
   end
+
 end

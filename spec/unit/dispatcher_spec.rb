@@ -4,7 +4,7 @@ describe Flamethrower::Dispatcher do
   before do
     @server = Flamethrower::MockServer.new(:log => Logger.new("/dev/null"))
     @channel = Flamethrower::Irc::Channel.new("#flamethrower")
-    @server.channels << @channel
+    @server.irc_channels << @channel
     @dispatcher = Flamethrower::Dispatcher.new(@server)
   end
 
@@ -53,7 +53,7 @@ describe Flamethrower::Dispatcher do
     context "channel mode" do
       it "responds to mode with a static channel mode" do
         channel = Flamethrower::Irc::Channel.new("#flamethrower")
-        @server.channels << channel
+        @server.irc_channels << channel
         @dispatcher.stub(:find_channel).and_return(channel)
         message = Flamethrower::Message.new("MODE #flamethrower\r\n")
         @dispatcher.server.should_receive(:send_channel_mode).with(channel)
@@ -88,7 +88,7 @@ describe Flamethrower::Dispatcher do
         message = Flamethrower::Message.new("PRIVMSG #test :Hello.\r\n")
         room = Flamethrower::Campfire::Room.new("mydomain", "mytoken", {'name' => "test"})
         irc_channel = room.to_irc
-        @dispatcher.server.channels << irc_channel
+        @dispatcher.server.irc_channels << irc_channel
         @dispatcher.handle_message(message)
         room.outbound_messages.size.should == 1
       end
@@ -97,7 +97,7 @@ describe Flamethrower::Dispatcher do
         message = Flamethrower::Message.new("PRIVMSG #test :Hello.\r\n")
         room = Flamethrower::Campfire::Room.new("mydomain", "mytoken", {'name' => "test"})
         irc_channel = room.to_irc
-        @dispatcher.server.channels << irc_channel
+        @dispatcher.server.irc_channels << irc_channel
         @dispatcher.handle_message(message)
         campfire_message = room.outbound_messages.pop
         campfire_message.body.should == "Hello."

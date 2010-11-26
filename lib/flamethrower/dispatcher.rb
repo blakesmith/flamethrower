@@ -14,7 +14,7 @@ module Flamethrower
     private
 
     def find_channel(name)
-      server.channels.detect {|channel| channel.name == name}
+      server.irc_channels.detect {|channel| channel.name == name}
     end
 
     protected
@@ -44,7 +44,7 @@ module Flamethrower
     end
 
     def handle_mode(message)
-      if server.channels.map(&:name).include?(message.parameters.first)
+      if server.irc_channels.map(&:name).include?(message.parameters.first)
         channel = find_channel(message.parameters.first)
         server.send_channel_mode(channel)
       elsif message.parameters.first == server.current_user.nickname
@@ -55,7 +55,7 @@ module Flamethrower
     end
 
     def handle_join(message)
-      if server.channels.map(&:name).include?(message.parameters.first)
+      if server.irc_channels.map(&:name).include?(message.parameters.first)
         channel = find_channel(message.parameters.first)
         channel.users << server.current_user
         server.send_topic(channel)
