@@ -2,10 +2,10 @@ module Flamethrower
   module Server
     include Flamethrower::Irc::Commands
 
-    attr_accessor :campfire_users, :current_user, :dispatcher, :log, :channels
+    attr_accessor :campfire_connection, :current_user, :dispatcher, :log, :channels
 
-    def initialize(log = Logger.new(STDOUT))
-      @log = log
+    def initialize(options = {})
+      @log = options[:log] || Logger.new(STDOUT)
       @channels = []
       @current_user ||= Flamethrower::Irc::User.new
       @dispatcher ||= Flamethrower::Dispatcher.new(self)

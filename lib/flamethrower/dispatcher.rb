@@ -19,6 +19,11 @@ module Flamethrower
 
     protected
 
+    def handle_privmsg(message)
+      name, body = *message.parameters
+      find_channel(name).to_campfire.say(body)
+    end
+
     def handle_user(message)
       username, hostname, servername, realname = *message.parameters
       server.current_user.username = username unless server.current_user.username

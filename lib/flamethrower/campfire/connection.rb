@@ -11,8 +11,8 @@ module Flamethrower
       end
 
       def rooms
-        response = campfire_get("/rooms.json")
-        Array.new.tap do |rooms|
+        @rooms ||= Array.new.tap do |rooms|
+          response = campfire_get("/rooms.json")
           case response
           when Net::HTTPSuccess
             json = JSON.parse(response.body)

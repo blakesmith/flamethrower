@@ -152,6 +152,10 @@ describe Flamethrower::Campfire::Room do
       @room.to_irc.is_a?(Flamethrower::Irc::Channel).should be_true
     end
 
+    it "references the same room when doing conversions" do
+      @room.to_irc.to_campfire.should == @room
+    end
+
     context "channel name" do
       it "maps the campfire room name to the channel name" do
         @room.name = "somename"
@@ -174,7 +178,7 @@ describe Flamethrower::Campfire::Room do
         @room.users = [Flamethrower::Campfire::User.new('name' => "bob")]
         @room.to_irc.users.first.is_a?(Flamethrower::Irc::User).should be_true
       end
-
     end
+
   end
 end

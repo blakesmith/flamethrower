@@ -2,7 +2,7 @@ require File.join(File.dirname(__FILE__), "../spec_helper")
 
 describe Flamethrower::Dispatcher do
   before do
-    @server = Flamethrower::MockServer.new(Logger.new("/dev/null"))
+    @server = Flamethrower::MockServer.new(:log => Logger.new("/dev/null"))
     @channel = Flamethrower::Irc::Channel.new("#flamethrower")
     @server.channels << @channel
     @dispatcher = Flamethrower::Dispatcher.new(@server)
@@ -79,6 +79,31 @@ describe Flamethrower::Dispatcher do
       message = Flamethrower::Message.new("NICK WiZ\r\n")
       @dispatcher.handle_message(message)
       @dispatcher.server.current_user.nickname.should == "WiZ"
+    end
+  end
+
+  describe "#privmsg" do
+    context "sent by me" do
+      it "generates and queues an outbound campfire message to the right room" do
+        message = Flamethrower::Message.new("PRIVMSG #test :Hello.\r\n")
+        room = Flamethrower::Campfire::Room.new("mydomain", "mytoken", {'name' => "test"})
+        irc_channel = room.to_irc
+        @dispatcher.server.channels << irc_channel
+        @dispatcher.handle_message(message)
+        room.outbound_messages.size.should == 1
+      end
+
+      it "sends the right message parameters to the new outbound message" do
+        message = Flamethrower::Message.new("PRIVMSG #test :Hello.\r\n")
+        room = Flamethrower::Campfire::Room.new("mydomain", "mytoken", {'name' => "test"})
+        irc_channel = room.to_irc
+        @dispatcher.server.channels << irc_channel
+        @dispatcher.handle_message(message)
+        campfire_message = room.outbound_messages.pop
+        campfire_message.body.should == "Hello."
+        campfire_message.user.should be_nil
+        campfire_message.message_type.should == "TextMessage"
+      end
     end
   end
 

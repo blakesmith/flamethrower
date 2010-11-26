@@ -13,8 +13,4 @@ describe Flamethrower::EventServer do
     @event_server.port.should == 6667
   end
 
-  it "instantiates the campfire connection with the domain and token" do
-    @event_server.campfire_connection.domain.should == "mydomain"
-    @event_server.campfire_connection.token.should == "mytoken"
-  end
 end

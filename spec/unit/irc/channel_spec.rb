@@ -2,7 +2,8 @@ require File.join(File.dirname(__FILE__), "../../spec_helper")
 
 describe Flamethrower::Irc::Channel do
   before do
-    @channel = Flamethrower::Irc::Channel.new("#flamethrower")
+    @room = Flamethrower::Campfire::Room.new("mydomain", "mytoken", {'name' => "flamethrower"})
+    @channel = Flamethrower::Irc::Channel.new("#flamethrower", @room)
   end
 
   it "returns the current channel name" do
@@ -22,5 +23,11 @@ describe Flamethrower::Irc::Channel do
 
   it "returns the channel mode from an array of modes" do
     @channel.mode.should == "+t"
+  end
+
+  describe "#to_campfire" do
+    it "returns the stored copy of the campfire room" do
+      @channel.to_campfire.should == @room
+    end
   end
 end
