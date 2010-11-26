@@ -17,7 +17,7 @@ module Flamethrower
 
       def send_userlist(channel)
         send_messages do |messages|
-          display_users = (["@#{@current_user.nickname}"] + channel.users).join("\s")
+          display_users = (["@#{@current_user.nickname}"] + channel.users.map(&:nickname)).join("\s")
           messages << reply(RPL_NAMEREPLY, "= #{channel.name} :#{display_users}")
           messages << reply(RPL_ENDOFNAMES, "#{channel.name} :/End of /NAMES list")
         end

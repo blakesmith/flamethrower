@@ -88,7 +88,7 @@ describe Flamethrower::Server do
 
     it "should have the correct USERLIST format" do
       channel = Flamethrower::Irc::Channel.new("#flamethrower")
-      channel.users = ["bob"]
+      channel.users << Flamethrower::Irc::User.new(:nickname => 'bob', :username => 'bob')
       @server.send_userlist(channel).should == [
         ":host 353 nick = #flamethrower :@nick bob",
         ":host 366 nick #flamethrower :/End of /NAMES list"
