@@ -80,7 +80,7 @@ module Flamethrower
 
       def to_irc
         name = "##{@name.downcase.gsub("\s", "_")}"
-        @irc_channel ||= Flamethrower::Irc::Channel.new(name, self)
+        @irc_channel = Flamethrower::Irc::Channel.new(name, self)
         @irc_channel.tap do |channel|
           channel.users = @users.map(&:to_irc)
           channel.topic = topic

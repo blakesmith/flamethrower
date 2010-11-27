@@ -3,7 +3,8 @@ require File.join(File.dirname(__FILE__), "../spec_helper")
 describe Flamethrower::Dispatcher do
   before do
     @server = Flamethrower::MockServer.new(:log => Logger.new("/dev/null"))
-    @channel = Flamethrower::Irc::Channel.new("#flamethrower")
+    @room = Flamethrower::Campfire::Room.new('mytoken', 'mydomain', {'name' => 'a room'})
+    @channel = Flamethrower::Irc::Channel.new("#flamethrower", @room)
     @server.irc_channels << @channel
     @dispatcher = Flamethrower::Dispatcher.new(@server)
   end
@@ -108,6 +109,10 @@ describe Flamethrower::Dispatcher do
   end
 
   describe "#join" do
+    before do
+      @room.stub(:fetch_room_info)
+    end
+
     it "responds with a topic and userlist if sent a join" do
       message = Flamethrower::Message.new("JOIN #flamethrower\r\n")
       @server.should_receive(:send_topic).with(@channel)
@@ -121,6 +126,12 @@ describe Flamethrower::Dispatcher do
       message = Flamethrower::Message.new("JOIN #flamethrower\r\n")
       @dispatcher.handle_message(message)
       @channel.users.should include(user)
+    end
+
+    it "fetches the room information on join" do
+      message = Flamethrower::Message.new("JOIN #flamethrower\r\n")
+      @room.should_receive(:fetch_room_info)
+      @dispatcher.handle_message(message)
     end
 
     it "responds with ERR_BADCHANNELKEY a channel that doesn't exist" do

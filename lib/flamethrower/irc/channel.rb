@@ -5,8 +5,8 @@ module Flamethrower
       attr_accessor :name, :topic, :users, :modes, :mode
 
       def initialize(name, campfire_channel=nil)
-        @name = name
         @users = []
+        @name = name
         @modes = ["t"]
         @campfire_channel = campfire_channel
       end
