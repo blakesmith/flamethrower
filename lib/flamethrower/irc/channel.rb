@@ -2,7 +2,7 @@ module Flamethrower
   module Irc
     class Channel
 
-      attr_accessor :name, :topic, :users, :modes, :mode
+      attr_accessor :name, :topic, :modes, :mode
 
       def initialize(name, campfire_channel=nil)
         @users = []
@@ -17,6 +17,14 @@ module Flamethrower
 
       def to_campfire
         @campfire_channel
+      end
+
+      def users=(users)
+        @users = users
+      end
+
+      def users
+        @users.concat(@campfire_channel.users.map(&:to_irc))
       end
 
     end

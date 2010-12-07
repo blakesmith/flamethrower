@@ -97,10 +97,23 @@ describe Flamethrower::Server do
     end
 
     it "should have the correct USERLIST format" do
-      channel = Flamethrower::Irc::Channel.new("#flamethrower")
+      room = Flamethrower::Campfire::Room.new('mydomain', 'mytoken')
+      channel = Flamethrower::Irc::Channel.new("#flamethrower", room)
       channel.users << Flamethrower::Irc::User.new(:nickname => 'bob', :username => 'bob')
       @server.send_userlist(channel).should == [
         ":host 353 nick = #flamethrower :@nick bob",
+        ":host 366 nick #flamethrower :/End of /NAMES list"
+      ]
+    end
+
+    it "sends the campfire users in the userlist" do
+      room = Flamethrower::Campfire::Room.new('mydomain', 'mytoken')
+      channel = Flamethrower::Irc::Channel.new("#flamethrower", room)
+      user1 = Flamethrower::Campfire::User.new('id' => 1234, 'name' => 'Bob Jones')
+      user2 = Flamethrower::Campfire::User.new('id' => 4321, 'name' => 'Bill Myer')
+      room.users = [user1, user2]
+      @server.send_userlist(channel).should == [
+        ":host 353 nick = #flamethrower :@nick Bob_Jones Bill_Myer",
         ":host 366 nick #flamethrower :/End of /NAMES list"
       ]
     end
