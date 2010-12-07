@@ -6,7 +6,7 @@ module Flamethrower
     end
 
     def campfire_connection
-      Flamethrower::Campfire::Connection.new("mydomain", "mytoken")
+      Flamethrower::Campfire::Connection.new("mydomain", "mytoken", self)
     end
   end
 end

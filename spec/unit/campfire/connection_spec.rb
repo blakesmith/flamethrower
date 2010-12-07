@@ -2,7 +2,9 @@ require File.join(File.dirname(__FILE__), "../../spec_helper")
 
 describe Flamethrower::Campfire::Connection do
   before do
-    @connection = Flamethrower::Campfire::Connection.new("mydomain", "mytoken")
+    @server = Flamethrower::MockServer.new
+    @server.log = Logger.new("/dev/null")
+    @connection = @server.campfire_connection
     FakeWeb.allow_net_connect = false
   end
 
@@ -23,6 +25,12 @@ describe Flamethrower::Campfire::Connection do
 
     it "returns empty set if not a successful response" do
       FakeWeb.register_uri(:get, "https://mytoken:x@mydomain.campfirenow.com/rooms.json", :status => ["400", "Bad Request"])
+      @connection.rooms.should == []
+    end
+
+    it "sends a motd error message if unable to fetch room list" do
+      @connection.should_receive(:campfire_get).and_raise(SocketError) 
+      @server.should_receive(:send_message).with(@server.reply(Flamethrower::Irc::Codes::RPL_MOTD, ":ERROR: Unable to fetch room list! Check your connection?"))
       @connection.rooms.should == []
     end
   end

@@ -19,7 +19,7 @@ module Flamethrower
       EventMachine::run do
         EventMachine::start_server(@host, @port, EventConnection) do |connection|
           connection.server = self
-          connection.campfire_connection = Flamethrower::Campfire::Connection.new(@domain, @token)
+          connection.campfire_connection = Flamethrower::Campfire::Connection.new(@domain, @token, connection)
         end
       end
     end
