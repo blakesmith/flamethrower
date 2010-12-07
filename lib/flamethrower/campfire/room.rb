@@ -4,7 +4,7 @@ module Flamethrower
       include Flamethrower::Campfire::RestApi
 
       attr_reader :stream, :token
-      attr_accessor :inbound_messages, :outbound_messages, :number, :name, :users
+      attr_accessor :inbound_messages, :outbound_messages, :thread_messages, :number, :name, :users
 
       def initialize(domain, token, params = {})
         @domain = domain
@@ -36,6 +36,13 @@ module Flamethrower
       def say(body, message_type='TextMessage')
         params = {'body' => body, 'type' => message_type}
         @outbound_messages << Flamethrower::Campfire::Message.new(params)
+      end
+
+      def thread
+        Thread.new do
+          connect
+          fetch_messages
+        end
       end
 
       def connect

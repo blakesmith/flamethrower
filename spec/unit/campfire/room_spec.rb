@@ -51,6 +51,22 @@ describe Flamethrower::Campfire::Room do
     end
   end
 
+  describe "#thread" do
+    context "in a Thread" do
+      it "calls connect at the start of the thread" do
+        @room.stub(:fetch_messages)
+        @room.should_receive(:connect)
+        @room.thread
+      end
+
+      it "fetches messages from the stream" do
+        @room.stub(:connect)
+        @room.should_receive(:fetch_messages)
+        @room.thread
+      end
+    end
+  end
+
   describe "#fetch_messages" do
     before do
       Twitter::JSONStream.stub(:connect).and_return("stream")
