@@ -15,6 +15,7 @@ module Flamethrower
         @name = params['name']
         @topic = params['topic']
         @users = []
+        @stop_thread = false
       end
 
       def topic=(topic)
@@ -38,11 +39,23 @@ module Flamethrower
         @outbound_messages << Flamethrower::Campfire::Message.new(params)
       end
 
-      def thread
+      def start_thread
         Thread.new do
           connect
-          fetch_messages
+          until kill_thread?
+            fetch_messages
+            post_messages
+            sleep 0.5
+          end
         end
+      end
+
+      def kill_thread?
+        @stop_thread
+      end
+
+      def kill_thread!
+        @stop_thread = true
       end
 
       def connect

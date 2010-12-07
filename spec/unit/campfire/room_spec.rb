@@ -52,18 +52,35 @@ describe Flamethrower::Campfire::Room do
   end
 
   describe "#thread" do
+    before do
+      Kernel.stub(:sleep)
+    end
+
     context "in a Thread" do
       it "calls connect at the start of the thread" do
         @room.stub(:fetch_messages)
-        @room.should_receive(:connect)
-        @room.thread
+        @room.stub(:post_messages)
+        @room.should_receive(:connect).at_least(1).times
+        @room.start_thread
+        @room.kill_thread!
       end
 
       it "fetches messages from the stream" do
         @room.stub(:connect)
-        @room.should_receive(:fetch_messages)
-        @room.thread
+        @room.stub(:post_messages)
+        @room.should_receive(:fetch_messages).at_least(1).times
+        @room.start_thread
+        @room.kill_thread!
       end
+
+      it "posts messages to the campfire API" do
+        @room.stub(:connect)
+        @room.stub(:fetch_messages)
+        @room.should_receive(:post_messages).at_least(1).times
+        @room.start_thread
+        @room.kill_thread!
+      end
+
     end
   end
 
