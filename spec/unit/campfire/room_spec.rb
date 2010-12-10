@@ -215,6 +215,17 @@ describe Flamethrower::Campfire::Room do
         @room.name = "Some Name 1"
         @room.to_irc.name.should == "#some_name_1"
       end
+
+      it "replaces slashes with underscores" do
+        @room.name = "API/Mobile"
+        @room.to_irc.name.should == "#api_mobile"
+      end
+
+      it "replaces ampersands with underscores" do
+        @room.name = "Stuff & Something"
+        @room.to_irc.name.should == "#stuff_something"
+      end
+
     end
 
     context "populating users" do

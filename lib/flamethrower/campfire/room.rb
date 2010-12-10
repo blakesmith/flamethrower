@@ -99,7 +99,7 @@ module Flamethrower
       end
 
       def to_irc
-        name = "##{@name.downcase.gsub("\s", "_")}"
+        name = "##{@name.downcase.scan(/[A-Za-z0-9]+/).join("_")}"
         @irc_channel = Flamethrower::Irc::Channel.new(name, self)
         @irc_channel.tap do |channel|
           channel.users = @users.map(&:to_irc)
