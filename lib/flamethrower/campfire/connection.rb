@@ -15,13 +15,14 @@ module Flamethrower
         begin
           @rooms ||= Array.new.tap do |rooms|
             response = campfire_get("/rooms.json")
-            json = JSON.parse(response.body)
-            @server.log.debug json
             case response
             when Net::HTTPSuccess
+              json = JSON.parse(response.body)
               json['rooms'].each do |room|
                 rooms << Room.new(@domain, @token, room)
               end
+            else
+              @server.log.debug response.body
             end
           end
         rescue SocketError
