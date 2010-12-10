@@ -103,7 +103,7 @@ module Flamethrower
         @irc_channel = Flamethrower::Irc::Channel.new(name, self)
         @irc_channel.tap do |channel|
           channel.users = @users.map(&:to_irc)
-          channel.topic = topic
+          channel.topic = topic.gsub("\n", "\s")
         end
       end
     end

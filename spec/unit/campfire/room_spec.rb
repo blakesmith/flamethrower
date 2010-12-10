@@ -200,6 +200,11 @@ describe Flamethrower::Campfire::Room do
       @room.to_irc.topic.should == @room.topic
     end
 
+    it "replaces newlines with spaces" do
+      @room.topic = "Some topic\nyeah"
+      @room.to_irc.topic.should == "Some topic yeah"
+    end
+
     context "channel name" do
       it "maps the campfire room name to the channel name" do
         @room.name = "somename"
