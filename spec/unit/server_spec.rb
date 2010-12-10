@@ -132,6 +132,19 @@ describe Flamethrower::Server do
           ":host 376 nick :End of channel list /MOTD"
         ]
       end
+
+      it "shows 'No topic' in the channel list if there's no room topic" do
+        channel = Flamethrower::Irc::Channel.new("#flamethrower")
+        channel2 = Flamethrower::Irc::Channel.new("#room_1")
+        channel.topic = channel2.topic = ""
+        @server.irc_channels = [channel, channel2]
+        @server.send_channel_list.should == [
+          ":host 372 nick :Active channels:",
+          ":host 372 nick :#flamethrower - No topic",
+          ":host 372 nick :#room_1 - No topic",
+          ":host 376 nick :End of channel list /MOTD"
+        ]
+      end
     end
 
     describe "#populate_irc_channels" do

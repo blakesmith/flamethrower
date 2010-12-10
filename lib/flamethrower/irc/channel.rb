@@ -2,7 +2,8 @@ module Flamethrower
   module Irc
     class Channel
 
-      attr_accessor :name, :topic, :modes, :mode
+      attr_accessor :name, :modes, :mode
+      attr_writer :topic
 
       def initialize(name, campfire_channel=nil)
         @users = []
@@ -13,6 +14,11 @@ module Flamethrower
 
       def mode
         "+#{@modes.join}"
+      end
+
+      def topic
+        return "No topic" if @topic && @topic.empty?
+        @topic
       end
 
       def to_campfire
