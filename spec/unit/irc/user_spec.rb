@@ -3,13 +3,10 @@ require File.join(File.dirname(__FILE__), "../../spec_helper")
 describe Flamethrower::Irc::User do
   before do
     @user = Flamethrower::Irc::User.new
+    @initial_user = Flamethrower::Irc::User.new :username => "user", :nickname => "nick", :hostname => "host", :realname => "realname", :servername => "servername"
   end
 
   context "storing initial arguments" do
-    before do
-      @initial_user = Flamethrower::Irc::User.new :username => "user", :nickname => "nick", :hostname => "host", :realname => "realname", :servername => "servername"
-    end
-
     it "should have user" do
       @initial_user.username.should == "user"
     end
@@ -50,6 +47,12 @@ describe Flamethrower::Irc::User do
 
     it "returns true if username, hostname, realname, servername are set" do
       Flamethrower::Irc::User.new.user_set?.should be_false
+    end
+  end
+
+  describe "#to_s" do
+    it "should display the correct irc user string" do
+      @initial_user.to_s.should == "nick!user@host"
     end
   end
 

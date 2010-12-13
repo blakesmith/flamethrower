@@ -4,6 +4,8 @@ describe Flamethrower::Irc::Channel do
   before do
     @room = Flamethrower::Campfire::Room.new("mydomain", "mytoken", {'name' => "flamethrower"})
     @channel = Flamethrower::Irc::Channel.new("#flamethrower", @room)
+    @campfire_user = Flamethrower::Campfire::User.new('name' => "bob", 'id' => 734581)
+    @irc_user = @campfire_user.to_irc
   end
 
   it "returns the current channel name" do
@@ -28,6 +30,14 @@ describe Flamethrower::Irc::Channel do
   describe "#to_campfire" do
     it "returns the stored copy of the campfire room" do
       @channel.to_campfire.should == @room
+    end
+  end
+
+  describe "#irc_messages" do
+    it "returns the irc messages to be sent to the client" do
+      message = Flamethrower::Campfire::Message.new('body' => 'Hello there', 'user' => @campfire_user, 'room' => @room)
+      @room.inbound_messages << message
+      @channel.retrieve_irc_messages.should == ["#{@irc_user.to_s} PRIVMSG #{@channel.name} :Hello there"]
     end
   end
 end

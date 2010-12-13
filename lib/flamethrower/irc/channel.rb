@@ -33,6 +33,10 @@ module Flamethrower
         @users.concat(@campfire_channel.users.map(&:to_irc))
       end
 
+      def retrieve_irc_messages
+        to_campfire.retrieve_messages.map{|message| message.to_irc.to_s}
+      end
+
     end
   end
 end

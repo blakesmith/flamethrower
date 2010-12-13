@@ -2,7 +2,11 @@ require File.join(File.dirname(__FILE__), "../../spec_helper")
 
 describe Flamethrower::Campfire::Message do
   before do
-    @message = Flamethrower::Campfire::Message.new('body' => "thebody", 'type' => "TextMessage")
+    @room = Flamethrower::Campfire::Room.new("mydomain", "mytoken", {'name' => "flamethrower"})
+    @channel = Flamethrower::Irc::Channel.new("#flamethrower", @room)
+    @campfire_user = Flamethrower::Campfire::User.new('name' => "bob", 'id' => 734581)
+    @irc_user = @campfire_user.to_irc
+    @message = Flamethrower::Campfire::Message.new('user' => @campfire_user, 'room' => @room, 'body' => 'thebody', 'type' => "TextMessage")
   end
 
   it "should have the message body" do
@@ -15,6 +19,12 @@ describe Flamethrower::Campfire::Message do
 
   it "initializes the status to 'pending'" do
     @message.status.should == "pending"
+  end
+
+  describe "#to_irc" do
+    it "converts the message to an irc message" do
+      @message.to_irc.to_s.should == "#{@irc_user.to_s} PRIVMSG #{@channel.name} :thebody"
+    end
   end
 
   describe "#mark_delivered!" do

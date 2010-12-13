@@ -24,6 +24,10 @@ module Flamethrower
       def mode
         "+#{@modes.join}"
       end
+
+      def to_s
+        "#{@nickname}!#{@username}@#{@hostname}"
+      end
     end
   end
 end

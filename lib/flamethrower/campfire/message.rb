@@ -18,6 +18,10 @@ module Flamethrower
       def mark_failed!
         @status = "failed"
       end
+
+      def to_irc
+        Flamethrower::Message.new("#{@user.to_irc.to_s} PRIVMSG #{@room.to_irc.name} :#{@body}")
+      end
     end
   end
 end

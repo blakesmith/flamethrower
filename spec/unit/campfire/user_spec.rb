@@ -24,5 +24,9 @@ describe Flamethrower::Campfire::User do
       @user.to_irc.nickname.should == "Bob_Jackson"
       @user.to_irc.username.should == "Bob_Jackson"
     end
+    
+    it "sets the user hostname to campfirenow.com" do
+      @user.to_irc.hostname.should == "campfirenow.com"
+    end
   end
 end

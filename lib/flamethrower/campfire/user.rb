@@ -10,7 +10,7 @@ module Flamethrower
 
       def to_irc
         nick = @name.gsub("\s", "_")
-        @irc_user ||= Flamethrower::Irc::User.new(:username => nick, :nickname => nick)
+        @irc_user ||= Flamethrower::Irc::User.new(:username => nick, :nickname => nick, :hostname => 'campfirenow.com')
       end
     end
   end

@@ -18,6 +18,10 @@ module Flamethrower
       parse[:params]
     end
 
+    def to_s
+      @message
+    end
+
     protected
 
     def strip_prefixes(params)

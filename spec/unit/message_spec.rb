@@ -22,4 +22,11 @@ describe Flamethrower::Message do
       message.send(:strip_prefixes, [":Ronnie", "Reagan"]).should == ["Ronnie Reagan"]
     end
   end
+
+  describe "#to_s" do
+    it "returns the irc message" do
+      message = Flamethrower::Message.new("COMMAND param")
+      message.to_s.should == "COMMAND param"
+    end
+  end
 end
