@@ -4,7 +4,7 @@ module Flamethrower
       include Flamethrower::Campfire::RestApi
 
       attr_reader :stream, :token
-      attr_accessor :inbound_messages, :outbound_messages, :thread_messages, :number, :name, :users
+      attr_accessor :inbound_messages, :outbound_messages, :thread_messages, :number, :name, :users, :server
 
       def initialize(domain, token, params = {})
         @domain = domain
@@ -40,11 +40,17 @@ module Flamethrower
       end
 
       def start_thread
+        ::FLAMETHROWER_LOGGER.debug "Starting thread for room #{name}"
         Thread.new do
           connect
           until kill_thread?
             fetch_messages
             post_messages
+            messages_to_send = to_irc.retrieve_irc_messages
+            messages_to_send.each do |m| 
+              ::FLAMETHROWER_LOGGER.debug "Sending irc message #{m.to_s}"
+              @server.send_message(m.to_s)
+            end
             sleep 0.5
           end
         end
@@ -59,12 +65,14 @@ module Flamethrower
       end
 
       def connect
+        ::FLAMETHROWER_LOGGER.debug "Connecting to #{name} stream"
         @stream = Twitter::JSONStream.connect(:path => "/room/#{@number}/live.json", 
                                     :host => "streaming.campfirenow.com", 
                                     :auth => "#{@token}:x")
       end
 
       def fetch_messages
+        #::FLAMETHROWER_LOGGER.debug "Fetching messages for #{name}"
         @stream.each_item do |item| 
           params = JSON.parse(item)
           params['user'] = @users.first {|u| u.number == params['user']['id'] }
@@ -74,6 +82,7 @@ module Flamethrower
       end
 
       def post_messages
+        #::FLAMETHROWER_LOGGER.debug "Posting messages for #{name}"
         failed_messages = []
         until @outbound_messages.empty?
           message = @outbound_messages.pop

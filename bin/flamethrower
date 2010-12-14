@@ -52,5 +52,7 @@ if options['config']
   end
 end
 
+FLAMETHROWER_LOGGER = options['logger'] || Logger.new(STDOUT)
 server = Flamethrower::EventServer.new(options['host'], options['port'], options['domain'], options['token'])
 server.start
+

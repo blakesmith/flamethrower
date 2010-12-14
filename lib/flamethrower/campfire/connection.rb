@@ -19,10 +19,12 @@ module Flamethrower
             when Net::HTTPSuccess
               json = JSON.parse(response.body)
               json['rooms'].each do |room|
-                rooms << Room.new(@domain, @token, room)
+                rooms << Room.new(@domain, @token, room).tap do |r|
+                  r.server = @server
+                end
               end
             else
-              @server.log.debug response.body
+              ::FLAMETHROWER_LOGGER.debug response.body
             end
           end
         rescue SocketError

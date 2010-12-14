@@ -57,8 +57,10 @@ module Flamethrower
     def handle_join(message)
       if server.irc_channels.map(&:name).include?(message.parameters.first)
         channel = find_channel(message.parameters.first)
+        room = channel.to_campfire
         channel.users << server.current_user
-        channel.to_campfire.fetch_room_info
+        room.fetch_room_info
+        room.start_thread
         server.send_topic(channel)
         server.send_userlist(channel)
       else

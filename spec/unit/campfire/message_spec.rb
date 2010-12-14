@@ -23,7 +23,7 @@ describe Flamethrower::Campfire::Message do
 
   describe "#to_irc" do
     it "converts the message to an irc message" do
-      @message.to_irc.to_s.should == "#{@irc_user.to_s} PRIVMSG #{@channel.name} :thebody"
+      @message.to_irc.to_s.should == ":#{@irc_user.to_s} PRIVMSG #{@channel.name} :thebody"
     end
   end
 

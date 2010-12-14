@@ -20,7 +20,7 @@ module Flamethrower
       end
 
       def to_irc
-        Flamethrower::Message.new("#{@user.to_irc.to_s} PRIVMSG #{@room.to_irc.name} :#{@body}")
+        Flamethrower::Message.new(":#{@user.to_irc.to_s} PRIVMSG #{@room.to_irc.name} :#{@body}")
       end
     end
   end

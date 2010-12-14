@@ -2,10 +2,9 @@ module Flamethrower
   module Server
     include Flamethrower::Irc::Commands
 
-    attr_accessor :campfire_connection, :current_user, :dispatcher, :log, :irc_channels
+    attr_accessor :campfire_connection, :current_user, :dispatcher, :irc_channels
 
     def initialize(options = {})
-      @log = options[:log] || Logger.new(STDOUT)
       @irc_channels = []
       @current_user ||= Flamethrower::Irc::User.new
       @dispatcher ||= Flamethrower::Dispatcher.new(self)
@@ -19,7 +18,7 @@ module Flamethrower
 
     def send_message(msg)
       send_data "#{msg}\r\n"
-      log.debug ">> #{msg}"
+      ::FLAMETHROWER_LOGGER.debug ">> #{msg}"
       msg
     end
 
@@ -27,7 +26,7 @@ module Flamethrower
       messages = msg.split("\r\n")
       messages.each do |message|
         dispatcher.handle_message(Flamethrower::Message.new(message))
-        log.debug "<< #{message}"
+        ::FLAMETHROWER_LOGGER.debug "<< #{message}"
       end
     end
 

@@ -34,7 +34,7 @@ module Flamethrower
       end
 
       def retrieve_irc_messages
-        to_campfire.retrieve_messages.map{|message| message.to_irc.to_s}
+        to_campfire.retrieve_messages.map{|message| message.to_irc}
       end
 
     end

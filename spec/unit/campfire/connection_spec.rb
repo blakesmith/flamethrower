@@ -3,7 +3,6 @@ require File.join(File.dirname(__FILE__), "../../spec_helper")
 describe Flamethrower::Campfire::Connection do
   before do
     @server = Flamethrower::MockServer.new
-    @server.log = Logger.new("/dev/null")
     @connection = @server.campfire_connection
     FakeWeb.allow_net_connect = false
   end

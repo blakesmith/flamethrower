@@ -3,7 +3,6 @@ require File.join(File.dirname(__FILE__), "../spec_helper")
 describe Flamethrower::Server do
   before do
     @server = Flamethrower::MockServer.new
-    @server.log = Logger.new("/dev/null")
     @server.stub!(:send_data)
     @user = Flamethrower::Irc::User.new :username => 'user', :nickname => 'nick', :hostname => 'host', :realname => 'realname'
     @server.current_user = @user
