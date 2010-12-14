@@ -86,11 +86,13 @@ module Flamethrower
         until @outbound_messages.empty?
           message = @outbound_messages.pop
           json = {"message" => {"body" => message.body, "type" => message.message_type}}.to_json
+          ::FLAMETHROWER_LOGGER.debug "Sending #{json} to campfire API"
           response = campfire_post("/room/#{@number}/speak.json", json)
           case response
           when Net::HTTPCreated
             message.mark_delivered!
           else
+            ::FLAMETHROWER_LOGGER.debug "Failed to post to campfire API with code: #{response.inspect}"
             message.mark_failed!
             failed_messages << message
           end

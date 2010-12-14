@@ -132,7 +132,7 @@ describe Flamethrower::Campfire::Room do
 
   describe "#post_messages" do
     it "pops the message off the queue and posts it to the campfire api" do
-      FakeWeb.register_uri(:post, "https://mytoken:x@mydomain.campfirenow.com/room/347348/speak.json", :body => json_fixture("speak_message"), :status => ["201", "Updated"])
+      FakeWeb.register_uri(:post, "https://mytoken:x@mydomain.campfirenow.com/room/347348/speak.json", :body => json_fixture("speak_message"), :status => ["201", "Created"])
       message = Flamethrower::Campfire::Message.new('type' => 'TextMessage', 'body' => 'Hello there', 'user' => @user, 'room' => @room)
       @room.outbound_messages << message
       @room.post_messages
@@ -156,7 +156,7 @@ describe Flamethrower::Campfire::Room do
     end
 
     it "marks the message as delivered if successfully posted to campfire" do
-      FakeWeb.register_uri(:post, "https://mytoken:x@mydomain.campfirenow.com/room/347348/speak.json", :body => json_fixture("speak_message"), :status => ["201", "Updated"])
+      FakeWeb.register_uri(:post, "https://mytoken:x@mydomain.campfirenow.com/room/347348/speak.json", :body => json_fixture("speak_message"), :status => ["201", "Created"])
       message = Flamethrower::Campfire::Message.new('type' => 'TextMessage', 'body' => 'Hello there', 'user' => @user, 'room' => @room)
       @room.outbound_messages << message
       @room.post_messages
@@ -164,7 +164,7 @@ describe Flamethrower::Campfire::Room do
     end
 
     it "sends the right json" do
-      FakeWeb.register_uri(:post, "https://mytoken:x@mydomain.campfirenow.com/room/347348/speak.json", :body => json_fixture("speak_message"), :status => ["201", "Updated"])
+      FakeWeb.register_uri(:post, "https://mytoken:x@mydomain.campfirenow.com/room/347348/speak.json", :body => json_fixture("speak_message"), :status => ["201", "Created"])
       message = Flamethrower::Campfire::Message.new('type' => 'TextMessage', 'body' => 'Hello there', 'user' => @user, 'room' => @room)
       @room.outbound_messages << message
       expected_json = {"message"=>{"body"=>"Hello there", "type"=>"TextMessage"}}.to_json
