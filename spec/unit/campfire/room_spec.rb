@@ -3,7 +3,8 @@ require File.join(File.dirname(__FILE__), "../../spec_helper")
 describe Flamethrower::Campfire::Room do
   before do
     @room = Flamethrower::Campfire::Room.new("mydomain", "mytoken", "id" => 347348, "topic" => "some topic", "name" => "some name")
-    @user = Flamethrower::Campfire::User.new('name' => "bob", 'id' => 734581)
+    @user = Flamethrower::Campfire::User.new('name' => "bob", 'id' => 489198)
+    @user2 = Flamethrower::Campfire::User.new('name' => "bill", 'id' => 123456)
   end
 
   describe "params" do
@@ -87,7 +88,7 @@ describe Flamethrower::Campfire::Room do
   describe "#fetch_messages" do
     before do
       Twitter::JSONStream.stub(:connect).and_return("stream")
-      item = json_fixture("message")
+      item = json_fixture("streaming_message")
       @room.connect
       @room.stream.stub(:each_item).and_yield(item)
     end
@@ -99,10 +100,11 @@ describe Flamethrower::Campfire::Room do
 
     it "maps the message body to a message object with the right body" do
       @room.fetch_messages
-      @room.inbound_messages.pop.body.should == "Wait for the message."
+      @room.inbound_messages.pop.body.should == "yep"
     end
 
     it "maps the message sender to the right user" do
+      @room.users << @user2
       @room.users << @user
       @room.fetch_messages
       @room.inbound_messages.pop.user.should == @user
