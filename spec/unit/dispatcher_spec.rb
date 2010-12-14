@@ -108,6 +108,14 @@ describe Flamethrower::Dispatcher do
     end
   end
 
+  describe "#ping" do
+    it "responds with pong of the same ping parameters" do
+      message = Flamethrower::Message.new("PING :something\r\n")
+      @server.should_receive(:send_message).with("PONG :something")
+      @dispatcher.handle_message(message)
+    end
+  end
+
   describe "#join" do
     before do
       @room.stub(:fetch_room_info)

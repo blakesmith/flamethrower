@@ -37,6 +37,10 @@ module Flamethrower
         send_message reply(RPL_CHANNELMODEIS, "#{channel.name} #{channel.mode}")
       end
 
+      def send_pong(hostname)
+        send_message "PONG :#{hostname}"
+      end
+
       def send_user_mode
         send_message reply(RPL_UMODEIS, @current_user.mode)
       end

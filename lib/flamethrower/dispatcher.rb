@@ -24,6 +24,11 @@ module Flamethrower
       find_channel(name).to_campfire.say(body)
     end
 
+    def handle_ping(message)
+      hostname = *message.parameters
+      server.send_pong(hostname)
+    end
+
     def handle_user(message)
       username, hostname, servername, realname = *message.parameters
       server.current_user.username = username unless server.current_user.username
