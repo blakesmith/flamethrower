@@ -72,9 +72,9 @@ module Flamethrower
       end
 
       def fetch_messages
-        #::FLAMETHROWER_LOGGER.debug "Fetching messages for #{name}"
         @stream.each_item do |item| 
           params = JSON.parse(item)
+          ::FLAMETHROWER_LOGGER.debug "Got json message #{params.inspect}"
           params['user'] = @users.first {|u| u.number == params['user']['id'] }
           params['room'] = self
           @inbound_messages << Flamethrower::Campfire::Message.new(params)
@@ -82,7 +82,6 @@ module Flamethrower
       end
 
       def post_messages
-        #::FLAMETHROWER_LOGGER.debug "Posting messages for #{name}"
         failed_messages = []
         until @outbound_messages.empty?
           message = @outbound_messages.pop

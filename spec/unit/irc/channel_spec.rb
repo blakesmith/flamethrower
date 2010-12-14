@@ -39,5 +39,11 @@ describe Flamethrower::Irc::Channel do
       @room.inbound_messages << message
       @channel.retrieve_irc_messages.map(&:to_s).should == [":#{@irc_user.to_s} PRIVMSG #{@channel.name} :Hello there"]
     end
+
+    it "doesn't send TimeStamp messages" do
+      message = Flamethrower::Campfire::Message.new('type' => 'TimestampMessage', 'body' => 'Hello there', 'user' => @campfire_user, 'room' => @room)
+      @room.inbound_messages << message
+      @channel.retrieve_irc_messages.should be_empty
+    end
   end
 end

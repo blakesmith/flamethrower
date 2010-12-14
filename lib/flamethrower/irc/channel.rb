@@ -34,7 +34,10 @@ module Flamethrower
       end
 
       def retrieve_irc_messages
-        to_campfire.retrieve_messages.map{|message| message.to_irc}
+        to_campfire.retrieve_messages.inject([]) do |all_messages, message|
+          all_messages << message.to_irc unless message.message_type == "TimestampMessage"
+          all_messages
+        end
       end
 
     end
