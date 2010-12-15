@@ -1,0 +1,20 @@
+= Flamethrower: An irc to campfire gateway
+
+Flamethrower gives you the power to use your awesome irc client to
+talk in your campfire rooms.
+
+= Usage:
+
+=== Getting Started
+
+  gem install flamethrower
+  flamethrower -d <campfire_domain> -t <campfire_api_token>
+
+Then fire up your irc client and point it to localhost:6667. If your
+domain and API token are valid, you should see a list of channels appear
+in the MOTD message. /join anyone of these and start chatting.
+
+=== Author
+
+Flamethrower is written by Blake Smith <blakesmith0@gmail.com>
+
