@@ -43,6 +43,15 @@ describe Flamethrower::Campfire::Message do
       message.to_irc.to_s.should == ":#{@irc_user.to_s} PART #{@channel.name}"
     end
 
+    it "converts a LeaveMessage to a part irc message" do
+      json = JSON.parse(json_fixture('leave_message'))
+      message = Flamethrower::Campfire::Message.new(json)
+      message.user = @campfire_user
+      message.room = @room
+      message.to_irc.to_s.should == ":#{@irc_user.to_s} PART #{@channel.name}"
+    end
+
+
     it "makes a PasteMessage a PRIVMSG" do
       json = JSON.parse(json_fixture('paste_message'))
       message = Flamethrower::Campfire::Message.new(json)
