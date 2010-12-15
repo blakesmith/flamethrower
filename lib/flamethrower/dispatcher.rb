@@ -55,6 +55,12 @@ module Flamethrower
       end
     end
 
+    def handle_topic(message)
+      find_channel_or_error(message.parameters.first) do |channel|
+        server.send_topic(channel)
+      end
+    end
+
     def handle_mode(message)
       first_param = message.parameters.first
       error = Flamethrower::Irc::Codes::ERR_UNKNOWNCOMMAND

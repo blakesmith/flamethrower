@@ -45,6 +45,28 @@ describe Flamethrower::Dispatcher do
     end
   end
 
+  describe "#topic" do
+    before do
+      @user = Flamethrower::Irc::User.new :username => "user", :nickname => "nick", :hostname => "host", :realname => "realname", :servername => "servername"
+      @server.current_user = @user
+    end
+
+    context "retrieving the channel topic" do
+      it "should display the channel topic" do
+        message = Flamethrower::Message.new("TOPIC #flamethrower")
+        @dispatcher.server.should_receive(:send_topic).with(@channel)
+        @dispatcher.handle_message(message)
+      end
+
+      it "responds with an error if the channel can't be found" do
+        message = Flamethrower::Message.new("TOPIC #bogus")
+        @dispatcher.server.should_not_receive(:send_topic)
+        @dispatcher.server.should_receive(:send_message).with(":#{@user.hostname} 475")
+        @dispatcher.handle_message(message)
+      end
+    end
+  end
+
   describe "#mode" do
     before do
       @user = Flamethrower::Irc::User.new :username => "user", :nickname => "nick", :hostname => "host", :realname => "realname", :servername => "servername"
