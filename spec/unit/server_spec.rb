@@ -39,8 +39,8 @@ describe Flamethrower::Server do
   describe "#receive_data" do
     it "calls the dispatcher with a new Message" do
       incoming = "COMMAND params"
-      msg = Flamethrower::Message.new(incoming)
-      Flamethrower::Message.should_receive(:new).with(incoming).and_return(msg)
+      msg = Flamethrower::Irc::Message.new(incoming)
+      Flamethrower::Irc::Message.should_receive(:new).with(incoming).and_return(msg)
       @server.dispatcher.should_receive(:handle_message).with(msg)
       @server.receive_data(incoming)
     end

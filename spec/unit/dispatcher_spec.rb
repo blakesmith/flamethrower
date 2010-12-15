@@ -11,13 +11,13 @@ describe Flamethrower::Dispatcher do
 
   describe "#handle_message" do
     it "sends the message to the right command handler method" do
-      message = Flamethrower::Message.new("USER stuff\r\n")
+      message = Flamethrower::Irc::Message.new("USER stuff\r\n")
       @dispatcher.should_receive(:handle_user).with(message)
       @dispatcher.handle_message(message)
     end
 
     it "doesn't send the message to the handler method if the method doesn't exist" do
-      message = Flamethrower::Message.new("BOGUS stuff\r\n")
+      message = Flamethrower::Irc::Message.new("BOGUS stuff\r\n")
       @dispatcher.should_not_receive(:BOGUS)
       @dispatcher.handle_message(message)
     end
@@ -25,7 +25,7 @@ describe Flamethrower::Dispatcher do
 
   describe "#user" do
     it "sets the current session's user to the specified user" do
-      message = Flamethrower::Message.new("USER guest tolmoon tolsun :Ronnie Reagan\r\n")
+      message = Flamethrower::Irc::Message.new("USER guest tolmoon tolsun :Ronnie Reagan\r\n")
       @dispatcher.handle_message(message)
       @dispatcher.server.current_user.username.should == "guest"
       @dispatcher.server.current_user.hostname.should == "tolmoon"
@@ -34,8 +34,8 @@ describe Flamethrower::Dispatcher do
     end
 
     it "not set a second user request if a first has already been recieved" do
-      message = Flamethrower::Message.new("USER guest tolmoon tolsun :Ronnie Reagan\r\n")
-      message2 = Flamethrower::Message.new("USER guest2 tolmoon2 tolsun2 :Ronnie Reagan2\r\n")
+      message = Flamethrower::Irc::Message.new("USER guest tolmoon tolsun :Ronnie Reagan\r\n")
+      message2 = Flamethrower::Irc::Message.new("USER guest2 tolmoon2 tolsun2 :Ronnie Reagan2\r\n")
       @dispatcher.handle_message(message)
       @dispatcher.handle_message(message2)
       @dispatcher.server.current_user.username.should == "guest"
@@ -53,13 +53,13 @@ describe Flamethrower::Dispatcher do
 
     context "retrieving the channel topic" do
       it "should display the channel topic" do
-        message = Flamethrower::Message.new("TOPIC #flamethrower")
+        message = Flamethrower::Irc::Message.new("TOPIC #flamethrower")
         @dispatcher.server.should_receive(:send_topic).with(@channel)
         @dispatcher.handle_message(message)
       end
 
       it "responds with an error if the channel can't be found" do
-        message = Flamethrower::Message.new("TOPIC #bogus")
+        message = Flamethrower::Irc::Message.new("TOPIC #bogus")
         @dispatcher.server.should_not_receive(:send_topic)
         @dispatcher.server.should_receive(:send_message).with(":#{@user.hostname} 475")
         @dispatcher.handle_message(message)
@@ -68,7 +68,7 @@ describe Flamethrower::Dispatcher do
 
     context "setting the channel topic" do
       it "sets the channel topic to the specified topic" do
-        message = Flamethrower::Message.new("TOPIC #flamethrower :some awesome topic")
+        message = Flamethrower::Irc::Message.new("TOPIC #flamethrower :some awesome topic")
         @dispatcher.server.should_receive(:send_topic).with(@channel)
         @dispatcher.handle_message(message)
         @channel.topic.should == "some awesome topic"
@@ -84,19 +84,19 @@ describe Flamethrower::Dispatcher do
 
     context "channel mode" do
       it "responds to mode with a static channel mode" do
-        message = Flamethrower::Message.new("MODE #flamethrower\r\n")
+        message = Flamethrower::Irc::Message.new("MODE #flamethrower\r\n")
         @dispatcher.server.should_receive(:send_channel_mode).with(@channel)
         @dispatcher.handle_message(message)
       end
 
       it "responds with the user mode if the mode isn't for a channel" do
-        message = Flamethrower::Message.new("MODE #{@user.nickname} +i\r\n")
+        message = Flamethrower::Irc::Message.new("MODE #{@user.nickname} +i\r\n")
         @dispatcher.server.should_receive(:send_user_mode)
         @dispatcher.handle_message(message)
       end
 
       it "responds with unknown command if the mode is neither a server nor the current user" do
-        message = Flamethrower::Message.new("MODE foo\r\n")
+        message = Flamethrower::Irc::Message.new("MODE foo\r\n")
         @dispatcher.server.should_receive(:send_message).with(":#{@user.hostname} 421")
         @dispatcher.handle_message(message)
       end
@@ -105,7 +105,7 @@ describe Flamethrower::Dispatcher do
 
   describe "#nick" do
     it "sets the current session's user nickname to the specified nick" do
-      message = Flamethrower::Message.new("NICK WiZ\r\n")
+      message = Flamethrower::Irc::Message.new("NICK WiZ\r\n")
       @dispatcher.handle_message(message)
       @dispatcher.server.current_user.nickname.should == "WiZ"
     end
@@ -114,7 +114,7 @@ describe Flamethrower::Dispatcher do
   describe "#privmsg" do
     context "sent by me" do
       it "generates and queues an outbound campfire message to the right room" do
-        message = Flamethrower::Message.new("PRIVMSG #test :Hello.\r\n")
+        message = Flamethrower::Irc::Message.new("PRIVMSG #test :Hello.\r\n")
         room = Flamethrower::Campfire::Room.new("mydomain", "mytoken", {'name' => "test"})
         irc_channel = room.to_irc
         @dispatcher.server.irc_channels << irc_channel
@@ -123,7 +123,7 @@ describe Flamethrower::Dispatcher do
       end
 
       it "sends the right message parameters to the new outbound message" do
-        message = Flamethrower::Message.new("PRIVMSG #test :Hello.\r\n")
+        message = Flamethrower::Irc::Message.new("PRIVMSG #test :Hello.\r\n")
         room = Flamethrower::Campfire::Room.new("mydomain", "mytoken", {'name' => "test"})
         irc_channel = room.to_irc
         @dispatcher.server.irc_channels << irc_channel
@@ -138,7 +138,7 @@ describe Flamethrower::Dispatcher do
 
   describe "#ping" do
     it "responds with pong of the same ping parameters" do
-      message = Flamethrower::Message.new("PING :something\r\n")
+      message = Flamethrower::Irc::Message.new("PING :something\r\n")
       @server.should_receive(:send_message).with("PONG :something")
       @dispatcher.handle_message(message)
     end
@@ -148,7 +148,7 @@ describe Flamethrower::Dispatcher do
     it "stops the thread of the room being parted from" do
       @room.instance_variable_set("@thread_running", true)
       @room.should be_alive
-      message = Flamethrower::Message.new("PART #flamethrower")
+      message = Flamethrower::Irc::Message.new("PART #flamethrower")
       @dispatcher.handle_message(message)
       @room.should_not be_alive
     end
@@ -156,7 +156,7 @@ describe Flamethrower::Dispatcher do
     it "responds with ERR_BADCHANNELKEY a channel that doesn't exist" do
       user = Flamethrower::Irc::User.new :username => "user", :nickname => "nick", :hostname => "host", :realname => "realname", :servername => "servername"
       @server.current_user = user
-      message = Flamethrower::Message.new("PART #foobar")
+      message = Flamethrower::Irc::Message.new("PART #foobar")
       @server.should_receive(:send_message).with(":#{user.hostname} 475")
       @dispatcher.handle_message(message)
     end
@@ -166,7 +166,7 @@ describe Flamethrower::Dispatcher do
     it "kills all the room threads on quit" do
       @room.instance_variable_set("@thread_running", true)
       @room.should be_alive
-      message = Flamethrower::Message.new("QUIT :leaving")
+      message = Flamethrower::Irc::Message.new("QUIT :leaving")
       @dispatcher.handle_message(message)
       @room.should_not be_alive
     end
@@ -178,7 +178,7 @@ describe Flamethrower::Dispatcher do
     end
 
     it "responds with a topic and userlist if sent a join" do
-      message = Flamethrower::Message.new("JOIN #flamethrower\r\n")
+      message = Flamethrower::Irc::Message.new("JOIN #flamethrower\r\n")
       @server.should_receive(:send_topic).with(@channel)
       @server.should_receive(:send_userlist)
       @dispatcher.handle_message(message)
@@ -187,13 +187,13 @@ describe Flamethrower::Dispatcher do
     it "adds the current user to the channel" do
       user = Flamethrower::Irc::User.new :username => "user", :nickname => "nick", :hostname => "host", :realname => "realname", :servername => "servername"
       @server.current_user = user
-      message = Flamethrower::Message.new("JOIN #flamethrower\r\n")
+      message = Flamethrower::Irc::Message.new("JOIN #flamethrower\r\n")
       @dispatcher.handle_message(message)
       @channel.users.should include(user)
     end
 
     it "fetches the room information on join" do
-      message = Flamethrower::Message.new("JOIN #flamethrower\r\n")
+      message = Flamethrower::Irc::Message.new("JOIN #flamethrower\r\n")
       @room.should_receive(:fetch_room_info)
       @dispatcher.handle_message(message)
     end
@@ -201,7 +201,7 @@ describe Flamethrower::Dispatcher do
     it "responds with ERR_BADCHANNELKEY a channel that doesn't exist" do
       user = Flamethrower::Irc::User.new :username => "user", :nickname => "nick", :hostname => "host", :realname => "realname", :servername => "servername"
       @server.current_user = user
-      message = Flamethrower::Message.new("JOIN #foobar\r\n")
+      message = Flamethrower::Irc::Message.new("JOIN #foobar\r\n")
       @server.should_receive(:send_message).with(":#{user.hostname} 475")
       @server.should_not_receive(:send_topic)
       @server.should_not_receive(:send_userlist)
@@ -211,8 +211,8 @@ describe Flamethrower::Dispatcher do
 
   context "after a nick and user has been set" do
     before do
-      @user_message = Flamethrower::Message.new("USER guest tolmoon tolsun :Ronnie Reagan\r\n")
-      @nick_message = Flamethrower::Message.new("NICK WiZ\r\n")
+      @user_message = Flamethrower::Irc::Message.new("USER guest tolmoon tolsun :Ronnie Reagan\r\n")
+      @nick_message = Flamethrower::Irc::Message.new("NICK WiZ\r\n")
     end
 
     describe "nick sent first" do

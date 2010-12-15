@@ -33,7 +33,7 @@ module Flamethrower
         when "PasteMessage"
           irc_string = ":#{@user.to_irc.to_s} PRIVMSG #{@room.to_irc.name} :#{@body}"
         end
-        Flamethrower::Message.new(irc_string)
+        Flamethrower::Irc::Message.new(irc_string)
       end
     end
   end

@@ -25,7 +25,7 @@ module Flamethrower
     def receive_data(msg)
       messages = msg.split("\r\n")
       messages.each do |message|
-        dispatcher.handle_message(Flamethrower::Message.new(message))
+        dispatcher.handle_message(Flamethrower::Irc::Message.new(message))
         ::FLAMETHROWER_LOGGER.debug "<< #{message}"
       end
     end
