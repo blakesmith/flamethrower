@@ -22,10 +22,13 @@ module Flamethrower
       def to_irc
         case message_type
         when "TextMessage"
-          Flamethrower::Message.new(":#{@user.to_irc.to_s} PRIVMSG #{@room.to_irc.name} :#{@body}")
+          irc_string = ":#{@user.to_irc.to_s} PRIVMSG #{@room.to_irc.name} :#{@body}"
         when "EnterMessage"
-          Flamethrower::Message.new(":#{@user.to_irc.to_s} JOIN #{@room.to_irc.name}")
+          irc_string = ":#{@user.to_irc.to_s} JOIN #{@room.to_irc.name}"
+        when "KickMessage"
+          irc_string = ":#{@user.to_irc.to_s} PART #{@room.to_irc.name}"
         end
+        Flamethrower::Message.new(irc_string)
       end
     end
   end

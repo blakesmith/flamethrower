@@ -34,6 +34,14 @@ describe Flamethrower::Campfire::Message do
       message.room = @room
       message.to_irc.to_s.should == ":#{@irc_user.to_s} JOIN #{@channel.name}"
     end
+
+    it "converts a KickMessage to a part irc message" do
+      json = JSON.parse(json_fixture('kick_message'))
+      message = Flamethrower::Campfire::Message.new(json)
+      message.user = @campfire_user
+      message.room = @room
+      message.to_irc.to_s.should == ":#{@irc_user.to_s} PART #{@channel.name}"
+    end
   end
 
   describe "#mark_delivered!" do
