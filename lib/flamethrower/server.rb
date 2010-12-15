@@ -6,8 +6,8 @@ module Flamethrower
 
     def initialize(options = {})
       @irc_channels = []
-      @current_user ||= Flamethrower::Irc::User.new
-      @dispatcher ||= Flamethrower::Dispatcher.new(self)
+      @current_user = Flamethrower::Irc::User.new
+      @dispatcher = Flamethrower::Dispatcher.new(self)
     end
 
     def after_connect
