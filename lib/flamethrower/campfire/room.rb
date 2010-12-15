@@ -45,7 +45,7 @@ module Flamethrower
         ::FLAMETHROWER_LOGGER.debug "Starting thread for room #{name}"
         Thread.new do
           connect
-          until kill_thread?
+          until dead?
             fetch_messages
             post_messages
             requeue_failed_messages
@@ -59,8 +59,12 @@ module Flamethrower
         end
       end
 
-      def kill_thread?
-        @stop_thread
+      def alive?
+        !@stop_thread
+      end
+
+      def dead?
+        !alive?
       end
 
       def kill_thread!

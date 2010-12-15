@@ -53,11 +53,8 @@ describe Flamethrower::Dispatcher do
 
     context "channel mode" do
       it "responds to mode with a static channel mode" do
-        channel = Flamethrower::Irc::Channel.new("#flamethrower")
-        @server.irc_channels << channel
-        @dispatcher.stub(:find_channel).and_return(channel)
         message = Flamethrower::Message.new("MODE #flamethrower\r\n")
-        @dispatcher.server.should_receive(:send_channel_mode).with(channel)
+        @dispatcher.server.should_receive(:send_channel_mode).with(@channel)
         @dispatcher.handle_message(message)
       end
 
@@ -112,6 +109,23 @@ describe Flamethrower::Dispatcher do
     it "responds with pong of the same ping parameters" do
       message = Flamethrower::Message.new("PING :something\r\n")
       @server.should_receive(:send_message).with("PONG :something")
+      @dispatcher.handle_message(message)
+    end
+  end
+
+  describe "#part" do
+    it "stops the thread of the room being parted from" do
+      @room.should be_alive
+      message = Flamethrower::Message.new("PART #flamethrower")
+      @dispatcher.handle_message(message)
+      @room.should_not be_alive
+    end
+
+    it "responds with ERR_BADCHANNELKEY a channel that doesn't exist" do
+      user = Flamethrower::Irc::User.new :username => "user", :nickname => "nick", :hostname => "host", :realname => "realname", :servername => "servername"
+      @server.current_user = user
+      message = Flamethrower::Message.new("PART #foobar")
+      @server.should_receive(:send_message).with(":#{user.hostname} 475")
       @dispatcher.handle_message(message)
     end
   end

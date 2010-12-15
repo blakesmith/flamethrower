@@ -13,15 +13,22 @@ module Flamethrower
 
     private
 
-    def find_channel(name)
-      server.irc_channels.detect {|channel| channel.name == name}
+    def find_channel_or_error(name, error=Flamethrower::Irc::Codes::ERR_BADCHANNELKEY)
+      channel = server.irc_channels.detect {|channel| channel.name == name}
+      if channel && block_given?
+        yield(channel)
+      else
+        server.send_message(server.error(error))
+      end
     end
 
     protected
 
     def handle_privmsg(message)
       name, body = *message.parameters
-      find_channel(name).to_campfire.say(body)
+      find_channel_or_error(name) do |channel|
+        channel.to_campfire.say(body)
+      end
     end
 
     def handle_ping(message)
@@ -49,27 +56,32 @@ module Flamethrower
     end
 
     def handle_mode(message)
-      if server.irc_channels.map(&:name).include?(message.parameters.first)
-        channel = find_channel(message.parameters.first)
-        server.send_channel_mode(channel)
-      elsif message.parameters.first == server.current_user.nickname
+      first_param = message.parameters.first
+      error = Flamethrower::Irc::Codes::ERR_UNKNOWNCOMMAND
+      if first_param == server.current_user.nickname
         server.send_user_mode
-      else
-        server.send_message(server.error(Flamethrower::Irc::Codes::ERR_UNKNOWNCOMMAND))
+        return
+      end
+      find_channel_or_error(first_param, error) do |channel|
+        server.send_channel_mode(channel)
       end
     end
 
     def handle_join(message)
-      if server.irc_channels.map(&:name).include?(message.parameters.first)
-        channel = find_channel(message.parameters.first)
+      find_channel_or_error(message.parameters.first) do |channel|
         room = channel.to_campfire
         channel.users << server.current_user
         room.fetch_room_info
         room.start_thread
         server.send_topic(channel)
         server.send_userlist(channel)
-      else
-        server.send_message(server.error(Flamethrower::Irc::Codes::ERR_BADCHANNELKEY))
+      end
+    end
+
+    def handle_part(message)
+      find_channel_or_error(message.parameters.first) do |channel|
+        room = channel.to_campfire
+        room.kill_thread!
       end
     end
   end
