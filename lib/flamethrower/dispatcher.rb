@@ -61,9 +61,10 @@ module Flamethrower
       if first_param == server.current_user.nickname
         server.send_user_mode
         return
-      end
-      find_channel_or_error(first_param, error) do |channel|
-        server.send_channel_mode(channel)
+      else
+        find_channel_or_error(first_param, error) do |channel|
+          server.send_channel_mode(channel)
+        end
       end
     end
 
