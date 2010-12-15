@@ -3,7 +3,6 @@ module Flamethrower
     class Channel
 
       attr_accessor :name, :modes, :mode
-      attr_writer :topic
 
       def initialize(name, campfire_channel=nil)
         @users = []
@@ -17,8 +16,13 @@ module Flamethrower
       end
 
       def topic
-        return "No topic" if @topic && @topic.empty?
-        @topic
+        campfire_topic = to_campfire.topic
+        return "No topic" if campfire_topic && campfire_topic.empty?
+        campfire_topic
+      end
+
+      def topic=(topic)
+        to_campfire.topic = topic 
       end
 
       def to_campfire

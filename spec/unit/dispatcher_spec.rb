@@ -65,6 +65,15 @@ describe Flamethrower::Dispatcher do
         @dispatcher.handle_message(message)
       end
     end
+
+    context "setting the channel topic" do
+      it "sets the channel topic to the specified topic" do
+        message = Flamethrower::Message.new("TOPIC #flamethrower :some awesome topic")
+        @dispatcher.server.should_receive(:send_topic).with(@channel)
+        @dispatcher.handle_message(message)
+        @channel.topic.should == "some awesome topic"
+      end
+    end
   end
 
   describe "#mode" do

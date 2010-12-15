@@ -90,7 +90,8 @@ describe Flamethrower::Server do
     end
 
     it "should have the correct TOPIC format" do
-      channel = Flamethrower::Irc::Channel.new("#flamethrower")
+      room = Flamethrower::Campfire::Room.new("mydomain", "mytoken", "id" => 347348, "name" => "room 1")
+      channel = Flamethrower::Irc::Channel.new("#flamethrower", room)
       channel.topic = "A topic"
       @server.send_topic(channel).should == ":host 332 nick #flamethrower :A topic"
     end
@@ -119,9 +120,11 @@ describe Flamethrower::Server do
 
     describe "#send_channel_list" do
       it "sends the right motd message with the channel list" do
-        channel = Flamethrower::Irc::Channel.new("#flamethrower")
+        room = Flamethrower::Campfire::Room.new("mydomain", "mytoken", "id" => 347348, "name" => "room 1")
+        room2 = Flamethrower::Campfire::Room.new("mydomain", "mytoken", "id" => 347349, "name" => "room 2")
+        channel = Flamethrower::Irc::Channel.new("#flamethrower", room)
         channel.topic = "Flamethrower topic"
-        channel2 = Flamethrower::Irc::Channel.new("#room_1")
+        channel2 = Flamethrower::Irc::Channel.new("#room_1", room2)
         channel2.topic = "Room 1 topic"
         @server.irc_channels = [channel, channel2]
         @server.send_channel_list.should == [
@@ -133,8 +136,10 @@ describe Flamethrower::Server do
       end
 
       it "shows 'No topic' in the channel list if there's no room topic" do
-        channel = Flamethrower::Irc::Channel.new("#flamethrower")
-        channel2 = Flamethrower::Irc::Channel.new("#room_1")
+        room = Flamethrower::Campfire::Room.new("mydomain", "mytoken", "id" => 347348, "name" => "room 1")
+        room2 = Flamethrower::Campfire::Room.new("mydomain", "mytoken", "id" => 347349, "name" => "room 2")
+        channel = Flamethrower::Irc::Channel.new("#flamethrower", room)
+        channel2 = Flamethrower::Irc::Channel.new("#room_1", room2)
         channel.topic = channel2.topic = ""
         @server.irc_channels = [channel, channel2]
         @server.send_channel_list.should == [
