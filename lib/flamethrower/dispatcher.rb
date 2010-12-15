@@ -84,6 +84,10 @@ module Flamethrower
         room.kill_thread!
       end
     end
+
+    def handle_quit(message)
+      server.irc_channels.each {|c| c.to_campfire.kill_thread!}
+    end
   end
 end
 

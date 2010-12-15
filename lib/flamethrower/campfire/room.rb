@@ -17,7 +17,7 @@ module Flamethrower
         @name = params['name']
         @topic = params['topic']
         @users = []
-        @stop_thread = false
+        @thread_running = false
       end
 
       def topic=(topic)
@@ -43,6 +43,7 @@ module Flamethrower
 
       def start_thread
         ::FLAMETHROWER_LOGGER.debug "Starting thread for room #{name}"
+        @thread_running = true
         Thread.new do
           connect
           until dead?
@@ -60,15 +61,15 @@ module Flamethrower
       end
 
       def alive?
-        !@stop_thread
+        @thread_running
       end
 
       def dead?
-        !alive?
+        !@thread_running
       end
 
       def kill_thread!
-        @stop_thread = true
+        @thread_running = false
       end
 
       def connect

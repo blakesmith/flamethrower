@@ -115,6 +115,7 @@ describe Flamethrower::Dispatcher do
 
   describe "#part" do
     it "stops the thread of the room being parted from" do
+      @room.instance_variable_set("@thread_running", true)
       @room.should be_alive
       message = Flamethrower::Message.new("PART #flamethrower")
       @dispatcher.handle_message(message)
@@ -127,6 +128,16 @@ describe Flamethrower::Dispatcher do
       message = Flamethrower::Message.new("PART #foobar")
       @server.should_receive(:send_message).with(":#{user.hostname} 475")
       @dispatcher.handle_message(message)
+    end
+  end
+
+  describe "#quit" do
+    it "kills all the room threads on quit" do
+      @room.instance_variable_set("@thread_running", true)
+      @room.should be_alive
+      message = Flamethrower::Message.new("QUIT :leaving")
+      @dispatcher.handle_message(message)
+      @room.should_not be_alive
     end
   end
 
