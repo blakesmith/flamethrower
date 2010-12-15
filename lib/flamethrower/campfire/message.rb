@@ -27,6 +27,8 @@ module Flamethrower
           irc_string = ":#{@user.to_irc.to_s} JOIN #{@room.to_irc.name}"
         when "KickMessage"
           irc_string = ":#{@user.to_irc.to_s} PART #{@room.to_irc.name}"
+        when "PasteMessage"
+          irc_string = ":#{@user.to_irc.to_s} PRIVMSG #{@room.to_irc.name} :#{@body}"
         end
         Flamethrower::Message.new(irc_string)
       end
