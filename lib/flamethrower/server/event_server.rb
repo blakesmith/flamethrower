@@ -17,6 +17,7 @@ module Flamethrower
 
     def start
       EventMachine::run do
+        FLAMETHROWER_LOGGER.info "Flamethrower started at #{@host}:#{@port} on domain #{@domain}"
         EventMachine::start_server(@host, @port, EventConnection) do |connection|
           connection.server = self
           connection.campfire_connection = Flamethrower::Campfire::Connection.new(@domain, @token, connection)
