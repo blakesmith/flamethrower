@@ -20,7 +20,12 @@ module Flamethrower
       end
 
       def to_irc
-        Flamethrower::Message.new(":#{@user.to_irc.to_s} PRIVMSG #{@room.to_irc.name} :#{@body}")
+        case message_type
+        when "TextMessage"
+          Flamethrower::Message.new(":#{@user.to_irc.to_s} PRIVMSG #{@room.to_irc.name} :#{@body}")
+        when "EnterMessage"
+          Flamethrower::Message.new(":#{@user.to_irc.to_s} JOIN #{@room.to_irc.name}")
+        end
       end
     end
   end

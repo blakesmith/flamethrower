@@ -35,7 +35,7 @@ describe Flamethrower::Irc::Channel do
 
   describe "#irc_messages" do
     it "returns the irc messages to be sent to the client" do
-      message = Flamethrower::Campfire::Message.new('body' => 'Hello there', 'user' => @campfire_user, 'room' => @room)
+      message = Flamethrower::Campfire::Message.new('body' => 'Hello there', 'user' => @campfire_user, 'room' => @room, 'type' => 'TextMessage')
       @room.inbound_messages << message
       @channel.retrieve_irc_messages.map(&:to_s).should == [":#{@irc_user.to_s} PRIVMSG #{@channel.name} :Hello there"]
     end

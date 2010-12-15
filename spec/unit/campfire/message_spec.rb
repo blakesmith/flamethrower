@@ -5,6 +5,7 @@ describe Flamethrower::Campfire::Message do
     @room = Flamethrower::Campfire::Room.new("mydomain", "mytoken", {'name' => "flamethrower"})
     @channel = Flamethrower::Irc::Channel.new("#flamethrower", @room)
     @campfire_user = Flamethrower::Campfire::User.new('name' => "bob", 'id' => 734581)
+    @room.users << @campfire_user
     @irc_user = @campfire_user.to_irc
     @message = Flamethrower::Campfire::Message.new('user' => @campfire_user, 'room' => @room, 'body' => 'thebody', 'type' => "TextMessage")
   end
@@ -24,6 +25,14 @@ describe Flamethrower::Campfire::Message do
   describe "#to_irc" do
     it "converts the message to an irc message" do
       @message.to_irc.to_s.should == ":#{@irc_user.to_s} PRIVMSG #{@channel.name} :thebody"
+    end
+
+    it "converts a EnterMessage to a join irc message" do
+      json = JSON.parse(json_fixture('enter_message'))
+      message = Flamethrower::Campfire::Message.new(json)
+      message.user = @campfire_user
+      message.room = @room
+      message.to_irc.to_s.should == ":#{@irc_user.to_s} JOIN #{@channel.name}"
     end
   end
 
