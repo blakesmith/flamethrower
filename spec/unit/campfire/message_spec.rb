@@ -66,5 +66,11 @@ describe Flamethrower::Campfire::Message do
       @message.mark_failed!
       @message.status.should == "failed"
     end
+
+    it "sets the retry_at to 15 seconds from now" do
+      Time.stub(:now).and_return(Time.parse("9:00AM"))
+      @message.mark_failed!
+      @message.retry_at.should == Time.parse("9:00:15AM")
+    end
   end
 end

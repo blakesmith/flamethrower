@@ -5,12 +5,14 @@ module Flamethrower
 
       attr_reader :stream, :token
       attr_accessor :inbound_messages, :outbound_messages, :thread_messages, :number, :name, :users, :server
+      attr_accessor :failed_messages
 
       def initialize(domain, token, params = {})
         @domain = domain
         @token = token
         @inbound_messages = Queue.new
         @outbound_messages = Queue.new
+        @failed_messages = []
         @number = params['id']
         @name = params['name']
         @topic = params['topic']
@@ -46,6 +48,7 @@ module Flamethrower
           until kill_thread?
             fetch_messages
             post_messages
+            requeue_failed_messages
             messages_to_send = to_irc.retrieve_irc_messages
             messages_to_send.each do |m| 
               ::FLAMETHROWER_LOGGER.debug "Sending irc message #{m.to_s}"
@@ -82,7 +85,6 @@ module Flamethrower
       end
 
       def post_messages
-        failed_messages = []
         until @outbound_messages.empty?
           message = @outbound_messages.pop
           json = {"message" => {"body" => message.body, "type" => message.message_type}}.to_json
@@ -94,16 +96,24 @@ module Flamethrower
           else
             ::FLAMETHROWER_LOGGER.debug "Failed to post to campfire API with code: #{response.inspect}"
             message.mark_failed!
-            failed_messages << message
+            @failed_messages << message
           end
         end
-        failed_messages.each {|m| @outbound_messages << m}
       end
 
       def retrieve_messages
         Array.new.tap do |new_array|
           until @inbound_messages.empty?
             new_array << @inbound_messages.pop
+          end
+        end
+      end
+
+      def requeue_failed_messages
+        @failed_messages.each do |m| 
+          if m.retry_at > Time.now
+            @outbound_messages << m 
+            @failed_messages.delete(m)
           end
         end
       end

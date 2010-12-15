@@ -1,7 +1,9 @@
 module Flamethrower
   module Campfire
     class Message
-      attr_accessor :body, :user, :room, :message_type, :status
+      attr_accessor :body, :user, :room, :message_type, :status, :retry_at
+
+      RETRY_SECONDS = 15
 
       def initialize(params = {})
         @body = params['body']
@@ -17,6 +19,7 @@ module Flamethrower
 
       def mark_failed!
         @status = "failed"
+        @retry_at = Time.now + RETRY_SECONDS
       end
 
       def to_irc

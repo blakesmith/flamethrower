@@ -132,6 +132,28 @@ describe Flamethrower::Campfire::Room do
     end
   end
 
+  describe "#requeue_failed_messages" do
+    it "queues a message whos retry_at is greater than now" do
+      Time.stub(:now).and_return(Time.parse("9:00AM"))
+      message = Flamethrower::Campfire::Message.new('type' => 'TextMessage', 'body' => 'Hello there', 'user' => @user, 'room' => @room)
+      message.retry_at = Time.parse("9:00:01AM")
+      @room.failed_messages << message
+      @room.requeue_failed_messages
+      @room.outbound_messages.size.should == 1
+      @room.failed_messages.size.should == 0
+    end
+
+    it "doesn't queue a message whos retry_at is less than now" do
+      Time.stub(:now).and_return(Time.parse("9:00AM"))
+      message = Flamethrower::Campfire::Message.new('type' => 'TextMessage', 'body' => 'Hello there', 'user' => @user, 'room' => @room)
+      message.retry_at = Time.parse("8:59AM")
+      @room.failed_messages << message
+      @room.requeue_failed_messages
+      @room.outbound_messages.size.should == 0
+      @room.failed_messages.size.should == 1
+    end
+  end
+
   describe "#post_messages" do
     it "pops the message off the queue and posts it to the campfire api" do
       FakeWeb.register_uri(:post, "https://mytoken:x@mydomain.campfirenow.com/room/347348/speak.json", :body => json_fixture("speak_message"), :status => ["201", "Created"])
@@ -141,12 +163,13 @@ describe Flamethrower::Campfire::Room do
       @room.outbound_messages.size.should == 0
     end
 
-    it "re queues the message if it fails to post to the campfire API" do
+    it "adds the message to the failed_messages array if it fails to post to the campfire API" do
       FakeWeb.register_uri(:post, "https://mytoken:x@mydomain.campfirenow.com/room/347348/speak.json", :status => ["400", "Bad Request"])
       message = Flamethrower::Campfire::Message.new('type' => 'TextMessage', 'body' => 'Hello there', 'user' => @user, 'room' => @room)
       @room.outbound_messages << message
       @room.post_messages
-      @room.outbound_messages.size.should == 1
+      @room.outbound_messages.size.should == 0
+      @room.failed_messages.size.should == 1
     end
 
     it "marks the message as failed when not able to deliver" do
