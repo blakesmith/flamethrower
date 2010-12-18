@@ -27,8 +27,6 @@ module Flamethrower
         put_or_post(Net::HTTP::Put, path, json)
       end
 
-      private
-
       def put_or_post(request_type, path, json)
         action = request_type.new(path)
         action.basic_auth @token, 'x'
