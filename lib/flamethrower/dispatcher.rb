@@ -79,6 +79,7 @@ module Flamethrower
       find_channel_or_error(message.parameters.first) do |channel|
         room = channel.to_campfire
         channel.users << server.current_user
+        room.join
         room.fetch_room_info
         room.start_thread
         server.send_topic(channel)

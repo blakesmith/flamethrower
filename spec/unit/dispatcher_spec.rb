@@ -175,6 +175,7 @@ describe Flamethrower::Dispatcher do
   describe "#join" do
     before do
       @room.stub(:fetch_room_info)
+      @room.stub(:join)
     end
 
     it "responds with a topic and userlist if sent a join" do
@@ -205,6 +206,12 @@ describe Flamethrower::Dispatcher do
       @server.should_receive(:send_message).with(":#{user.hostname} 475")
       @server.should_not_receive(:send_topic)
       @server.should_not_receive(:send_userlist)
+      @dispatcher.handle_message(message)
+    end
+
+    it "sends a join command to the API" do
+      message = Flamethrower::Irc::Message.new("JOIN #flamethrower\r\n")
+      @room.should_receive(:join)
       @dispatcher.handle_message(message)
     end
   end

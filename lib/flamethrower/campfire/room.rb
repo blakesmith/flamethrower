@@ -72,6 +72,10 @@ module Flamethrower
         @thread_running = false
       end
 
+      def join
+        campfire_post("/room/#{@number}/join.json").code == "200"
+      end
+
       def connect
         ::FLAMETHROWER_LOGGER.debug "Connecting to #{name} stream"
         @stream = Twitter::JSONStream.connect(:path => "/room/#{@number}/live.json", 

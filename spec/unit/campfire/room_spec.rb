@@ -45,6 +45,18 @@ describe Flamethrower::Campfire::Room do
 
   end
 
+  describe "#join" do
+    it "returns true when posting to the room join call succeeds" do
+      FakeWeb.register_uri(:post, "https://mytoken:x@mydomain.campfirenow.com/room/347348/join.json", :status => ["200", "OK"])
+      @room.join.should == true
+    end
+
+    it "returns false when posting to the room join call fails" do
+      FakeWeb.register_uri(:post, "https://mytoken:x@mydomain.campfirenow.com/room/347348/join.json", :status => ["400", "Bad Request"])
+      @room.join.should == false
+    end
+  end
+
   describe "#connect" do
     it "initializes the twitter jsonstream with the right options" do
       Twitter::JSONStream.should_receive(:connect).with(:path => "/room/347348/live.json", :host => "streaming.campfirenow.com", :auth => "mytoken:x")

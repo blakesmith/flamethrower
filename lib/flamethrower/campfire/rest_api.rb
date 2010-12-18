@@ -19,10 +19,10 @@ module Flamethrower
         http.request(get)
       end
 
-      def campfire_post(path, json)
+      def campfire_post(path, json=nil)
         post = Net::HTTP::Post.new(path)
         post.basic_auth @token, 'x'
-        post.body = json
+        post.body = json if json
         post.add_field "Content-Type", "application/json"
         http.request(post)
       end
