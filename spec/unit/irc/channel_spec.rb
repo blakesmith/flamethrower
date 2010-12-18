@@ -45,5 +45,12 @@ describe Flamethrower::Irc::Channel do
       @room.inbound_messages << message
       @channel.retrieve_irc_messages.should be_empty
     end
+
+    xit "doesn't send the message if the source is the current user" do
+      message = Flamethrower::Campfire::Message.new('body' => 'Hello there', 'user' => @campfire_user, 'room' => @room, 'type' => 'TextMessage')
+      @room.inbound_messages << message
+      @room.campfire_user = @current_user
+      @channel.retrieve_irc_messages.map(&:to_s).should be_empty
+    end
   end
 end
