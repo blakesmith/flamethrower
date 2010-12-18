@@ -28,6 +28,21 @@ describe Flamethrower::Campfire::Room do
     end
   end
 
+  describe "#send_topic!" do
+    it "sets the topic when the campfire API returns 200" do
+      FakeWeb.register_uri(:put, "https://mytoken:x@mydomain.campfirenow.com/room/347348.json", :body => json_fixture("room_update"), :status => ["200", "OK"])
+      @room.send_topic!("some updated topic")
+      @room.topic.should == "some updated topic"
+    end
+
+    it "keeps the previous topic when the campfire API returns non 200" do
+      FakeWeb.register_uri(:put, "https://mytoken:x@mydomain.campfirenow.com/room/347348.json", :body => json_fixture("room_update"), :status => ["400", "Bad Request"])
+      @room.instance_variable_set("@topic", "some old topic")
+      @room.send_topic!("some updated topic")
+      @room.topic.should == "some old topic"
+    end
+  end
+
   describe "#fetch_room_info" do
     before do
       FakeWeb.register_uri(:get, "https://mytoken:x@mydomain.campfirenow.com/room/347348.json", :body => json_fixture("room"), :status => ["200", "OK"])

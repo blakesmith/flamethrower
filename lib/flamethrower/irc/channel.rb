@@ -39,9 +39,15 @@ module Flamethrower
 
       def retrieve_irc_messages
         to_campfire.retrieve_messages.inject([]) do |all_messages, message|
-          all_messages << message.to_irc unless message.message_type == "TimestampMessage"
+          all_messages << message.to_irc if display_message?(message)
           all_messages
         end
+      end
+
+      private
+
+      def display_message?(message)
+        message.message_type != "TimestampMessage"
       end
 
     end

@@ -4,6 +4,7 @@ module Flamethrower
       include Flamethrower::Campfire::RestApi
 
       attr_reader :stream, :token
+      attr_writer :topic
       attr_accessor :inbound_messages, :outbound_messages, :thread_messages, :number, :name, :users, :server
       attr_accessor :failed_messages
 
@@ -20,12 +21,13 @@ module Flamethrower
         @thread_running = false
       end
 
-      def topic=(topic)
-        @topic = topic
-      end
-
       def topic
         @topic || "No topic"
+      end
+
+      def send_topic!(topic)
+        response = campfire_put("/room/#{@number}.json", {:topic => topic}.to_json)
+        @topic = topic if response.code == "200"
       end
 
       def fetch_room_info

@@ -57,7 +57,7 @@ module Flamethrower
 
     def handle_topic(message)
       find_channel_or_error(message.parameters.first) do |channel|
-        channel.topic = message.parameters.last if message.parameters.size > 1
+        channel.to_campfire.send_topic!(message.parameters.last) if message.parameters.size > 1
         server.send_topic(channel)
       end
     end

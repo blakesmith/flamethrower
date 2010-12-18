@@ -3,7 +3,7 @@ require File.join(File.dirname(__FILE__), "../spec_helper")
 describe Flamethrower::Dispatcher do
   before do
     @server = Flamethrower::MockServer.new(:log => Logger.new("/dev/null"))
-    @room = Flamethrower::Campfire::Room.new('mytoken', 'mydomain', {'name' => 'a room'})
+    @room = Flamethrower::Campfire::Room.new('mydomain', 'mytoken', {'name' => 'a room', 'id' => 347348})
     @channel = Flamethrower::Irc::Channel.new("#flamethrower", @room)
     @server.irc_channels << @channel
     @dispatcher = Flamethrower::Dispatcher.new(@server)
@@ -68,6 +68,7 @@ describe Flamethrower::Dispatcher do
 
     context "setting the channel topic" do
       it "sets the channel topic to the specified topic" do
+        FakeWeb.register_uri(:put, "https://mytoken:x@mydomain.campfirenow.com/room/347348.json", :body => json_fixture("room_update"), :status => ["200", "OK"])
         message = Flamethrower::Irc::Message.new("TOPIC #flamethrower :some awesome topic")
         @dispatcher.server.should_receive(:send_topic).with(@channel)
         @dispatcher.handle_message(message)
