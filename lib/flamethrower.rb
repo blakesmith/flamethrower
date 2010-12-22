@@ -1,9 +1,6 @@
 $:.unshift File.join(File.dirname(__FILE__), "flamethrower")
 
 require 'rubygems'
-require 'bundler'
-
-Bundler.setup
 
 require 'net/https'
 require 'eventmachine'

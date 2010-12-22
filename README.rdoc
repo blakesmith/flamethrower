@@ -14,6 +14,22 @@ Then fire up your irc client and point it to localhost:6667. If your
 domain and API token are valid, you should see a list of channels appear
 in the MOTD message. /join anyone of these and start chatting.
 
+You can also create a YAML file with domain and token specified like so:
+
+domain: mydomain
+token: aoeu1234
+
+Then start flamethrower like so:
+
+flamethrower -c ~/myconfig.yml
+
+=== A work in progress
+
+Flamethrower is a work in progress. Right now basic messaging works, but
+it still needs a lot of love. If you find it useful and would like to see
+it do something, please submit a patch (with tests please)!. Bug reports are
+also highly appreciated.
+
 === Author
 
 Flamethrower is written by Blake Smith <blakesmith0@gmail.com>

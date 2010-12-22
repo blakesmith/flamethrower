@@ -9,3 +9,20 @@ RSpec::Core::RakeTask.new do |t|
   t.pattern = "./spec/**/*_spec.rb" 
 end
 
+begin
+  require 'jeweler'
+  Jeweler::Tasks.new do |gemspec|
+    gemspec.name = "flamethrower"
+    gemspec.summary = "Campfire IRC gateway"
+    gemspec.description = "Flamethrower gives you the power to use your awesome irc client to talk in your campfire rooms."
+    gemspec.email = "blakesmith0@gmail.com"
+    gemspec.homepage = "http://github.com/blakesmith/flamethrower"
+    gemspec.authors = ["Blake Smith"]
+    gemspec.add_dependency('eventmachine', '>=0.12.10')
+    gemspec.add_dependency('json')
+    gemspec.add_dependency('twitter-stream')
+  end
+rescue LoadError
+  puts "Jeweler not available. Install it with: gem install jeweler"
+end
+

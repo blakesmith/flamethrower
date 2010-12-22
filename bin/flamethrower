@@ -11,6 +11,7 @@ Basic command line usage:
 
 HELP
 
+require 'rubygems'
 require 'flamethrower'
 require 'optparse'
 
