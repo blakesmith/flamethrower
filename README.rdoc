@@ -16,12 +16,12 @@ in the MOTD message. /join anyone of these and start chatting.
 
 You can also create a YAML file with domain and token specified like so:
 
-domain: mydomain
-token: aoeu1234
+  domain: mydomain
+  token: aoeu1234
 
 Then start flamethrower like so:
 
-flamethrower -c ~/myconfig.yml
+  flamethrower -c ~/myconfig.yml
 
 === A work in progress
 
