@@ -27,6 +27,16 @@ describe Flamethrower::Campfire::Message do
       @message.to_irc.to_s.should == ":#{@irc_user.to_s} PRIVMSG #{@channel.name} :thebody"
     end
 
+    it "returns if the message type is unhandled" do
+      json = JSON.parse(json_fixture('enter_message'))
+      json['type'] = "BogusMessage"
+      message = Flamethrower::Campfire::Message.new(json)
+      message.user = @campfire_user
+      message.room = @room
+      Flamethrower::Irc::Message.should_not_receive(:new)
+      message.to_irc.should be_nil
+    end
+
     it "converts a EnterMessage to a join irc message" do
       json = JSON.parse(json_fixture('enter_message'))
       message = Flamethrower::Campfire::Message.new(json)

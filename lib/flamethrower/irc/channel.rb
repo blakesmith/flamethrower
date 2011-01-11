@@ -47,7 +47,7 @@ module Flamethrower
       private
 
       def display_message?(message)
-        message.message_type != "TimestampMessage"
+        message && message.message_type != "TimestampMessage"
       end
 
     end
