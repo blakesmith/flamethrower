@@ -62,15 +62,22 @@ describe Flamethrower::Campfire::Room do
   describe "#fetch_users" do
     it "makes a call to the campfire api to fetch user information" do
       FakeWeb.register_uri(:get, "https://mytoken:x@mydomain.campfirenow.com/users/734581.json", :body => json_fixture("user"), :status => ["200", "OK"])
-      @room.instance_variable_get("@users_to_fetch") << Flamethrower::Campfire::Message.new(JSON.parse(json_fixture("user")))
+      @room.instance_variable_get("@users_to_fetch") << Flamethrower::Campfire::Message.new(JSON.parse(json_fixture("enter_message")))
       @room.fetch_users
       @room.users.map(&:name).should == ["blake"]
+    end
+
+    it "fetches using the 'user_id' field if a streaming message" do
+      FakeWeb.register_uri(:get, "https://mytoken:x@mydomain.campfirenow.com/users/734581.json", :body => json_fixture("user"), :status => ["200", "OK"])
+      @room.instance_variable_get("@users_to_fetch") << Flamethrower::Campfire::Message.new(JSON.parse(json_fixture("enter_message")))
+      @room.should_receive(:campfire_get).with("/users/734581.json")
+      @room.fetch_users
     end
 
     context "successfully get user info" do
       it "enqueues an EnterMessage into @inbound_messages for displaying in irc" do
         FakeWeb.register_uri(:get, "https://mytoken:x@mydomain.campfirenow.com/users/734581.json", :body => json_fixture("user"), :status => ["200", "OK"])
-        @room.instance_variable_get("@users_to_fetch") << Flamethrower::Campfire::Message.new(JSON.parse(json_fixture("user")))
+        @room.instance_variable_get("@users_to_fetch") << Flamethrower::Campfire::Message.new(JSON.parse(json_fixture("enter_message")))
         @room.fetch_users
         message = @room.inbound_messages.pop.user.number.should == 734581
       end
@@ -79,7 +86,7 @@ describe Flamethrower::Campfire::Room do
     context "fails to get user info" do
       it "doesn't enqueue an EnterMessage" do
         FakeWeb.register_uri(:get, "https://mytoken:x@mydomain.campfirenow.com/users/734581.json", :status => ["400", "Bad Request"])
-        @room.instance_variable_get("@users_to_fetch") << Flamethrower::Campfire::Message.new(JSON.parse(json_fixture("user")))
+        @room.instance_variable_get("@users_to_fetch") << Flamethrower::Campfire::Message.new(JSON.parse(json_fixture("enter_message")))
         @room.fetch_users
         message = @room.inbound_messages.size.should == 0
       end
@@ -139,6 +146,7 @@ describe Flamethrower::Campfire::Room do
         @room.stub(:connect)
         @room.stub(:fetch_messages)
         @room.stub(:post_messages)
+        @room.stub(:requeue_failed_messages)
         @room.should_receive(:fetch_users).at_least(1).times
         @room.start_thread
         @room.kill_thread!
@@ -150,9 +158,10 @@ describe Flamethrower::Campfire::Room do
   describe "#fetch_messages" do
     before do
       Twitter::JSONStream.stub(:connect).and_return("stream")
-      item = json_fixture("streaming_message")
+      @item = json_fixture("streaming_message")
+      @room.users << @user
       @room.connect
-      @room.stream.stub(:each_item).and_yield(item)
+      @room.stream.stub(:each_item).and_yield(@item)
     end
 
     it "iterates over each stream item and sends to the message queue" do
@@ -167,7 +176,6 @@ describe Flamethrower::Campfire::Room do
 
     it "maps the message sender to the right user" do
       @room.users << @user2
-      @room.users << @user
       @room.fetch_messages
       @room.inbound_messages.pop.user.should == @user
     end
@@ -180,6 +188,14 @@ describe Flamethrower::Campfire::Room do
     it "puts messages with type EnterMessage into the users_to_fetch queue" do
       item = json_fixture("enter_message")
       @room.stream.stub(:each_item).and_yield(item)
+      @room.fetch_messages
+      @room.instance_variable_get("@users_to_fetch").size.should == 1
+    end
+
+    it "puts messages that don't have an existing user into the users_to_fetch queue" do
+      enter_message = JSON.parse(json_fixture("streaming_message"))
+      enter_message['user_id'] = 98765
+      @room.stream.stub(:each_item).and_yield(enter_message.to_json)
       @room.fetch_messages
       @room.instance_variable_get("@users_to_fetch").size.should == 1
     end

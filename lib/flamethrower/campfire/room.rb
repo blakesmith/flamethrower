@@ -94,8 +94,7 @@ module Flamethrower
           params['user'] = @users.find {|u| u.number == params['user_id'] }
           params['room'] = self
           message = Flamethrower::Campfire::Message.new(params)
-          case message.message_type
-          when "EnterMessage"
+          unless message.user
             @users_to_fetch << message
           else
             @inbound_messages << message
@@ -106,7 +105,7 @@ module Flamethrower
       def fetch_users
         until @users_to_fetch.empty?
           message = @users_to_fetch.pop
-          response = campfire_get("/users/#{message.user['id']}.json")
+          response = campfire_get("/users/#{message.user_id}.json")
           case response
           when Net::HTTPOK
             json = JSON.parse(response.body)

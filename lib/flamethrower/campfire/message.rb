@@ -1,7 +1,7 @@
 module Flamethrower
   module Campfire
     class Message
-      attr_accessor :body, :user, :room, :message_type, :status, :retry_at
+      attr_accessor :body, :user, :room, :message_type, :status, :retry_at, :user_id
 
       RETRY_SECONDS = 15
 
@@ -9,6 +9,7 @@ module Flamethrower
         @body = params['body']
         @user = params['user']
         @room = params['room']
+        @user_id = params['user_id']
         @message_type = params['type']
         @status = "pending"
       end
