@@ -94,10 +94,12 @@ module Flamethrower
           params['user'] = @users.find {|u| u.number == params['user_id'] }
           params['room'] = self
           message = Flamethrower::Campfire::Message.new(params)
-          unless message.user
-            @users_to_fetch << message
-          else
-            @inbound_messages << message unless message.message_type == "TimestampMessage"
+          unless message.message_type == "TimestampMessage"
+            unless message.user
+              @users_to_fetch << message
+            else
+              @inbound_messages << message
+            end
           end
         end
       end

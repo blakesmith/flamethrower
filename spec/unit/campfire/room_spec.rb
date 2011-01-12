@@ -190,6 +190,7 @@ describe Flamethrower::Campfire::Room do
       @room.stream.stub(:each_item).and_yield(item)
       @room.fetch_messages
       @room.instance_variable_get("@inbound_messages").size.should == 0
+      @room.instance_variable_get("@users_to_fetch").size.should == 0
     end
 
     it "puts messages that don't have an existing user into the users_to_fetch queue" do
