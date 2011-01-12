@@ -97,7 +97,7 @@ module Flamethrower
           unless message.user
             @users_to_fetch << message
           else
-            @inbound_messages << message
+            @inbound_messages << message unless message.message_type == "TimestampMessage"
           end
         end
       end
