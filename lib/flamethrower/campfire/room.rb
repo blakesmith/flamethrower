@@ -13,6 +13,7 @@ module Flamethrower
         @token = token
         @inbound_messages = Queue.new
         @outbound_messages = Queue.new
+        @users_to_fetch = Queue.new
         @failed_messages = []
         @number = params['id']
         @name = params['name']
@@ -52,6 +53,7 @@ module Flamethrower
             fetch_messages
             post_messages
             requeue_failed_messages
+            fetch_users
             messages_to_send = to_irc.retrieve_irc_messages
             messages_to_send.each do |m| 
               ::FLAMETHROWER_LOGGER.debug "Sending irc message #{m.to_s}"
@@ -91,7 +93,28 @@ module Flamethrower
           ::FLAMETHROWER_LOGGER.debug "Got json message #{params.inspect}"
           params['user'] = @users.find {|u| u.number == params['user_id'] }
           params['room'] = self
-          @inbound_messages << Flamethrower::Campfire::Message.new(params)
+          message = Flamethrower::Campfire::Message.new(params)
+          case message.message_type
+          when "EnterMessage"
+            @users_to_fetch << message
+          else
+            @inbound_messages << message
+          end
+        end
+      end
+
+      def fetch_users
+        until @users_to_fetch.empty?
+          message = @users_to_fetch.pop
+          response = campfire_get("/users/#{message.user['id']}.json")
+          case response
+          when Net::HTTPOK
+            json = JSON.parse(response.body)
+            user = Flamethrower::Campfire::User.new(json['user'])
+            message.user = user
+            @users << user
+            @inbound_messages << message
+          end
         end
       end
 

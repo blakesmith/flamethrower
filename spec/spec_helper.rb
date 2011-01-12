@@ -4,6 +4,7 @@ require 'flamethrower'
 require 'server/mock_server'
 require 'json'
 require 'fakeweb'
+require 'time'
 
 ::FLAMETHROWER_LOGGER = Logger.new("/dev/null") unless Object.const_defined?("FLAMETHROWER_LOGGER")
 

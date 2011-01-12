@@ -57,7 +57,33 @@ describe Flamethrower::Campfire::Room do
       @room.fetch_room_info
       FakeWeb.last_request['authorization'].should == "Basic #{Base64::encode64("#{@room.token}:x").chomp}"
     end
+  end
 
+  describe "#fetch_users" do
+    it "makes a call to the campfire api to fetch user information" do
+      FakeWeb.register_uri(:get, "https://mytoken:x@mydomain.campfirenow.com/users/734581.json", :body => json_fixture("user"), :status => ["200", "OK"])
+      @room.instance_variable_get("@users_to_fetch") << Flamethrower::Campfire::Message.new(JSON.parse(json_fixture("user")))
+      @room.fetch_users
+      @room.users.map(&:name).should == ["blake"]
+    end
+
+    context "successfully get user info" do
+      it "enqueues an EnterMessage into @inbound_messages for displaying in irc" do
+        FakeWeb.register_uri(:get, "https://mytoken:x@mydomain.campfirenow.com/users/734581.json", :body => json_fixture("user"), :status => ["200", "OK"])
+        @room.instance_variable_get("@users_to_fetch") << Flamethrower::Campfire::Message.new(JSON.parse(json_fixture("user")))
+        @room.fetch_users
+        message = @room.inbound_messages.pop.user.number.should == 734581
+      end
+    end
+
+    context "fails to get user info" do
+      it "doesn't enqueue an EnterMessage" do
+        FakeWeb.register_uri(:get, "https://mytoken:x@mydomain.campfirenow.com/users/734581.json", :status => ["400", "Bad Request"])
+        @room.instance_variable_get("@users_to_fetch") << Flamethrower::Campfire::Message.new(JSON.parse(json_fixture("user")))
+        @room.fetch_users
+        message = @room.inbound_messages.size.should == 0
+      end
+    end
   end
 
   describe "#join" do
@@ -109,6 +135,15 @@ describe Flamethrower::Campfire::Room do
         @room.kill_thread!
       end
 
+      it "fetches user information" do
+        @room.stub(:connect)
+        @room.stub(:fetch_messages)
+        @room.stub(:post_messages)
+        @room.should_receive(:fetch_users).at_least(1).times
+        @room.start_thread
+        @room.kill_thread!
+      end
+
     end
   end
 
@@ -140,6 +175,13 @@ describe Flamethrower::Campfire::Room do
     it "maps the message room to the right room" do
       @room.fetch_messages
       @room.inbound_messages.pop.room.should == @room
+    end
+
+    it "puts messages with type EnterMessage into the users_to_fetch queue" do
+      item = json_fixture("enter_message")
+      @room.stream.stub(:each_item).and_yield(item)
+      @room.fetch_messages
+      @room.instance_variable_get("@users_to_fetch").size.should == 1
     end
   end
 
