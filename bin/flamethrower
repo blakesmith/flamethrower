@@ -14,6 +14,7 @@ HELP
 require 'rubygems'
 require 'flamethrower'
 require 'optparse'
+require 'yaml'
 
 options = {}
 opts = OptionParser.new do |opts|
@@ -42,15 +43,19 @@ end
 
 opts.parse!
 
-if options['config']
-  case File.exists?(options['config'])
-  when true
-    require 'yaml'
-    yaml = YAML.load_file(options['config'])
+load_options_from_file = lambda do |filename, verbose|
+  if File.exists?(filename)
+    yaml = YAML.load_file(filename)
     yaml.each {|k, v| options[k] = v}
-  when false
-    puts "Unable to find the specified file! Check the path?"
+  else
+    puts "Unable to load config file!" if verbose
   end
+end
+
+if options['config']
+  load_options_from_file.call(options['config'], true)
+else
+  load_options_from_file.call(File.join(ENV["HOME"], '.flamethrower', 'config.yml'), false)
 end
 
 FLAMETHROWER_LOGGER = Logger.new(options['logger'] || STDOUT)
