@@ -7,6 +7,18 @@ module Flamethrower
     def unbind
       @server.connections.delete(self)
     end
+
+    def stop
+      irc_channels.map do |channel|
+        channel.to_campfire.kill_thread!
+      end
+    end
+
+    def streams_alive?
+      irc_channels.any? do |channel|
+        channel.to_campfire.alive?
+      end
+    end
   end
 
   class EventServer
@@ -34,17 +46,17 @@ module Flamethrower
     def stop
       FLAMETHROWER_LOGGER.info("Killing room threads")
       @connections.each do |connection|
-        connection.irc_channels.map do |channel|
-          channel.to_campfire.kill_thread!
-        end
+        connection.stop
       end
       EventMachine.stop_server(@signature)
       die_safely
     end
 
+    private
+
     def die_safely
       FLAMETHROWER_LOGGER.info("Waiting for streams and connections to die")
-      if streams_alive? && connections_alive?
+      if any_streams_alive? || any_connections_alive?
         EventMachine.add_periodic_timer(1) { die_safely }
       else
         FLAMETHROWER_LOGGER.info("Done.")
@@ -52,15 +64,13 @@ module Flamethrower
       end
     end
 
-    def streams_alive?
+    def any_streams_alive?
       @connections.any? do |connection|
-        connection.irc_channels.any? do |channel|
-          channel.to_campfire.alive?
-        end
+        connection.streams_alive?
       end
     end
 
-    def connections_alive?
+    def any_connections_alive?
       @connections.size <= 0
     end
   end
