@@ -56,4 +56,10 @@ end
 FLAMETHROWER_LOGGER = Logger.new(options['logger'] || STDOUT)
 
 server = Flamethrower::EventServer.new(options['host'], options['port'], options['domain'], options['token'])
+
+trap("INT") do
+  FLAMETHROWER_LOGGER.info("Received shutdown signal, killing connections")
+  server.stop
+end
+
 server.start
