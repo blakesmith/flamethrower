@@ -112,49 +112,6 @@ describe Flamethrower::Campfire::Room do
     end
   end
 
-  describe "#thread" do
-    before do
-      Kernel.stub(:sleep)
-    end
-
-    context "in a Thread" do
-      it "calls connect at the start of the thread" do
-        @room.stub(:fetch_messages)
-        @room.stub(:post_messages)
-        @room.should_receive(:connect).at_least(1).times
-        @room.start_thread
-        @room.kill_thread!
-      end
-
-      it "fetches messages from the stream" do
-        @room.stub(:connect)
-        @room.stub(:post_messages)
-        @room.should_receive(:fetch_messages).at_least(1).times
-        @room.start_thread
-        @room.kill_thread!
-      end
-
-      it "posts messages to the campfire API" do
-        @room.stub(:connect)
-        @room.stub(:fetch_messages)
-        @room.should_receive(:post_messages).at_least(1).times
-        @room.start_thread
-        @room.kill_thread!
-      end
-
-      it "fetches user information" do
-        @room.stub(:connect)
-        @room.stub(:fetch_messages)
-        @room.stub(:post_messages)
-        @room.stub(:requeue_failed_messages)
-        @room.should_receive(:fetch_users).at_least(1).times
-        @room.start_thread
-        @room.kill_thread!
-      end
-
-    end
-  end
-
   describe "#fetch_messages" do
     before do
       Twitter::JSONStream.stub(:connect).and_return("stream")
