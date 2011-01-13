@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{flamethrower}
-  s.version = "0.0.1"
+  s.version = "0.1.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Blake Smith"]
-  s.date = %q{2010-12-22}
+  s.date = %q{2011-01-12}
   s.default_executable = %q{flamethrower}
   s.description = %q{Flamethrower gives you the power to use your awesome irc client to talk in your campfire rooms.}
   s.email = %q{blakesmith0@gmail.com}
@@ -48,11 +48,16 @@ Gem::Specification.new do |s|
      "spec/fixtures/leave_message.json",
      "spec/fixtures/message.json",
      "spec/fixtures/paste_message.json",
+     "spec/fixtures/paste_message_with_pound.json",
      "spec/fixtures/room.json",
      "spec/fixtures/room_update.json",
      "spec/fixtures/rooms.json",
      "spec/fixtures/speak_message.json",
      "spec/fixtures/streaming_message.json",
+     "spec/fixtures/timestamp_message.json",
+     "spec/fixtures/upload_message.json",
+     "spec/fixtures/upload_url_sample",
+     "spec/fixtures/user.json",
      "spec/spec_helper.rb",
      "spec/unit/campfire/connection_spec.rb",
      "spec/unit/campfire/message_spec.rb",
