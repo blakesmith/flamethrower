@@ -49,7 +49,7 @@ module Flamethrower
         connection.stop
       end
       EventMachine.stop_server(@signature)
-      die_safely
+      EventMachine.add_periodic_timer(0.2) { die_safely }
     end
 
     private
@@ -57,7 +57,7 @@ module Flamethrower
     def die_safely
       FLAMETHROWER_LOGGER.info("Waiting for streams and connections to die")
       if any_streams_alive? || any_connections_alive?
-        EventMachine.add_periodic_timer(1) { die_safely }
+        return
       else
         FLAMETHROWER_LOGGER.info("Done.")
         EventMachine.stop
@@ -71,7 +71,7 @@ module Flamethrower
     end
 
     def any_connections_alive?
-      @connections.size <= 0
+      @connections.size > 0
     end
   end
 end
