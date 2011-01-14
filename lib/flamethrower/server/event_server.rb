@@ -47,6 +47,7 @@ module Flamethrower
       FLAMETHROWER_LOGGER.info("Killing room threads")
       @connections.each do |connection|
         connection.stop
+        connection.close_connection
       end
       EventMachine.stop_server(@signature)
       EventMachine.add_periodic_timer(0.2) { die_safely }
