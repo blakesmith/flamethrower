@@ -81,7 +81,7 @@ module Flamethrower
         channel.users << server.current_user
         room.join
         room.fetch_room_info
-        room.start_thread
+        room.start
         server.send_topic(channel)
         server.send_userlist(channel)
       end
@@ -96,13 +96,13 @@ module Flamethrower
     def handle_part(message)
       find_channel_or_error(message.parameters.first) do |channel|
         room = channel.to_campfire
-        room.kill_thread!
+        room.stop
         server.send_part(server.current_user, channel)
       end
     end
 
     def handle_quit(message)
-      server.irc_channels.each {|c| c.to_campfire.kill_thread!}
+      server.irc_channels.each {|c| c.to_campfire.stop}
     end
   end
 end

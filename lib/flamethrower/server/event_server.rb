@@ -10,7 +10,7 @@ module Flamethrower
 
     def stop
       irc_channels.map do |channel|
-        channel.to_campfire.kill_thread!
+        channel.to_campfire.stop
       end
     end
 

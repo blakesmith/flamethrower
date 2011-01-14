@@ -155,7 +155,8 @@ describe Flamethrower::Dispatcher do
 
   describe "#part" do
     it "stops the thread of the room being parted from" do
-      @room.instance_variable_set("@thread_running", true)
+      EventMachine.stub(:cancel_timer)
+      @room.instance_variable_set("@room_alive", true)
       @room.should be_alive
       message = Flamethrower::Irc::Message.new("PART #flamethrower")
       @dispatcher.handle_message(message)
@@ -163,6 +164,7 @@ describe Flamethrower::Dispatcher do
     end
 
     it "sends a part message with your current user's name" do
+      EventMachine.stub(:cancel_timer)
       user = Flamethrower::Irc::User.new :username => "user", :nickname => "nick", :hostname => "host", :realname => "realname", :servername => "servername"
       @server.current_user = user
       message = Flamethrower::Irc::Message.new("PART #flamethrower")
@@ -181,7 +183,10 @@ describe Flamethrower::Dispatcher do
 
   describe "#quit" do
     it "kills all the room threads on quit" do
-      @room.instance_variable_set("@thread_running", true)
+      timer = mock(:timer)
+      EventMachine.should_receive(:cancel_timer).with(timer)
+      @room.instance_variable_set("@room_alive", true)
+      @room.instance_variable_set("@timer", timer)
       @room.should be_alive
       message = Flamethrower::Irc::Message.new("QUIT :leaving")
       @dispatcher.handle_message(message)
@@ -191,6 +196,7 @@ describe Flamethrower::Dispatcher do
 
   describe "#join" do
     before do
+      @room.stub(:start)
       @room.stub(:fetch_room_info)
       @room.stub(:join)
     end

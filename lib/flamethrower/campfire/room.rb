@@ -19,7 +19,7 @@ module Flamethrower
         @name = params['name']
         @topic = params['topic']
         @users = []
-        @thread_running = false
+        @room_alive = false
       end
 
       def topic
@@ -44,36 +44,37 @@ module Flamethrower
         @outbound_messages << Flamethrower::Campfire::Message.new(params)
       end
 
-      def start_thread
-        ::FLAMETHROWER_LOGGER.debug "Starting thread for room #{name}"
-        @thread_running = true
-        Thread.new do
-          connect
-          until dead?
-            fetch_messages
-            post_messages
-            requeue_failed_messages
-            fetch_users
-            messages_to_send = to_irc.retrieve_irc_messages
-            messages_to_send.each do |m| 
-              ::FLAMETHROWER_LOGGER.debug "Sending irc message #{m.to_s}"
-              @server.send_message(m.to_s)
-            end
-            sleep 0.5
+      def start
+        @room_alive = true
+        connect
+        @timer = EventMachine.add_periodic_timer(0.5) { poll }
+      end
+
+      def stop
+        @room_alive = false
+        EventMachine.cancel_timer(@timer)
+      end
+
+      def poll
+        unless dead?
+          fetch_messages
+          post_messages
+          requeue_failed_messages
+          fetch_users
+          messages_to_send = to_irc.retrieve_irc_messages
+          messages_to_send.each do |m|
+            ::FLAMETHROWER_LOGGER.debug "Sending irc message #{m.to_s}"
+            @server.send_message(m.to_s)
           end
         end
       end
 
       def alive?
-        @thread_running
+        @room_alive
       end
 
       def dead?
-        !@thread_running
-      end
-
-      def kill_thread!
-        @thread_running = false
+        !@room_alive
       end
 
       def join
