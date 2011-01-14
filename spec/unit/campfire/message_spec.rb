@@ -67,7 +67,11 @@ describe Flamethrower::Campfire::Message do
       message = Flamethrower::Campfire::Message.new(json)
       message.user = @campfire_user
       message.room = @room
-      message.to_irc.to_s.should == ":#{@irc_user.to_s} PRIVMSG #{@channel.name} :Line one\\n\\tpoint one\\n\\tpoint two\\npoint three"
+      expected = ":#{@irc_user.to_s} PRIVMSG #{@channel.name} :Line one\r\n"
+      expected << ":#{@irc_user.to_s} PRIVMSG #{@channel.name} :\tpoint one\r\n"
+      expected << ":#{@irc_user.to_s} PRIVMSG #{@channel.name} :\tpoint two\r\n"
+      expected << ":#{@irc_user.to_s} PRIVMSG #{@channel.name} :point three"
+      message.to_irc.to_s.should == expected
     end
   end
 

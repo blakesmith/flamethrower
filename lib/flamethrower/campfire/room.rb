@@ -89,8 +89,8 @@ module Flamethrower
 
       def fetch_messages
         @stream.each_item do |item| 
+          ::FLAMETHROWER_LOGGER.debug "Got json message #{item.inspect}"
           params = JSON.parse(item)
-          ::FLAMETHROWER_LOGGER.debug "Got json message #{params.inspect}"
           params['user'] = @users.find {|u| u.number == params['user_id'] }
           params['room'] = self
           message = Flamethrower::Campfire::Message.new(params)

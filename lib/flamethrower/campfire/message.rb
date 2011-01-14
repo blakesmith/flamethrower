@@ -34,11 +34,21 @@ module Flamethrower
         when "LeaveMessage"
           irc_string = ":#{@user.to_irc.to_s} PART #{@room.to_irc.name}"
         when "PasteMessage"
-          irc_string = ":#{@user.to_irc.to_s} PRIVMSG #{@room.to_irc.name} :#{@body}"
+          irc_string = format_paste_message
         else
           return
         end
         Flamethrower::Irc::Message.new(irc_string)
+      end
+
+      private
+
+      def format_paste_message
+        lines = @body.split("\n")
+        message = lines.inject(Array.new) do |array, line|
+          array << ":#{@user.to_irc.to_s} PRIVMSG #{@room.to_irc.name} :#{line}"
+        end
+        message.join("\r\n")
       end
     end
   end
