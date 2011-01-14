@@ -5,6 +5,8 @@ module Flamethrower
       RPL_MOTD = 372
       RPL_ENDOFMOTD = 376
       RPL_TOPIC = 332
+      RPL_WHOREPLY = 352
+      RPL_ENDOFWHO = 315
       RPL_NAMEREPLY = 353
       RPL_ENDOFNAMES = 366
       RPL_CHANNELMODEIS = 324

@@ -33,6 +33,15 @@ module Flamethrower
         end
       end
 
+      def send_who(channel)
+        send_messages do |messages|
+          channel.users.each do |user|
+            messages << reply(RPL_WHOREPLY, "#{channel.name} #{user.nickname} #{user.hostname} localhost #{user.nickname} H :0 #{user.nickname}")
+          end
+          messages << reply(RPL_ENDOFWHO, "#{channel.name} :/End of /WHO list")
+        end
+      end
+
       def send_channel_mode(channel)
         send_message reply(RPL_CHANNELMODEIS, "#{channel.name} #{channel.mode}")
       end
@@ -43,6 +52,10 @@ module Flamethrower
 
       def send_user_mode
         send_message reply(RPL_UMODEIS, @current_user.mode)
+      end
+
+      def send_part(user, channel)
+        send_message ":#{user.to_s} PART #{channel.name}"
       end
 
       def reply(code, message)

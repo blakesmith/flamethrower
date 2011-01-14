@@ -106,16 +106,19 @@ describe Flamethrower::Server do
       ]
     end
 
-    it "sends the campfire users in the userlist" do
-      room = Flamethrower::Campfire::Room.new('mydomain', 'mytoken')
-      channel = Flamethrower::Irc::Channel.new("#flamethrower", room)
-      user1 = Flamethrower::Campfire::User.new('id' => 1234, 'name' => 'Bob Jones')
-      user2 = Flamethrower::Campfire::User.new('id' => 4321, 'name' => 'Bill Myer')
-      room.users = [user1, user2]
-      @server.send_userlist(channel).should == [
-        ":host 353 nick = #flamethrower :@nick Bob_Jones Bill_Myer",
-        ":host 366 nick #flamethrower :/End of /NAMES list"
-      ]
+    describe "#send_who" do
+      it "sends the campfire users in the userlist" do
+        room = Flamethrower::Campfire::Room.new('mydomain', 'mytoken')
+        channel = Flamethrower::Irc::Channel.new("#flamethrower", room)
+        user1 = Flamethrower::Campfire::User.new('id' => 1234, 'name' => 'Bob Jones')
+        user2 = Flamethrower::Campfire::User.new('id' => 4321, 'name' => 'Bill Myer')
+        room.users = [user1, user2]
+        @server.send_who(channel).should == [
+          ":host 352 nick #flamethrower Bob_Jones campfirenow.com localhost Bob_Jones H :0 Bob_Jones",
+          ":host 352 nick #flamethrower Bill_Myer campfirenow.com localhost Bill_Myer H :0 Bill_Myer",
+          ":host 315 nick #flamethrower :/End of /WHO list"
+        ]
+      end
     end
 
     describe "#send_channel_list" do

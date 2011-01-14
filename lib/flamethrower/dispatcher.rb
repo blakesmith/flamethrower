@@ -87,10 +87,17 @@ module Flamethrower
       end
     end
 
+    def handle_who(message)
+      find_channel_or_error(message.parameters.first) do |channel|
+        server.send_who(channel)
+      end
+    end
+
     def handle_part(message)
       find_channel_or_error(message.parameters.first) do |channel|
         room = channel.to_campfire
         room.kill_thread!
+        server.send_part(server.current_user, channel)
       end
     end
 

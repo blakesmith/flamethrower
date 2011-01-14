@@ -77,6 +77,14 @@ describe Flamethrower::Dispatcher do
     end
   end
 
+  describe "#who" do
+    it "responds with a who list" do
+      message = Flamethrower::Irc::Message.new("WHO #flamethrower\r\n")
+      @dispatcher.server.should_receive(:send_who).with(@channel)
+      @dispatcher.handle_message(message)
+    end
+  end
+
   describe "#mode" do
     before do
       @user = Flamethrower::Irc::User.new :username => "user", :nickname => "nick", :hostname => "host", :realname => "realname", :servername => "servername"
@@ -152,6 +160,14 @@ describe Flamethrower::Dispatcher do
       message = Flamethrower::Irc::Message.new("PART #flamethrower")
       @dispatcher.handle_message(message)
       @room.should_not be_alive
+    end
+
+    it "sends a part message with your current user's name" do
+      user = Flamethrower::Irc::User.new :username => "user", :nickname => "nick", :hostname => "host", :realname => "realname", :servername => "servername"
+      @server.current_user = user
+      message = Flamethrower::Irc::Message.new("PART #flamethrower")
+      @server.should_receive(:send_message).with(":#{user.to_s} PART #flamethrower")
+      @dispatcher.handle_message(message)
     end
 
     it "responds with ERR_BADCHANNELKEY a channel that doesn't exist" do
