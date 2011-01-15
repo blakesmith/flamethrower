@@ -2,8 +2,8 @@ $:.unshift File.join(File.dirname(__FILE__), "../lib")
 
 require 'flamethrower'
 require 'server/mock_server'
+require 'webmock/rspec'
 require 'json'
-require 'fakeweb'
 require 'time'
 
 ::FLAMETHROWER_LOGGER = Logger.new("/dev/null") unless Object.const_defined?("FLAMETHROWER_LOGGER")

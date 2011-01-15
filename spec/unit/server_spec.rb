@@ -47,6 +47,10 @@ describe Flamethrower::Server do
   end
 
   context "#after_connect" do
+    before do
+      stub_request(:get, "https://mytoken:x@mydomain.campfirenow.com/rooms.json").to_return(:body => json_fixture("rooms"), :status => 200)
+    end
+
     it "sends motd" do
       @server.should_receive(:send_motd)
       @server.after_connect
@@ -156,7 +160,7 @@ describe Flamethrower::Server do
 
     describe "#populate_irc_channels" do
       it "populates the server irc_channels from the associated campfire channels" do
-        FakeWeb.register_uri(:get, "https://mytoken:x@mydomain.campfirenow.com/rooms.json", :body => json_fixture("rooms"), :status => ["200", "OK"])
+        stub_request(:get, "https://mytoken:x@mydomain.campfirenow.com/rooms.json").to_return(:body => json_fixture("rooms"), :status => 200)
         @server.populate_irc_channels
         @server.irc_channels.count.should == 1
         @server.irc_channels.first.name.should == "#room_1"

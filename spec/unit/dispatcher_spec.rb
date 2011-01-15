@@ -68,7 +68,7 @@ describe Flamethrower::Dispatcher do
 
     context "setting the channel topic" do
       it "sets the channel topic to the specified topic" do
-        FakeWeb.register_uri(:put, "https://mytoken:x@mydomain.campfirenow.com/room/347348.json", :body => json_fixture("room_update"), :status => ["200", "OK"])
+        stub_request(:put, "https://mytoken:x@mydomain.campfirenow.com/room/347348.json").to_return(:body => json_fixture("room_update"), :status => 200)
         message = Flamethrower::Irc::Message.new("TOPIC #flamethrower :some awesome topic")
         @dispatcher.server.should_receive(:send_topic).with(@channel)
         @dispatcher.handle_message(message)

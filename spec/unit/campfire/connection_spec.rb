@@ -4,12 +4,11 @@ describe Flamethrower::Campfire::Connection do
   before do
     @server = Flamethrower::MockServer.new
     @connection = @server.campfire_connection
-    FakeWeb.allow_net_connect = false
   end
 
   describe "#rooms" do
     it "retrieves a list of rooms from JSON" do
-      FakeWeb.register_uri(:get, "https://mytoken:x@mydomain.campfirenow.com/rooms.json", :body => json_fixture("rooms"), :status => ["200", "OK"])
+      stub_request(:get, "https://mytoken:x@mydomain.campfirenow.com/rooms.json").to_return(:body => json_fixture("rooms"), :status => 200)
       room = @connection.rooms.first
       room.number.should == 347348
       room.name.should == "Room 1"
@@ -17,13 +16,13 @@ describe Flamethrower::Campfire::Connection do
     end
 
     it "makes the http request with a token in basic auth" do
-      FakeWeb.register_uri(:get, "https://mytoken:x@mydomain.campfirenow.com/rooms.json", :body => json_fixture("rooms"), :status => ["200", "OK"])
+      stub_request(:get, "https://mytoken:x@mydomain.campfirenow.com/rooms.json").to_return(:body => json_fixture("rooms"), :status => 200)
       @connection.rooms
-      FakeWeb.last_request['authorization'].should == "Basic #{Base64::encode64("#{@connection.token}:x").chomp}"
+      assert_requested(:get, "https://mytoken:x@mydomain.campfirenow.com/rooms.json") {|req| req.uri.userinfo.should == "mytoken:x"}
     end
 
     it "returns empty set if not a successful response" do
-      FakeWeb.register_uri(:get, "https://mytoken:x@mydomain.campfirenow.com/rooms.json", :status => ["400", "Bad Request"])
+      stub_request(:get, "https://mytoken:x@mydomain.campfirenow.com/rooms.json").to_return(:status => 400)
       @connection.rooms.should == []
     end
 
