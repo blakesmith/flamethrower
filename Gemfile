@@ -3,9 +3,9 @@ source :gemcutter
 gem 'eventmachine'
 gem 'twitter-stream'
 gem 'json'
+gem 'em-http-request'
 
 group :test do
   gem 'rspec'
-  gem 'fakeweb'
   gem 'webmock'
 end

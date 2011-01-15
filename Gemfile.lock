@@ -4,8 +4,10 @@ GEM
     addressable (2.2.2)
     crack (0.1.8)
     diff-lcs (1.1.2)
+    em-http-request (0.2.15)
+      addressable (>= 2.0.0)
+      eventmachine (>= 0.12.9)
     eventmachine (0.12.10)
-    fakeweb (1.3.0)
     json (1.4.6)
     roauth (0.0.3)
     rspec (2.1.0)
@@ -27,8 +29,8 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  em-http-request
   eventmachine
-  fakeweb
   json
   rspec
   twitter-stream

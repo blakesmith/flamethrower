@@ -8,7 +8,9 @@ describe Flamethrower::Campfire::Connection do
 
   describe "#rooms" do
     it "retrieves a list of rooms from JSON" do
-      stub_request(:get, "https://mytoken:x@mydomain.campfirenow.com/rooms.json").to_return(:body => json_fixture("rooms"), :status => 200)
+      json = json_fixture("rooms")
+      stub_request(:get, "https://mytoken:x@mydomain.campfirenow.com/rooms.json").to_return(:body => json, :status => 200)
+      debugger
       room = @connection.rooms.first
       room.number.should == 347348
       room.name.should == "Room 1"

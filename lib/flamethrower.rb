@@ -2,7 +2,8 @@ $:.unshift File.join(File.dirname(__FILE__), "flamethrower")
 
 require 'rubygems'
 
-require 'net/https'
+#require 'net/https'
+require 'em-http'
 require 'eventmachine'
 require 'twitter/json_stream'
 require 'logger'
