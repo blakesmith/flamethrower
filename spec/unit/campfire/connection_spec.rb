@@ -6,6 +6,25 @@ describe Flamethrower::Campfire::Connection do
     @connection = @server.campfire_connection
   end
 
+  describe "#fetch_my_user" do
+    it "retrieves my user and stores it on the connection" do
+      stub_request(:get, "https://mydomain.campfirenow.com/users/me.json").
+        with(:headers => {'Authorization'=>['mytoken', 'x']}).
+        to_return(:status => 200, :body => json_fixture("user"))
+      EM.run_block { @connection.fetch_my_user }
+      @server.current_user.nickname.should == "blake"
+    end
+
+    it "renames your current user to the new current user" do
+      @server.current_user = Flamethrower::Irc::User.new(:nickname => "bob")
+      stub_request(:get, "https://mydomain.campfirenow.com/users/me.json").
+        with(:headers => {'Authorization'=>['mytoken', 'x']}).
+        to_return(:status => 200, :body => json_fixture("user"))
+      @server.should_receive(:send_message).with(":bob NICK blake")
+      EM.run_block { @connection.fetch_my_user }
+    end
+  end
+
   describe "#rooms" do
     it "retrieves a list of rooms from JSON" do
       stub_request(:get, "https://mydomain.campfirenow.com/rooms.json").

@@ -13,6 +13,7 @@ module Flamethrower
     def after_connect
       send_motd
       populate_irc_channels
+      populate_my_user
     end
 
     def send_message(msg)
@@ -36,6 +37,10 @@ module Flamethrower
 
     def populate_irc_channels
       campfire_connection.fetch_rooms
+    end
+
+    def populate_my_user
+      campfire_connection.fetch_my_user
     end
 
   end

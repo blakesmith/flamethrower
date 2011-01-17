@@ -54,12 +54,21 @@ describe Flamethrower::Server do
     end
 
     it "sends motd" do
+      @server.stub(:populate_irc_channels)
+      @server.stub(:populate_my_user)
       @server.should_receive(:send_motd)
       @server.after_connect
     end
 
     it "populates the channel list" do
+      @server.stub(:populate_my_user)
       @server.should_receive(:populate_irc_channels)
+      @server.after_connect
+    end
+
+    it "populates the currently logged in user" do
+      @server.stub(:populate_irc_channels)
+      @server.should_receive(:populate_my_user)
       @server.after_connect
     end
   end

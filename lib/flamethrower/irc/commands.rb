@@ -33,6 +33,10 @@ module Flamethrower
         end
       end
 
+      def send_rename(from, to)
+        send_message ":#{from} NICK #{to}"
+      end
+
       def send_who(channel)
         send_messages do |messages|
           channel.users.each do |user|
