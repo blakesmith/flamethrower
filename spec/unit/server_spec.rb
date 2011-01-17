@@ -48,7 +48,9 @@ describe Flamethrower::Server do
 
   context "#after_connect" do
     before do
-      stub_request(:get, "https://mytoken:x@mydomain.campfirenow.com/rooms.json").to_return(:body => json_fixture("rooms"), :status => 200)
+      stub_request(:get, "https://mydomain.campfirenow.com/rooms.json").
+        with(:headers => {'Authorization'=>['mytoken', 'x']}).
+        to_return(:status => 200, :body => json_fixture("rooms"))
     end
 
     it "sends motd" do
@@ -58,11 +60,6 @@ describe Flamethrower::Server do
 
     it "populates the channel list" do
       @server.should_receive(:populate_irc_channels)
-      @server.after_connect
-    end
-
-    it "sends the channel list" do
-      @server.should_receive(:send_channel_list)
       @server.after_connect
     end
   end
@@ -160,8 +157,11 @@ describe Flamethrower::Server do
 
     describe "#populate_irc_channels" do
       it "populates the server irc_channels from the associated campfire channels" do
-        stub_request(:get, "https://mytoken:x@mydomain.campfirenow.com/rooms.json").to_return(:body => json_fixture("rooms"), :status => 200)
-        @server.populate_irc_channels
+        stub_request(:get, "https://mydomain.campfirenow.com/rooms.json").
+          with(:headers => {'Authorization'=>['mytoken', 'x']}).
+          to_return(:status => 200, :body => json_fixture("rooms"))
+        
+        EM.run_block { @server.populate_irc_channels }
         @server.irc_channels.count.should == 1
         @server.irc_channels.first.name.should == "#room_1"
       end

@@ -11,7 +11,7 @@ module Flamethrower
         @server = server
       end
 
-      def rooms
+      def fetch_rooms
         http = campfire_get("/rooms.json")
         http.callback do
           case http.response_header.status

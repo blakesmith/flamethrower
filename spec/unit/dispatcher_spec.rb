@@ -68,10 +68,12 @@ describe Flamethrower::Dispatcher do
 
     context "setting the channel topic" do
       it "sets the channel topic to the specified topic" do
-        stub_request(:put, "https://mytoken:x@mydomain.campfirenow.com/room/347348.json").to_return(:body => json_fixture("room_update"), :status => 200)
+       stub_request(:put, "https://mydomain.campfirenow.com/room/347348.json").
+         with(:headers => {'Authorization'=>['mytoken', 'x'], 'Content-Type'=>'application/json'}).
+         to_return(:status => 200, :body => json_fixture("room_update"))
         message = Flamethrower::Irc::Message.new("TOPIC #flamethrower :some awesome topic")
         @dispatcher.server.should_receive(:send_topic).with(@channel)
-        @dispatcher.handle_message(message)
+        EM.run_block { @dispatcher.handle_message(message) }
         @channel.topic.should == "some awesome topic"
       end
     end

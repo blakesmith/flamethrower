@@ -6,7 +6,7 @@ module Flamethrower
       attr_reader :stream, :token
       attr_writer :topic
       attr_accessor :inbound_messages, :outbound_messages, :thread_messages, :number, :name, :users, :server
-      attr_accessor :failed_messages
+      attr_accessor :failed_messages, :joined
 
       def initialize(domain, token, params = {})
         @domain = domain
@@ -19,6 +19,7 @@ module Flamethrower
         @name = params['name']
         @topic = params['topic']
         @users = []
+        @joined = false
         @room_alive = false
       end
 
@@ -26,16 +27,23 @@ module Flamethrower
         @topic || "No topic"
       end
 
-      def send_topic!(topic)
-        response = campfire_put("/room/#{@number}.json", {:topic => topic}.to_json)
-        @topic = topic if response.code == "200"
+      def send_topic(topic)
+        http = campfire_put("/room/#{@number}.json", {:topic => topic}.to_json)
+        http.callback do
+          @topic = topic if http.response_header.status == 200
+        end
       end
 
       def fetch_room_info
-        response = campfire_get("/room/#{@number}.json")
-        json = JSON.parse(response.body)
-        json['room']['users'].each do |user|
-          @users << Flamethrower::Campfire::User.new(user)
+        http = campfire_get("/room/#{@number}.json")
+        http.callback do
+          case http.response_header.status
+          when 200
+            json = JSON.parse(http.response)
+            json['room']['users'].each do |user|
+              @users << Flamethrower::Campfire::User.new(user)
+            end
+          end
         end
       end
 
@@ -78,7 +86,10 @@ module Flamethrower
       end
 
       def join
-        campfire_post("/room/#{@number}/join.json").code == "200"
+        http = campfire_post("/room/#{@number}/join.json")
+        http.callback do
+          @joined = true if http.response_header.status == 200
+        end
       end
 
       def connect
@@ -108,14 +119,16 @@ module Flamethrower
       def fetch_users
         until @users_to_fetch.empty?
           message = @users_to_fetch.pop
-          response = campfire_get("/users/#{message.user_id}.json")
-          case response
-          when Net::HTTPOK
-            json = JSON.parse(response.body)
-            user = Flamethrower::Campfire::User.new(json['user'])
-            message.user = user
-            @users << user
-            @inbound_messages << message
+          http = campfire_get("/users/#{message.user_id}.json")
+          http.callback do
+            case http.response_header.status
+            when 200
+              json = JSON.parse(http.response)
+              user = Flamethrower::Campfire::User.new(json['user'])
+              message.user = user
+              @users << user
+              @inbound_messages << message
+            end
           end
         end
       end
@@ -125,14 +138,16 @@ module Flamethrower
           message = @outbound_messages.pop
           json = {"message" => {"body" => message.body, "type" => message.message_type}}.to_json
           ::FLAMETHROWER_LOGGER.debug "Sending #{json} to campfire API"
-          response = campfire_post("/room/#{@number}/speak.json", json)
-          case response
-          when Net::HTTPCreated
-            message.mark_delivered!
-          else
-            ::FLAMETHROWER_LOGGER.debug "Failed to post to campfire API with code: #{response.inspect}"
-            message.mark_failed!
-            @failed_messages << message
+          http = campfire_post("/room/#{@number}/speak.json", json)
+          http.callback do
+            case http.response_header.status
+            when 200
+              message.mark_delivered!
+            else
+              ::FLAMETHROWER_LOGGER.debug "Failed to post to campfire API with code: #{http.response_header.inspect}"
+              message.mark_failed!
+              @failed_messages << message
+            end
           end
         end
       end

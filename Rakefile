@@ -20,6 +20,7 @@ begin
     gemspec.authors = ["Blake Smith"]
     gemspec.add_dependency('eventmachine', '>=0.12.10')
     gemspec.add_dependency('json')
+    gemspec.add_dependency('em-http-request')
     gemspec.add_dependency('twitter-stream')
   end
 rescue LoadError

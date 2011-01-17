@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Blake Smith"]
-  s.date = %q{2011-01-12}
+  s.date = %q{2011-01-16}
   s.default_executable = %q{flamethrower}
   s.description = %q{Flamethrower gives you the power to use your awesome irc client to talk in your campfire rooms.}
   s.email = %q{blakesmith0@gmail.com}
@@ -96,15 +96,18 @@ Gem::Specification.new do |s|
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
       s.add_runtime_dependency(%q<eventmachine>, [">= 0.12.10"])
       s.add_runtime_dependency(%q<json>, [">= 0"])
+      s.add_runtime_dependency(%q<em-http-request>, [">= 0"])
       s.add_runtime_dependency(%q<twitter-stream>, [">= 0"])
     else
       s.add_dependency(%q<eventmachine>, [">= 0.12.10"])
       s.add_dependency(%q<json>, [">= 0"])
+      s.add_dependency(%q<em-http-request>, [">= 0"])
       s.add_dependency(%q<twitter-stream>, [">= 0"])
     end
   else
     s.add_dependency(%q<eventmachine>, [">= 0.12.10"])
     s.add_dependency(%q<json>, [">= 0"])
+    s.add_dependency(%q<em-http-request>, [">= 0"])
     s.add_dependency(%q<twitter-stream>, [">= 0"])
   end
 end
