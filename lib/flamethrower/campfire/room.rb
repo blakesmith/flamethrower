@@ -2,7 +2,7 @@ module Flamethrower
   module Campfire
     class Room
       POLL_SECONDS = 0.5
-      PERIODIC_UPDATE_SECONDS = 60 * 5
+      PERIODIC_UPDATE_SECONDS = 60 * 10
 
       include Flamethrower::Campfire::RestApi
 
@@ -54,6 +54,7 @@ module Flamethrower
               @users << Flamethrower::Campfire::User.new(user)
             end
             send_info unless @room_info_sent
+            @room_info_sent = true
           end
         end
       end
