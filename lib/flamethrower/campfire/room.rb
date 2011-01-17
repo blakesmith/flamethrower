@@ -157,7 +157,11 @@ module Flamethrower
       def retrieve_messages
         Array.new.tap do |new_array|
           until @inbound_messages.empty?
-            new_array << @inbound_messages.pop
+            message = @inbound_messages.pop
+            next unless message
+            unless message.user.to_irc.nickname == @server.current_user.nickname
+              new_array << message
+            end
           end
         end
       end

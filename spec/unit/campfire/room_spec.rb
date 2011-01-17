@@ -272,20 +272,6 @@ describe Flamethrower::Campfire::Room do
     end
   end
 
-  describe "#retrieve_messages" do
-    it "returns all the messages in the message buffer" do
-      @room.inbound_messages << "one"
-      @room.inbound_messages << "two"
-      @room.retrieve_messages.should == ["one", "two"]
-    end
-
-    it "pops the messages from the messages array" do
-      @room.inbound_messages << "one"
-      @room.retrieve_messages.should == ["one"]
-      @room.inbound_messages.size.should == 0
-    end
-  end
-
   describe "#to_irc" do
     it "returns an irc channel object" do
       @room.to_irc.is_a?(Flamethrower::Irc::Channel).should be_true
