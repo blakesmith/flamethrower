@@ -203,13 +203,6 @@ describe Flamethrower::Dispatcher do
       @room.stub(:join)
     end
 
-    it "responds with a topic and userlist if sent a join" do
-      message = Flamethrower::Irc::Message.new("JOIN #flamethrower\r\n")
-      @server.should_receive(:send_topic).with(@channel)
-      @server.should_receive(:send_userlist)
-      @dispatcher.handle_message(message)
-    end
-
     it "adds the current user to the channel" do
       user = Flamethrower::Irc::User.new :username => "user", :nickname => "nick", :hostname => "host", :realname => "realname", :servername => "servername"
       @server.current_user = user

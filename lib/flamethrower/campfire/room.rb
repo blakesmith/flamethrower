@@ -43,6 +43,8 @@ module Flamethrower
             json['room']['users'].each do |user|
               @users << Flamethrower::Campfire::User.new(user)
             end
+            @server.send_topic(to_irc)
+            @server.send_userlist(to_irc)
           end
         end
       end
@@ -141,10 +143,10 @@ module Flamethrower
           http = campfire_post("/room/#{@number}/speak.json", json)
           http.callback do
             case http.response_header.status
-            when 200
+            when 201
               message.mark_delivered!
             else
-              ::FLAMETHROWER_LOGGER.debug "Failed to post to campfire API with code: #{http.response_header.inspect}"
+              ::FLAMETHROWER_LOGGER.debug "Failed to post to campfire API with code: #{http.response_header.status} body: #{http.response}"
               message.mark_failed!
               @failed_messages << message
             end

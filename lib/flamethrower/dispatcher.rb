@@ -82,8 +82,6 @@ module Flamethrower
         room.join
         room.fetch_room_info
         room.start
-        server.send_topic(channel)
-        server.send_userlist(channel)
       end
     end
 

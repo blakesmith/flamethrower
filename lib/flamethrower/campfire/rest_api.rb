@@ -21,12 +21,16 @@ module Flamethrower
 
       def campfire_post(path, json=nil)
         full_path = host << path
-        http = EventMachine::HttpRequest.new(full_path).post :head => {'Content-Type' => 'application/json', 'authorization' => [@token, 'x']}
+        params = {:head => {'Content-Type' => 'application/json', 'authorization' => [@token, 'x']}}
+        params[:body] = json if json
+        http = EventMachine::HttpRequest.new(full_path).post params
       end
 
       def campfire_put(path, json=nil)
         full_path = host << path
-        EventMachine::HttpRequest.new(full_path).put :head => {'Content-Type' => 'application/json', 'authorization' => [@token, 'x']}
+        params = {:head => {'Content-Type' => 'application/json', 'authorization' => [@token, 'x']}}
+        params[:body] = json if json
+        EventMachine::HttpRequest.new(full_path).put params
       end
 
       #def put_or_post(request_type, path, json)

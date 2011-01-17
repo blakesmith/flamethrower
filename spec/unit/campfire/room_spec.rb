@@ -2,7 +2,9 @@ require File.join(File.dirname(__FILE__), "../../spec_helper")
 
 describe Flamethrower::Campfire::Room do
   before do
+    @server = Flamethrower::MockServer.new
     @room = Flamethrower::Campfire::Room.new("mydomain", "mytoken", "id" => 347348, "topic" => "some topic", "name" => "some name")
+    @room.server = @server
     @user = Flamethrower::Campfire::User.new('name' => "bob", 'id' => 489198)
     @user2 = Flamethrower::Campfire::User.new('name' => "bill", 'id' => 123456)
   end
@@ -252,7 +254,7 @@ describe Flamethrower::Campfire::Room do
     it "marks the message as delivered if successfully posted to campfire" do
      stub_request(:post, "https://mydomain.campfirenow.com/room/347348/speak.json").
        with(:headers => {'Authorization'=>['mytoken', 'x'], 'Content-Type'=>'application/json'}).
-       to_return(:status => 200, :body => json_fixture("speak_message"))
+       to_return(:status => 201, :body => json_fixture("speak_message"))
       
       message = Flamethrower::Campfire::Message.new('type' => 'TextMessage', 'body' => 'Hello there', 'user' => @user, 'room' => @room)
       @room.outbound_messages << message
