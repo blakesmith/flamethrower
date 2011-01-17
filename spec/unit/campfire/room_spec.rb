@@ -61,6 +61,12 @@ describe Flamethrower::Campfire::Room do
       @room.users.all? {|u| u.is_a?(Flamethrower::Campfire::User)}.should be_true
     end
 
+    it "doesn't send the room join info if the room has already been joined" do
+      @room.joined = true
+      @room.should_not_receive(:send_info)
+      EM.run_block { @room.fetch_room_info }
+    end
+
     it "makes the http request with a token in basic auth" do
       EM.run_block { @room.fetch_room_info }
       assert_requested(:get, "https://mydomain.campfirenow.com/room/347348.json") {|req| req.headers['Authorization'].should == ["mytoken", "x"]}

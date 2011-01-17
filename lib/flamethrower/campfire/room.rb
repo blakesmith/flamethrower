@@ -1,6 +1,9 @@
 module Flamethrower
   module Campfire
     class Room
+      POLL_SECONDS = 0.5
+      PERIODIC_UPDATE_SECONDS = 60 * 5
+
       include Flamethrower::Campfire::RestApi
 
       attr_reader :stream, :token
@@ -34,17 +37,22 @@ module Flamethrower
         end
       end
 
+      def send_info
+        @server.send_topic(to_irc)
+        @server.send_userlist(to_irc)
+      end
+
       def fetch_room_info
         http = campfire_get("/room/#{@number}.json")
         http.callback do
           case http.response_header.status
           when 200
+            @users = []
             json = JSON.parse(http.response)
             json['room']['users'].each do |user|
               @users << Flamethrower::Campfire::User.new(user)
             end
-            @server.send_topic(to_irc)
-            @server.send_userlist(to_irc)
+            send_info unless @joined
           end
         end
       end
@@ -57,12 +65,14 @@ module Flamethrower
       def start
         @room_alive = true
         connect
-        @timer = EventMachine.add_periodic_timer(0.5) { poll }
+        @polling_timer = EventMachine.add_periodic_timer(POLL_SECONDS) { poll }
+        @periodic_timer = EventMachine.add_periodic_timer(ROOM_UPDATE_SECONDS) {fetch_room_info }
       end
 
       def stop
         @room_alive = false
-        EventMachine.cancel_timer(@timer)
+        EventMachine.cancel_timer(@polling_timer)
+        EventMachine.cancel_timer(@periodic_timer)
       end
 
       def poll

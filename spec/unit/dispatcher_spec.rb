@@ -184,11 +184,14 @@ describe Flamethrower::Dispatcher do
   end
 
   describe "#quit" do
-    it "kills all the room threads on quit" do
-      timer = mock(:timer)
-      EventMachine.should_receive(:cancel_timer).with(timer)
+    it "kills all the eventmachine timers on quit" do
+      polling_timer = mock(:polling_timer)
+      periodic_timer = mock(:periodic_timer)
+      EventMachine.should_receive(:cancel_timer).with(polling_timer)
+      EventMachine.should_receive(:cancel_timer).with(periodic_timer)
       @room.instance_variable_set("@room_alive", true)
-      @room.instance_variable_set("@timer", timer)
+      @room.instance_variable_set("@polling_timer", polling_timer)
+      @room.instance_variable_set("@periodic_timer", periodic_timer)
       @room.should be_alive
       message = Flamethrower::Irc::Message.new("QUIT :leaving")
       @dispatcher.handle_message(message)
