@@ -62,7 +62,7 @@ describe Flamethrower::Campfire::Room do
     end
 
     it "doesn't send the room join info if the room has already been joined" do
-      @room.joined = true
+      @room.instance_variable_set("@room_info_sent", true)
       @room.should_not_receive(:send_info)
       EM.run_block { @room.fetch_room_info }
     end

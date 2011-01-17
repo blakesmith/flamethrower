@@ -23,6 +23,7 @@ module Flamethrower
         @topic = params['topic']
         @users = []
         @joined = false
+        @room_info_sent = false
         @room_alive = false
       end
 
@@ -52,7 +53,7 @@ module Flamethrower
             json['room']['users'].each do |user|
               @users << Flamethrower::Campfire::User.new(user)
             end
-            send_info unless @joined
+            send_info unless @room_info_sent
           end
         end
       end
@@ -64,9 +65,10 @@ module Flamethrower
 
       def start
         @room_alive = true
+        fetch_room_info
         connect
         @polling_timer = EventMachine.add_periodic_timer(POLL_SECONDS) { poll }
-        @periodic_timer = EventMachine.add_periodic_timer(ROOM_UPDATE_SECONDS) {fetch_room_info }
+        @periodic_timer = EventMachine.add_periodic_timer(PERIODIC_UPDATE_SECONDS) { fetch_room_info }
       end
 
       def stop

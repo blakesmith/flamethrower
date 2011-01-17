@@ -214,12 +214,6 @@ describe Flamethrower::Dispatcher do
       @channel.users.should include(user)
     end
 
-    it "fetches the room information on join" do
-      message = Flamethrower::Irc::Message.new("JOIN #flamethrower\r\n")
-      @room.should_receive(:fetch_room_info)
-      @dispatcher.handle_message(message)
-    end
-
     it "responds with ERR_BADCHANNELKEY a channel that doesn't exist" do
       user = Flamethrower::Irc::User.new :username => "user", :nickname => "nick", :hostname => "host", :realname => "realname", :servername => "servername"
       @server.current_user = user

@@ -80,7 +80,6 @@ module Flamethrower
         room = channel.to_campfire
         channel.users << server.current_user
         room.join
-        room.fetch_room_info
         room.start
       end
     end
