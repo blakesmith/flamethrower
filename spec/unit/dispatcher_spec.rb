@@ -4,6 +4,7 @@ describe Flamethrower::Dispatcher do
   before do
     @server = Flamethrower::MockServer.new(:log => Logger.new("/dev/null"))
     @room = Flamethrower::Campfire::Room.new('mydomain', 'mytoken', {'name' => 'a room', 'id' => 347348})
+    @room.instance_variable_set("@stream", mock(:twitter_stream, :stop => nil))
     @channel = Flamethrower::Irc::Channel.new("#flamethrower", @room)
     @user = Flamethrower::Irc::User.new :username => "user", :nickname => "nick", :hostname => "host", :realname => "realname", :servername => "servername"
     @server.irc_channels << @channel
