@@ -71,7 +71,7 @@ module Flamethrower
       end
 
       def say(body, message_type='TextMessage')
-        params = {'body' => body, 'type' => message_type}
+        params = {'body' => translate_nicknames(body), 'type' => message_type}
         @outbound_messages << Flamethrower::Campfire::Message.new(params)
       end
 
@@ -208,6 +208,18 @@ module Flamethrower
           channel.topic = topic.gsub("\n", "\s")
         end
       end
+
+      private
+
+      def translate_nicknames(message_body)
+        @users.each do |user|
+          if message_body.include?(user.to_irc.nickname)
+            message_body.gsub!(user.to_irc.nickname, user.name)
+          end
+        end
+        message_body
+      end
+
     end
   end
 end

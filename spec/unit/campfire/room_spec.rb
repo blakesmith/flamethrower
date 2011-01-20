@@ -221,6 +221,24 @@ describe Flamethrower::Campfire::Room do
     end
   end
 
+  describe "#translate_nicknames" do
+    it "changes an IRC highlighted name to the campfire name" do
+      user = Flamethrower::Campfire::User.new('name' => "bob_hope", 'id' => 489198)
+      user2 = Flamethrower::Campfire::User.new('name' => "bill_jones", 'id' => 123456)
+      @room.users = [user, user2]
+      message_body = "#{user2.to_irc.nickname}: Hello there!"
+      @room.send(:translate_nicknames, message_body).should == "#{user2.name}: Hello there!"
+    end
+
+    it "doesn't change the message body if no user's name is present in the body" do
+      user = Flamethrower::Campfire::User.new('name' => "bob_hope", 'id' => 489198)
+      user2 = Flamethrower::Campfire::User.new('name' => "bill_jones", 'id' => 123456)
+      @room.users = [user, user2]
+      message_body = "Hello there!"
+      @room.send(:translate_nicknames, message_body).should == "Hello there!"
+    end
+  end
+
   describe "#requeue_failed_messages" do
     it "queues a message whos retry_at is greater than now" do
       Time.stub(:now).and_return(Time.parse("9:00AM"))
