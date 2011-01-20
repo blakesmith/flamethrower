@@ -8,7 +8,7 @@ module Flamethrower
     
     def handle_message(message)
       method = "handle_#{message.command.downcase}"
-      send(method, message) if protected_methods.include?(method)
+      send(method, message) if protected_methods.map(&:to_s).include?(method)
     end
 
     private
@@ -25,19 +25,19 @@ module Flamethrower
     protected
 
     def handle_privmsg(message)
-      name, body = *message.parameters
+      name, body = message.parameters
       find_channel_or_error(name) do |channel|
         channel.to_campfire.say(body)
       end
     end
 
     def handle_ping(message)
-      hostname = *message.parameters
+      hostname = message.parameters.first
       server.send_pong(hostname)
     end
 
     def handle_user(message)
-      username, hostname, servername, realname = *message.parameters
+      username, hostname, servername, realname = message.parameters
       server.current_user.username = username unless server.current_user.username
       server.current_user.hostname = hostname unless server.current_user.hostname
       server.current_user.servername = servername unless server.current_user.servername
@@ -48,7 +48,7 @@ module Flamethrower
     end
 
     def handle_nick(message)
-      nickname = *message.parameters
+      nickname = message.parameters.first
       server.current_user.nickname = nickname
       if server.current_user.nick_set? && server.current_user.user_set?
         server.after_connect
