@@ -84,7 +84,7 @@ module Flamethrower
       end
 
       def stop
-        @stream.stop
+        @stream.stop if @stream
         EventMachine.cancel_timer(@polling_timer)
         EventMachine.cancel_timer(@periodic_timer)
         @room_alive = false
