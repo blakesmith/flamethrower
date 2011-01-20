@@ -73,6 +73,26 @@ describe Flamethrower::Campfire::Room do
     end
   end
 
+  describe "#resolve renames" do
+    it "calls 'send_rename' for each user who's name has changed" do
+      blake = Flamethrower::Campfire::User.new('id' => 1, 'name' => 'blake')
+      bob = Flamethrower::Campfire::User.new('id' => 2, 'name' => 'bob')
+      bill = Flamethrower::Campfire::User.new('id' => 3, 'name' => 'bill')
+      old_users = [blake, bob, bill]
+
+      blake2 = blake.dup
+      bob2 = bob.dup
+
+      blake2.name = "Blake Smith"
+      bob2.name = "Bob Hope"
+      new_users = [blake2, bob2, bill]
+
+      @room.server.should_receive(:send_rename).with("blake", "Blake_Smith")
+      @room.server.should_receive(:send_rename).with("bob", "Bob_Hope")
+      @room.resolve_renames(old_users, new_users)
+    end
+  end
+
   describe "#fetch_users" do
     it "makes a call to the campfire api to fetch user information" do
       stub_request(:get, "https://mydomain.campfirenow.com/users/734581.json").

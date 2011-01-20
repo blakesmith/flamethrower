@@ -48,13 +48,24 @@ module Flamethrower
         http.callback do
           case http.response_header.status
           when 200
+            old_users = @users
             @users = []
             json = JSON.parse(http.response)
             json['room']['users'].each do |user|
               @users << Flamethrower::Campfire::User.new(user)
             end
+            resolve_renames(old_users, @users)
             send_info unless @room_info_sent
             @room_info_sent = true
+          end
+        end
+      end
+
+      def resolve_renames(old_users, new_users)
+        old_users.each do |old_user|
+          user = new_users.detect {|new_user| new_user.number == old_user.number}
+          unless old_user.name == user.name
+            @server.send_rename(old_user.to_irc.nickname, user.to_irc.nickname)
           end
         end
       end
