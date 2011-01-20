@@ -84,6 +84,17 @@ module Flamethrower
       end
     end
 
+    def handle_away(message)
+      away_message = message.parameters.first
+      if away_message.empty?
+        server.current_user.away_message = nil
+        server.send_unaway
+      else
+        server.current_user.away_message = away_message
+        server.send_nowaway
+      end
+    end
+
     def handle_who(message)
       find_channel_or_error(message.parameters.first) do |channel|
         server.send_who(channel)

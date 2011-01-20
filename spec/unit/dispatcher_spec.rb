@@ -5,6 +5,7 @@ describe Flamethrower::Dispatcher do
     @server = Flamethrower::MockServer.new(:log => Logger.new("/dev/null"))
     @room = Flamethrower::Campfire::Room.new('mydomain', 'mytoken', {'name' => 'a room', 'id' => 347348})
     @channel = Flamethrower::Irc::Channel.new("#flamethrower", @room)
+    @user = Flamethrower::Irc::User.new :username => "user", :nickname => "nick", :hostname => "host", :realname => "realname", :servername => "servername"
     @server.irc_channels << @channel
     @dispatcher = Flamethrower::Dispatcher.new(@server)
   end
@@ -42,6 +43,25 @@ describe Flamethrower::Dispatcher do
       @dispatcher.server.current_user.hostname.should == "tolmoon"
       @dispatcher.server.current_user.servername.should == "tolsun"
       @dispatcher.server.current_user.realname.should == "Ronnie Reagan"
+    end
+  end
+
+  describe "#away" do
+    it "respond with RPL_NOWAWAY when the user specifies an away message" do
+      @server.current_user = @user
+      message = Flamethrower::Irc::Message.new("AWAY :I'm away")
+      @dispatcher.server.should_receive(:send_message).with(":#{@user.hostname} 306 #{@user.nickname} :You have been marked as being away")
+      @dispatcher.handle_message(message)
+      @server.current_user.away_message.should == "I'm away"
+    end
+
+    it "respond with RPL_UNAWAY when the user doesn't specify an away message" do
+      @server.current_user = @user
+      @server.current_user.away_message = "Currently away"
+      message = Flamethrower::Irc::Message.new("AWAY :")
+      @dispatcher.server.should_receive(:send_message).with(":#{@user.hostname} 305 #{@user.nickname} :You are no longer marked as being away")
+      @dispatcher.handle_message(message)
+      @server.current_user.away_message.should == nil
     end
   end
 

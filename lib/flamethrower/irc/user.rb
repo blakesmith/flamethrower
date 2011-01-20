@@ -3,6 +3,7 @@ module Flamethrower
     class User
 
       attr_accessor :username, :nickname, :hostname, :realname, :servername, :modes
+      attr_accessor :away_message
 
       def initialize(options={})
         @username = options[:username]

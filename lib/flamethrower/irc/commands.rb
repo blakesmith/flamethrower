@@ -37,6 +37,14 @@ module Flamethrower
         send_message ":#{from} NICK #{to}"
       end
 
+      def send_nowaway
+        send_message reply(RPL_NOWAWAY, ":You have been marked as being away")
+      end
+
+      def send_unaway
+        send_message reply(RPL_UNAWAY, ":You are no longer marked as being away")
+      end
+
       def send_who(channel)
         send_messages do |messages|
           channel.users.each do |user|
