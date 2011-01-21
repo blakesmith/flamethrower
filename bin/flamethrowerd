@@ -1,0 +1,11 @@
+#!/usr/bin/env ruby
+
+require 'rubygems'
+require 'daemons'
+
+config = File.join(ENV["HOME"], '.flamethrower', 'config.yml')
+if File.exists?(config)
+  Daemons.run('flamethrower')
+else
+  puts "Unable to find config file! Please create $HOME/.flamethrower/config.yml and specify your domain and campfire API token"
+end
