@@ -5,7 +5,8 @@ require 'daemons'
 
 config = File.join(ENV["HOME"], '.flamethrower', 'config.yml')
 if File.exists?(config)
-  Daemons.run('flamethrower')
+  script = File.join(File.dirname(__FILE__), 'flamethrower')
+  Daemons.run(script)
 else
   puts "Unable to find config file! Please create $HOME/.flamethrower/config.yml and specify your domain and campfire API token"
 end
