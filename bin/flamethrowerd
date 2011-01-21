@@ -3,10 +3,18 @@
 require 'rubygems'
 require 'daemons'
 
-config = File.join(ENV["HOME"], '.flamethrower', 'config.yml')
+flamethrower_dir = File.join(ENV["HOME"], '.flamethrower')
+config = File.join(flamethrower_dir, 'config.yml')
+options = {
+  :dir => flamethrower_dir,
+  :dir_mode => :normal,
+  :log_output => true,
+  :backtrace => true
+}
+
 if File.exists?(config)
   script = File.join(File.dirname(__FILE__), 'flamethrower')
-  Daemons.run(script)
+  Daemons.run(script, options)
 else
   puts "Unable to find config file! Please create $HOME/.flamethrower/config.yml and specify your domain and campfire API token"
 end
