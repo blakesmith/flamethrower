@@ -7,10 +7,6 @@ module Flamethrower
       end
 
       private
-      def http
-        EventMachine::HttpRequest.new(host)
-      end
-
       def campfire_get(path)
         action_log("get", path, nil)
         full_path = host << path
@@ -22,7 +18,7 @@ module Flamethrower
         full_path = host << path
         params = {:head => {'Content-Type' => 'application/json', 'authorization' => [@token, 'x']}}
         params[:body] = json if json
-        http = EventMachine::HttpRequest.new(full_path).post params
+        EventMachine::HttpRequest.new(full_path).post params
       end
 
       def campfire_put(path, json=nil)
