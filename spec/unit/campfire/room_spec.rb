@@ -91,6 +91,17 @@ describe Flamethrower::Campfire::Room do
       @room.server.should_receive(:send_rename).with("bob", "Bob_Hope")
       @room.resolve_renames(old_users, new_users)
     end
+
+    it "doesn't rename if old_users has a user that new_users doesn't" do
+      blake = Flamethrower::Campfire::User.new('id' => 1, 'name' => 'blake')
+      bob = Flamethrower::Campfire::User.new('id' => 2, 'name' => 'bob')
+      bill = Flamethrower::Campfire::User.new('id' => 3, 'name' => 'bill')
+      old_users = [blake, bob, bill]
+      new_users = [blake, bob]
+
+      @room.server.should_not_receive(:send_rename)
+      @room.resolve_renames(old_users, new_users)
+    end
   end
 
   describe "#fetch_users" do

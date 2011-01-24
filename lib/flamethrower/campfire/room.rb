@@ -64,8 +64,10 @@ module Flamethrower
       def resolve_renames(old_users, new_users)
         old_users.each do |old_user|
           user = new_users.detect {|new_user| new_user.number == old_user.number}
-          unless old_user.name == user.name
-            @server.send_rename(old_user.to_irc.nickname, user.to_irc.nickname)
+          if user
+            unless old_user.name == user.name
+              @server.send_rename(old_user.to_irc.nickname, user.to_irc.nickname)
+            end
           end
         end
       end
