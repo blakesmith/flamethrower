@@ -49,6 +49,30 @@ describe Flamethrower::Campfire::Room do
     end
   end
 
+  describe "#stop" do
+    it "should stop the stream" do
+      EventMachine.stub(:cancel_timer)
+      @room.instance_variable_set("@stream", mock(:stream, :stop => nil))
+      @room.stream.should_receive(:stop)
+      @room.stop
+    end
+
+    it "should cancel the timers" do
+      timer = mock(:timer)
+      @room.instance_variable_set("@polling_timer", timer)
+      @room.instance_variable_set("@periodic_timer", timer)
+      EventMachine.should_receive(:cancel_timer).with(timer).twice
+      @room.stop
+    end
+
+    it "should flip all the appropriate stop booleans" do
+      EventMachine.stub(:cancel_timer)
+      @room.stop
+      @room.should_not be_alive
+      @room.instance_variable_get("@room_info_set").should be_false
+    end
+  end
+
   describe "#fetch_room_info" do
     before do
       stub_request(:get, "https://mydomain.campfirenow.com/room/347348.json").
