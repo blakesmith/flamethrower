@@ -30,6 +30,33 @@ describe Flamethrower::Campfire::Room do
     end
   end
 
+  describe "#on_reconnect" do
+    it "writes to the log that it reconnected" do
+      message = "Reconnected to some name stream"
+      ::FLAMETHROWER_LOGGER.should_receive(:debug).with(message)
+
+      @room.send(:on_reconnect)
+    end
+  end
+
+  describe "#on_max_reconnects" do
+    it "writes to the log that it has failed to reconnect" do
+      message = "Failed to reconnect to some name, stopping"
+      ::FLAMETHROWER_LOGGER.should_receive(:debug).with(message)
+
+      @room.send(:on_max_reconnects)
+    end
+  end
+
+  describe "#on_error" do
+    it "writes to the log that there was an error" do
+      message = "There was an error connecting to some name stream"
+      ::FLAMETHROWER_LOGGER.should_receive(:debug).with(message)
+
+      @room.send(:on_error)
+    end
+  end
+
   describe "#send_topic!" do
     it "sets the topic when the campfire API returns 200" do
       stub_request(:put, "https://mydomain.campfirenow.com/room/347348.json").
@@ -188,14 +215,24 @@ describe Flamethrower::Campfire::Room do
 
   describe "#connect" do
     it "initializes the twitter jsonstream with the right options" do
-      Twitter::JSONStream.should_receive(:connect).with(:path => "/room/347348/live.json", :host => "streaming.campfirenow.com", :auth => "mytoken:x")
+      stream = mock(:stream, :on_reconnect => nil, :on_error => nil, :on_max_reconnects => nil)
+      Twitter::JSONStream.should_receive(:connect).with(:path => "/room/347348/live.json", :host => "streaming.campfirenow.com", :auth => "mytoken:x").and_return(stream)
+      @room.connect
+    end
+
+    it "sets up the stream callbacks" do
+      stream = mock(:stream, :on_reconnect => nil, :on_error => nil, :on_max_reconnects => nil)
+      Twitter::JSONStream.should_receive(:connect).with(:path => "/room/347348/live.json", :host => "streaming.campfirenow.com", :auth => "mytoken:x").and_return(stream)
+
+      @room.should_receive(:setup_stream_callbacks)
       @room.connect
     end
   end
 
   describe "#fetch_messages" do
     before do
-      Twitter::JSONStream.stub(:connect).and_return("stream")
+      stream = mock(:stream, :on_reconnect => nil, :on_error => nil, :on_max_reconnects => nil)
+      Twitter::JSONStream.stub(:connect).and_return(stream)
       @item = json_fixture("streaming_message")
       @room.users << @user
       @room.connect

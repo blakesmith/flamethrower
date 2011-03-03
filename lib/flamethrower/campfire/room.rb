@@ -127,6 +127,7 @@ module Flamethrower
         @stream = Twitter::JSONStream.connect(:path => "/room/#{@number}/live.json", 
                                     :host => "streaming.campfirenow.com", 
                                     :auth => "#{@token}:x")
+        setup_stream_callbacks
       end
 
       def fetch_messages
@@ -221,6 +222,24 @@ module Flamethrower
           end
         end
         message_body
+      end
+
+      def setup_stream_callbacks
+        @stream.on_reconnect { self.on_reconnect }
+        @stream.on_error { self.on_error }
+        @stream.on_max_reconnects { self.on_max_reconnects }
+      end
+
+      def on_reconnect
+        ::FLAMETHROWER_LOGGER.debug "Reconnected to #{name} stream"
+      end
+
+      def on_error
+        ::FLAMETHROWER_LOGGER.debug "There was an error connecting to #{name} stream"
+      end
+
+      def on_max_reconnects
+        ::FLAMETHROWER_LOGGER.debug "Failed to reconnect to #{name}, stopping"
       end
 
     end
