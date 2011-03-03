@@ -35,7 +35,7 @@ describe Flamethrower::Campfire::Room do
       message = "Reconnected to some name stream"
       ::FLAMETHROWER_LOGGER.should_receive(:debug).with(message)
 
-      @room.send(:on_reconnect)
+      @room.on_reconnect
     end
   end
 
@@ -44,7 +44,7 @@ describe Flamethrower::Campfire::Room do
       message = "Failed to reconnect to some name, stopping"
       ::FLAMETHROWER_LOGGER.should_receive(:debug).with(message)
 
-      @room.send(:on_max_reconnects)
+      @room.on_max_reconnects
     end
   end
 
@@ -53,7 +53,7 @@ describe Flamethrower::Campfire::Room do
       message = "There was an error connecting to some name stream"
       ::FLAMETHROWER_LOGGER.should_receive(:debug).with(message)
 
-      @room.send(:on_error)
+      @room.on_error
     end
   end
 
