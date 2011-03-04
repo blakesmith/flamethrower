@@ -1,6 +1,7 @@
 module Flamethrower
   module Campfire
     class Room
+      MAX_RECONNECT_TIMOUT_SECONDS = 20
       POLL_SECONDS = 0.5
       PERIODIC_UPDATE_SECONDS = 60 * 10
 
@@ -91,6 +92,14 @@ module Flamethrower
         EventMachine.cancel_timer(@periodic_timer)
         @room_alive = false
         @room_info_sent = false
+      end
+
+      def setup_reconnect
+        @stream.reset_timeouts
+        EventMachine.add_periodic_timer(MAX_RECONNECT_TIMOUT_SECONDS) do
+          stop
+          start
+        end
       end
 
       def poll
@@ -222,7 +231,8 @@ module Flamethrower
       end
 
       def on_max_reconnects
-        ::FLAMETHROWER_LOGGER.debug "Failed to reconnect to #{name}, stopping"
+        ::FLAMETHROWER_LOGGER.debug "Failed to reconnect to #{name}, restarting room in #{MAX_RECONNECT_TIMOUT_SECONDS} seconds"
+        setup_reconnect
       end
 
       private

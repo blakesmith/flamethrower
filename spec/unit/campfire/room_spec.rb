@@ -40,10 +40,20 @@ describe Flamethrower::Campfire::Room do
   end
 
   describe "#on_max_reconnects" do
+    before do
+      @room.instance_variable_set("@stream", mock(:stream, :reset_timeouts => nil))
+    end
+
     it "writes to the log that it has failed to reconnect" do
-      message = "Failed to reconnect to some name, stopping"
+      @room.stub(:setup_reconnect)
+      message = "Failed to reconnect to some name, restarting room in 20 seconds"
       ::FLAMETHROWER_LOGGER.should_receive(:debug).with(message)
 
+      @room.on_max_reconnects
+    end
+
+    it "schedules up the reconnect" do
+      @room.should_receive(:setup_reconnect)
       @room.on_max_reconnects
     end
   end
@@ -385,6 +395,25 @@ describe Flamethrower::Campfire::Room do
       expected_json = {"message"=>{"body"=>"Hello there", "type"=>"TextMessage"}}.to_json
       @room.should_receive(:campfire_post).with("/room/#{@room.number}/speak.json", expected_json).and_return(mock(:post, :callback => nil))
       EM.run_block { @room.post_messages }
+    end
+  end
+
+  describe "#setup_reconnect" do
+    before do
+      @stream = mock(:stream, :reset_timeouts => nil)
+    end
+
+    it "resets the timeouts" do
+      EventMachine.stub(:add_periodic_timer)
+      @room.instance_variable_set("@stream", @stream)
+      @room.stream.should_receive(:reset_timeouts)
+      @room.setup_reconnect
+    end
+
+    it "adds an EventMachine timer to stop and start the room" do
+      @room.instance_variable_set("@stream", @stream)
+      EventMachine.should_receive(:add_periodic_timer).with(20)
+      @room.setup_reconnect
     end
   end
 
