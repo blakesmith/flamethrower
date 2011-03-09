@@ -95,7 +95,6 @@ module Flamethrower
       end
 
       def setup_reconnect
-        @stream.reset_timeouts
         EventMachine.add_periodic_timer(MAX_RECONNECT_TIMOUT_SECONDS) do
           stop
           start

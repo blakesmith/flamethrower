@@ -41,7 +41,7 @@ describe Flamethrower::Campfire::Room do
 
   describe "#on_max_reconnects" do
     before do
-      @room.instance_variable_set("@stream", mock(:stream, :reset_timeouts => nil))
+      @room.instance_variable_set("@stream", mock(:stream))
     end
 
     it "writes to the log that it has failed to reconnect" do
@@ -400,14 +400,7 @@ describe Flamethrower::Campfire::Room do
 
   describe "#setup_reconnect" do
     before do
-      @stream = mock(:stream, :reset_timeouts => nil)
-    end
-
-    it "resets the timeouts" do
-      EventMachine.stub(:add_periodic_timer)
-      @room.instance_variable_set("@stream", @stream)
-      @room.stream.should_receive(:reset_timeouts)
-      @room.setup_reconnect
+      @stream = mock(:stream)
     end
 
     it "adds an EventMachine timer to stop and start the room" do
