@@ -405,7 +405,7 @@ describe Flamethrower::Campfire::Room do
 
     it "adds an EventMachine timer to stop and start the room" do
       @room.instance_variable_set("@stream", @stream)
-      EventMachine.should_receive(:add_periodic_timer).with(20)
+      EventMachine.should_receive(:add_timer).with(20)
       @room.setup_reconnect
     end
   end

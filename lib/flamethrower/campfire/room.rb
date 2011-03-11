@@ -95,7 +95,7 @@ module Flamethrower
       end
 
       def setup_reconnect
-        EventMachine.add_periodic_timer(MAX_RECONNECT_TIMOUT_SECONDS) do
+        EventMachine.add_timer(MAX_RECONNECT_TIMOUT_SECONDS) do
           stop
           start
         end
