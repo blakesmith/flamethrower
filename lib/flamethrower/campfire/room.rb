@@ -94,13 +94,6 @@ module Flamethrower
         @room_info_sent = false
       end
 
-      def setup_reconnect
-        EventMachine.add_timer(MAX_RECONNECT_TIMOUT_SECONDS) do
-          stop
-          start
-        end
-      end
-
       def poll
         unless dead?
           fetch_messages
@@ -231,7 +224,6 @@ module Flamethrower
 
       def on_max_reconnects
         ::FLAMETHROWER_LOGGER.debug "Failed to reconnect to #{name}, restarting room in #{MAX_RECONNECT_TIMOUT_SECONDS} seconds"
-        setup_reconnect
       end
 
       private

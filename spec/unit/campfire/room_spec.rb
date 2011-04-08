@@ -51,11 +51,6 @@ describe Flamethrower::Campfire::Room do
 
       @room.on_max_reconnects
     end
-
-    it "schedules up the reconnect" do
-      @room.should_receive(:setup_reconnect)
-      @room.on_max_reconnects
-    end
   end
 
   describe "#on_error" do
@@ -395,18 +390,6 @@ describe Flamethrower::Campfire::Room do
       expected_json = {"message"=>{"body"=>"Hello there", "type"=>"TextMessage"}}.to_json
       @room.should_receive(:campfire_post).with("/room/#{@room.number}/speak.json", expected_json).and_return(mock(:post, :callback => nil))
       EM.run_block { @room.post_messages }
-    end
-  end
-
-  describe "#setup_reconnect" do
-    before do
-      @stream = mock(:stream)
-    end
-
-    it "adds an EventMachine timer to stop and start the room" do
-      @room.instance_variable_set("@stream", @stream)
-      EventMachine.should_receive(:add_timer).with(20)
-      @room.setup_reconnect
     end
   end
 
