@@ -75,6 +75,50 @@ describe Flamethrower::Campfire::Message do
     end
   end
 
+  describe "#image_urls" do
+    it "returns a standalone image url" do
+      @message.body = "http://example.com/kitties.jpg"
+      @message.image_urls.should == ["http://example.com/kitties.jpg"]
+    end
+
+    it "supports jpeg" do
+      @message.body = "http://example.com/kitties.jpeg"
+      @message.image_urls.should == ["http://example.com/kitties.jpeg"]
+    end
+
+    it "supports gif" do
+      @message.body = "http://example.com/kitties.gif"
+      @message.image_urls.should == ["http://example.com/kitties.gif"]
+    end
+
+    it "supports png" do
+      @message.body = "http://example.com/kitties.png"
+      @message.image_urls.should == ["http://example.com/kitties.png"]
+    end
+
+    it "supports multiple images" do
+      @message.body = "http://example.com/kitties.png http://blah.com/duppy-pogs.png"
+      @message.image_urls.should == ["http://example.com/kitties.png", "http://blah.com/duppy-pogs.png"]
+    end
+
+    it "supports interleaved urls with messages" do
+      @message.body = "check this out: http://example.com/kitties.png"
+      @message.image_urls.should == ["http://example.com/kitties.png"]
+    end
+  end
+
+  describe "#has_images?" do
+    it "returns true if there are images present in the body" do
+      @message.body = "look ma! kitties! http://example.com/kitties.jpg"
+      @message.should have_images
+    end
+
+    it "returns false if there are no images present in the body" do
+      @message.body = "i love lamp, i really do"
+      @message.should_not have_images
+    end
+  end
+
   describe "#mark_delivered!" do
     it "sets the status to delivered" do
       @message.status.should_not == "delivered"

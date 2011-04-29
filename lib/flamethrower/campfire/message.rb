@@ -23,6 +23,14 @@ module Flamethrower
         @retry_at = Time.now + RETRY_SECONDS
       end
 
+      def image_urls
+        @body.scan(/(http:\/\/.+?\.(?:jpg|jpeg|gif|png))/).flatten
+      end
+
+      def has_images?
+        image_urls.size > 0
+      end
+
       def to_irc
         case message_type
         when "TextMessage"
