@@ -24,7 +24,11 @@ module Flamethrower
       end
 
       def image_urls
-        @body.scan(/(http:\/\/.+?\.(?:jpg|jpeg|gif|png))/).flatten
+        if @body
+          @body.scan(/(http:\/\/.+?\.(?:jpg|jpeg|gif|png))/).flatten
+        else
+          []
+        end
       end
 
       def has_images?

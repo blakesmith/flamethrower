@@ -166,7 +166,7 @@ module Flamethrower
               user = Flamethrower::Campfire::User.new(json['user'])
               message.user = user
               @users << user
-              @inbound_messages << message
+              sort_and_dispatch_message(message)
             end
           end
         end
