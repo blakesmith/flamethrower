@@ -18,6 +18,7 @@ module Flamethrower
         @inbound_messages = Queue.new
         @outbound_messages = Queue.new
         @users_to_fetch = Queue.new
+        @images_to_fetch = Queue.new
         @failed_messages = []
         @number = params['id']
         @name = params['name']
@@ -139,12 +140,18 @@ module Flamethrower
           params['room'] = self
           message = Flamethrower::Campfire::Message.new(params)
           unless message.message_type == "TimestampMessage"
-            unless message.user
-              @users_to_fetch << message
-            else
-              @inbound_messages << message
-            end
+            sort_and_dispatch_message(message)
           end
+        end
+      end
+
+      def sort_and_dispatch_message(message)
+        if !message.user
+          @users_to_fetch << message
+        elsif message.has_images?
+          @images_to_fetch << message
+        else
+          @inbound_messages << message
         end
       end
 

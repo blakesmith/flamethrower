@@ -279,6 +279,15 @@ describe Flamethrower::Campfire::Room do
       @room.stream.stub(:each_item).and_yield(enter_message.to_json)
       @room.fetch_messages
       @room.instance_variable_get("@users_to_fetch").size.should == 1
+      @room.instance_variable_get("@inbound_messages").size.should == 0
+    end
+
+    it "puts messages that have an image url in the into the images_to_fetch queue" do
+      image_message = json_fixture("streaming_image_message")
+      @room.stream.stub(:each_item).and_yield(image_message)
+      @room.fetch_messages
+      @room.instance_variable_get("@inbound_messages").size.should == 0
+      @room.instance_variable_get("@images_to_fetch").size.should == 1
     end
   end
 
