@@ -1,7 +1,7 @@
 module Flamethrower
   module Campfire
     class Message
-      attr_accessor :body, :user, :room, :message_type, :status, :retry_at, :user_id
+      attr_accessor :body, :user, :room, :message_type, :status, :retry_at, :image_converted, :user_id
 
       RETRY_SECONDS = 15
 
@@ -12,6 +12,7 @@ module Flamethrower
         @user_id = params['user_id']
         @message_type = params['type']
         @status = "pending"
+        @image_converted = false
       end
 
       def mark_delivered!
@@ -33,6 +34,16 @@ module Flamethrower
 
       def has_images?
         image_urls.size > 0
+      end
+
+      def needs_image_conversion?
+        has_images? && !@image_converted
+      end
+
+      def set_ascii_image(str)
+        @body << "\n#{str}"
+        @message_type = "PasteMessage"
+        @image_converted = true
       end
 
       def to_irc

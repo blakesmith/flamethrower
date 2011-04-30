@@ -102,6 +102,7 @@ module Flamethrower
           post_messages
           requeue_failed_messages
           fetch_users
+          fetch_images
           messages_to_send = to_irc.retrieve_irc_messages
           messages_to_send.each do |m|
             ::FLAMETHROWER_LOGGER.debug "Sending irc message #{m.to_s}"
@@ -149,7 +150,7 @@ module Flamethrower
       def sort_and_dispatch_message(message)
         if !message.user
           @users_to_fetch << message
-        elsif message.has_images?
+        elsif message.needs_image_conversion?
           @images_to_fetch << message
         else
           @inbound_messages << message
@@ -164,7 +165,8 @@ module Flamethrower
             http.callback do
               case http.response_header.status
               when 200
-                message.body << "\n#{http.response}"
+                message.set_ascii_image(http.response)
+                sort_and_dispatch_message(message)
               end
             end
           end

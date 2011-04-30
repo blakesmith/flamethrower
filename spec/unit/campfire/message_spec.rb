@@ -119,6 +119,18 @@ describe Flamethrower::Campfire::Message do
     end
   end
 
+  describe "#needs_conversion?" do
+    it "returns true if the image hasn't been converted yet" do
+      @message.body = "look ma! kitties! http://example.com/kitties.jpg"
+      @message.should be_needs_image_conversion
+    end
+
+    it "returns false if the image has already been converted" do
+      @message.set_ascii_image("LOLCATS ASCII HERE!")
+      @message.should_not be_needs_image_conversion
+    end
+  end
+
   describe "#mark_delivered!" do
     it "sets the status to delivered" do
       @message.status.should_not == "delivered"
