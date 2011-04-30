@@ -2,7 +2,14 @@ require File.join(File.dirname(__FILE__), "../../spec_helper")
 
 describe Flamethrower::EventServer do
   before do
-    @event_server = Flamethrower::EventServer.new("0.0.0.0", 6667, "mydomain", "mytoken")
+    options = {
+      'host' => '0.0.0.0',
+      'port' => 6667,
+      'domain' => 'mydomain',
+      'token' => 'token'
+    }
+
+    @event_server = Flamethrower::EventServer.new(options)
   end
 
   it "initializes the host" do
