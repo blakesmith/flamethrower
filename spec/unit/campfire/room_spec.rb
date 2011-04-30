@@ -162,7 +162,7 @@ describe Flamethrower::Campfire::Room do
 
   describe "#fetch_images" do
     it "makes a call to the image ascii service to convert the image" do
-      stub_request(:get, "http://skeeter.blakesmith.me/?image_url=http://example.com/kitties.jpg").
+      stub_request(:get, "http://skeeter.blakesmith.me/?image_url=http://example.com/kitties.jpg&width=80").
         to_return(:status => 200, :body => "LOLCAT ASCII ART HERE!")
       @message = Flamethrower::Campfire::Message.new(JSON.parse(json_fixture("streaming_image_message")))
       @room.instance_variable_get("@images_to_fetch") << @message
