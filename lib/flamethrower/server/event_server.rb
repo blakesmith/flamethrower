@@ -22,13 +22,16 @@ module Flamethrower
   end
 
   class EventServer
-    attr_reader :host, :port, :campfire_connection, :connections
+    DEFAULT_IMAGE_ASCII_SERVICE = "http://skeeter.blakesmith.me"
+
+    attr_reader :host, :port, :image_ascii_service, :campfire_connection, :connections
 
     def initialize(options = {})
       @host = options['host'] || "0.0.0.0"
       @port = options['port'] || 6667
       @domain = options['domain']
       @token = options['token']
+      @image_ascii_service = options['image_ascii_service'] || DEFAULT_IMAGE_ASCII_SERVICE
       @connections = []
     end
 
