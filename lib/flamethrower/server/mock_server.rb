@@ -9,5 +9,9 @@ module Flamethrower
       Flamethrower::Campfire::Connection.new("mydomain", "mytoken", self)
     end
 
+    def server
+      Flamethrower::EventServer.new
+    end
+
   end
 end

@@ -6,6 +6,7 @@ module Flamethrower
       PERIODIC_UPDATE_SECONDS = 60 * 10
 
       include Flamethrower::Campfire::RestApi
+      include Flamethrower::AsciiImager
 
       attr_reader :stream, :token
       attr_writer :topic
@@ -152,6 +153,21 @@ module Flamethrower
           @images_to_fetch << message
         else
           @inbound_messages << message
+        end
+      end
+
+      def fetch_images
+        until @images_to_fetch.empty?
+          message = @images_to_fetch.pop
+          message.image_urls.each do |url|
+            http = image_get(url)
+            http.callback do
+              case http.response_header.status
+              when 200
+                message.body << "\n#{http.response}"
+              end
+            end
+          end
         end
       end
 

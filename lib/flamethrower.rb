@@ -9,6 +9,8 @@ require 'twitter/json_stream'
 require 'logger'
 require 'json'
 
+require 'ascii_imager'
+
 require 'irc/codes'
 require 'irc/commands'
 require 'irc/user'
