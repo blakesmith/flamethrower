@@ -7,7 +7,10 @@ describe Flamethrower::EventServer do
       'port' => 6667,
       'domain' => 'mydomain',
       'token' => 'token',
-      'image_ascii_service' => 'http://bloop.com'
+      'ascii_conversion' => {
+        'service' => 'http://bloop.com',
+        'scale_to_width' => 80
+      }
     }
 
     @event_server = Flamethrower::EventServer.new(options)
@@ -21,8 +24,12 @@ describe Flamethrower::EventServer do
     @event_server.port.should == 6667
   end
 
-  it "initializes the image_ascii_service" do
-    @event_server.image_ascii_service.should == "http://bloop.com"
+  it "initializes the ascii_conversion service" do
+    @event_server.ascii_conversion['service'].should == "http://bloop.com"
+  end
+
+  it "initializes the ascii_conversion scale_to_width" do
+    @event_server.ascii_conversion['scale_to_width'].should == 80
   end
 
 end

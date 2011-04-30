@@ -22,14 +22,14 @@ module Flamethrower
   end
 
   class EventServer
-    attr_reader :host, :port, :image_ascii_service, :campfire_connection, :connections
+    attr_reader :host, :port, :ascii_conversion, :campfire_connection, :connections
 
     def initialize(options = {})
       @host = options['host'] || "0.0.0.0"
       @port = options['port'] || 6667
       @domain = options['domain']
       @token = options['token']
-      @image_ascii_service = options['image_ascii_service']
+      @ascii_conversion = options['ascii_conversion'] || {}
       @connections = []
     end
 
