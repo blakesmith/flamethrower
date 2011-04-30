@@ -24,11 +24,11 @@ module Flamethrower
   class EventServer
     attr_reader :host, :port, :campfire_connection, :connections
 
-    def initialize(host, port, domain, token)
-      @host = host || "0.0.0.0"
-      @port = port || 6667
-      @domain = domain
-      @token = token
+    def initialize(options = {})
+      @host = options['host'] || "0.0.0.0"
+      @port = options['port'] || 6667
+      @domain = options['domain']
+      @token = options['token']
       @connections = []
     end
 
