@@ -1,0 +1,6 @@
+domain: flamethrower # eg, flamethrower.campfirenow.com
+token: c9be61aeb7c1a311f8f5a928ac6a0d41c93c4a72 # your personal API token
+ascii_conversion:
+        enabled: true
+        service: "http://skeeter.blakesmith.me"
+        scale_to_width: 80

@@ -1,5 +1,7 @@
 = Flamethrower: An irc to campfire gateway
 
+* Now with ASCII art conversion! (Oooo, shiney!)
+
 Flamethrower gives you the power to use your awesome irc client to
 talk in your campfire rooms.
 
@@ -23,14 +25,17 @@ Then start flamethrower like so:
 
   flamethrower -c ~/myconfig.yml
 
-=== A work in progress
+By default, flamethrower will use the config file located at ~/.flamethrower/config.yml.
 
-Flamethrower is a work in progress. Right now basic messaging works, but
-it still needs a lot of love. If you find it useful and would like to see
-it do something, please submit a patch (with tests please)!. Bug reports are
+=== Contributing
+
+Flamethrower is a constant work in progress. If you find it useful and would like to see it do something, please submit a patch (with tests please)!. Bug reports are
 also highly appreciated.
 
-=== Author
+=== Authors
 
 Flamethrower is written by Blake Smith <blakesmith0@gmail.com>
+
+Contributions by:
+  [Alexander Rakoczy](https://github.com/toothrot)
 
