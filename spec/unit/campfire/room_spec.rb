@@ -302,6 +302,16 @@ describe Flamethrower::Campfire::Room do
       @room.instance_variable_get("@inbound_messages").size.should == 0
       @room.instance_variable_get("@images_to_fetch").size.should == 1
     end
+
+    it "doesn't make the call to the image ascii service if the option is disabled" do
+      @room.server.server.ascii_conversion['enabled'] = false
+      image_message = json_fixture("streaming_image_message")
+      @room.stream.stub(:each_item).and_yield(image_message)
+      @room.fetch_messages
+      @room.instance_variable_get("@users_to_fetch").size.should == 0
+      @room.instance_variable_get("@images_to_fetch").size.should == 0
+      @room.instance_variable_get("@inbound_messages").size.should == 1
+    end
   end
 
   describe "#say" do

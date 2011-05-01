@@ -150,7 +150,7 @@ module Flamethrower
       def sort_and_dispatch_message(message)
         if !message.user
           @users_to_fetch << message
-        elsif message.needs_image_conversion?
+        elsif @server.server.ascii_conversion['enabled'] && message.needs_image_conversion?
           @images_to_fetch << message
         else
           @inbound_messages << message
