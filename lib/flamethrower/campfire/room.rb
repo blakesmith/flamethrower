@@ -236,11 +236,7 @@ module Flamethrower
         @failed_messages.each do |m| 
           if m.retry_at > Time.now
             m.mark_pending!
-            if m.outbound?
-              @outbound_messages << m
-            elsif m.inbound?
-              sort_and_dispatch_message(m)
-            end
+            sort_and_dispatch_message(m)
             @failed_messages.delete(m)
           end
         end
