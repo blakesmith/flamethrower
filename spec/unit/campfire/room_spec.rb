@@ -300,6 +300,11 @@ describe Flamethrower::Campfire::Room do
       @room.inbound_messages.pop.room.should == @room
     end
 
+    it "marks the message as inbound" do
+      @room.fetch_messages
+      @room.inbound_messages.pop.should be_inbound
+    end
+
     it "discards timestamp messages altogether" do
       item = json_fixture("timestamp_message")
       @room.stream.stub(:each_item).and_yield(item)
@@ -338,17 +343,21 @@ describe Flamethrower::Campfire::Room do
 
   describe "#say" do
     it "queues a campfire message given a message body" do
-      message = Flamethrower::Campfire::Message.new('body' => 'Hello there', 'user' => @user, 'room' => @room)
       @room.say('Hello there')
       popped_message = @room.outbound_messages.pop
       popped_message.body.should == 'Hello there'
     end
 
     it "takes an optional message type" do
-      message = Flamethrower::Campfire::Message.new('type' => 'TextMessage', 'body' => 'Hello there', 'user' => @user, 'room' => @room)
       @room.say('Hello there', 'TextMessage')
       popped_message = @room.outbound_messages.pop
       popped_message.message_type.should == 'TextMessage'
+    end
+
+    it "marks the message as an outbound message" do
+      @room.say('Hello there', 'TextMessage')
+      popped_message = @room.outbound_messages.pop
+      popped_message.should be_outbound
     end
   end
 
@@ -371,9 +380,9 @@ describe Flamethrower::Campfire::Room do
   end
 
   describe "#requeue_failed_messages" do
-    it "queues a message whos retry_at is greater than now" do
+    it "queues an outbound message whos retry_at is greater than now" do
       Time.stub(:now).and_return(Time.parse("9:00AM"))
-      message = Flamethrower::Campfire::Message.new('type' => 'TextMessage', 'body' => 'Hello there', 'user' => @user, 'room' => @room)
+      message = Flamethrower::Campfire::Message.new('type' => 'TextMessage', 'body' => 'Hello there', 'user' => @user, 'room' => @room, 'direction' => 'outbound')
       message.retry_at = Time.parse("9:00:01AM")
       @room.failed_messages << message
       @room.requeue_failed_messages
@@ -381,9 +390,19 @@ describe Flamethrower::Campfire::Room do
       @room.failed_messages.size.should == 0
     end
 
+    it "queues an inbound message whos retry_at is greater than now" do
+      Time.stub(:now).and_return(Time.parse("9:00AM"))
+      message = Flamethrower::Campfire::Message.new('type' => 'TextMessage', 'body' => 'Hello there', 'user' => @user, 'room' => @room, 'direction' => 'inbound')
+      message.retry_at = Time.parse("9:00:01AM")
+      @room.failed_messages << message
+      @room.requeue_failed_messages
+      @room.inbound_messages.size.should == 1
+      @room.failed_messages.size.should == 0
+    end
+
     it "doesn't queue a message whos retry_at is less than now" do
       Time.stub(:now).and_return(Time.parse("9:00AM"))
-      message = Flamethrower::Campfire::Message.new('type' => 'TextMessage', 'body' => 'Hello there', 'user' => @user, 'room' => @room)
+      message = Flamethrower::Campfire::Message.new('type' => 'TextMessage', 'body' => 'Hello there', 'user' => @user, 'room' => @room, 'direction' => 'outbound')
       message.retry_at = Time.parse("8:59AM")
       @room.failed_messages << message
       @room.requeue_failed_messages

@@ -76,7 +76,7 @@ module Flamethrower
       end
 
       def say(body, message_type='TextMessage')
-        params = {'body' => translate_nicknames(body), 'type' => message_type}
+        params = {'body' => translate_nicknames(body), 'type' => message_type, 'direction' => 'outbound'}
         @outbound_messages << Flamethrower::Campfire::Message.new(params)
       end
 
@@ -140,6 +140,7 @@ module Flamethrower
           params = JSON.parse(item)
           params['user'] = @users.find {|u| u.number == params['user_id'] }
           params['room'] = self
+          params['direction'] = 'inbound'
           message = Flamethrower::Campfire::Message.new(params)
           unless message.message_type == "TimestampMessage"
             sort_and_dispatch_message(message)
@@ -226,7 +227,11 @@ module Flamethrower
       def requeue_failed_messages
         @failed_messages.each do |m| 
           if m.retry_at > Time.now
-            @outbound_messages << m 
+            if m.outbound?
+              @outbound_messages << m
+            elsif m.inbound?
+              sort_and_dispatch_message(m)
+            end
             @failed_messages.delete(m)
           end
         end

@@ -1,7 +1,7 @@
 module Flamethrower
   module Campfire
     class Message
-      attr_accessor :body, :user, :room, :message_type, :status, :retry_at, :image_converted, :user_id
+      attr_accessor :body, :user, :room, :direction, :message_type, :status, :retry_at, :image_converted, :user_id
 
       RETRY_SECONDS = 15
 
@@ -11,6 +11,7 @@ module Flamethrower
         @room = params['room']
         @user_id = params['user_id']
         @message_type = params['type']
+        @direction = params['direction']
         @status = "pending"
         @image_converted = false
       end
@@ -34,6 +35,14 @@ module Flamethrower
 
       def has_images?
         image_urls.size > 0
+      end
+
+      def outbound?
+        @direction == "outbound"
+      end
+
+      def inbound?
+        @direction == "inbound"
       end
 
       def needs_image_conversion?
