@@ -171,6 +171,19 @@ describe Flamethrower::Campfire::Room do
       expected_body << "LOLCAT ASCII ART HERE!"
       @message.body.should == expected_body
     end
+
+    context "when the image get call fails" do
+      it "marks the message as fetched and puts it into inbound messages" do
+        stub_request(:get, "http://skeeter.blakesmith.me/?image_url=http://example.com/kitties.jpg&width=80").
+          to_return(:status => 400, :body => "An error has occured")
+        @message = Flamethrower::Campfire::Message.new(JSON.parse(json_fixture("streaming_image_message")))
+        @message.user = mock('user')
+        @room.instance_variable_get("@images_to_fetch") << @message
+        EM.run_block { @room.fetch_images }
+        @message.image_converted.should == true
+        @room.instance_variable_get("@inbound_messages").size.should == 1
+      end
+    end
   end
 
   describe "#fetch_users" do
@@ -209,6 +222,15 @@ describe Flamethrower::Campfire::Room do
         @room.instance_variable_get("@users_to_fetch") << Flamethrower::Campfire::Message.new(JSON.parse(json_fixture("enter_message")))
         EM.run_block { @room.fetch_users }
         message = @room.inbound_messages.size.should == 0
+      end
+
+      it "re-enqueues the message to fetch user info" do
+        stub_request(:get, "https://mydomain.campfirenow.com/users/734581.json").
+          with(:headers => {'Authorization'=>['mytoken', 'x']}).
+          to_return(:status => 400, :body => json_fixture("user"))
+        @room.instance_variable_get("@users_to_fetch") << Flamethrower::Campfire::Message.new(JSON.parse(json_fixture("enter_message")))
+        EM.run_block { @room.fetch_users }
+        message = @room.instance_variable_get("@users_to_fetch").size.should == 1
       end
     end
   end

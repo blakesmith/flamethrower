@@ -166,8 +166,10 @@ module Flamethrower
               case http.response_header.status
               when 200
                 message.set_ascii_image(http.response)
-                sort_and_dispatch_message(message)
+              else
+                message.image_converted = true
               end
+              sort_and_dispatch_message(message)
             end
           end
         end
@@ -184,8 +186,8 @@ module Flamethrower
               user = Flamethrower::Campfire::User.new(json['user'])
               message.user = user
               @users << user
-              sort_and_dispatch_message(message)
             end
+            sort_and_dispatch_message(message)
           end
         end
       end
