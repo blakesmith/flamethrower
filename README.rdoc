@@ -38,5 +38,5 @@ Flamethrower is written by Blake Smith <blakesmith0@gmail.com>
 
 Contributions by:
 
-[Alexander Rakoczy](https://github.com/toothrot)
+Alexander Rakoczy[https://github.com/toothrot]
 
