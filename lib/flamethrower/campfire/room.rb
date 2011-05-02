@@ -77,7 +77,7 @@ module Flamethrower
 
       def say(body, message_type='TextMessage')
         params = {'body' => translate_nicknames(body), 'type' => message_type, 'direction' => 'outbound'}
-        @outbound_messages << Flamethrower::Campfire::Message.new(params)
+        sort_and_dispatch_message(Flamethrower::Campfire::Message.new(params))
       end
 
       def start
