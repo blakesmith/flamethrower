@@ -149,12 +149,16 @@ module Flamethrower
       end
 
       def sort_and_dispatch_message(message)
-        if !message.user
+        if message.failed?
+          @failed_messages << message
+        elsif !message.user
           @users_to_fetch << message
         elsif @server.server.ascii_conversion['enabled'] && message.needs_image_conversion?
           @images_to_fetch << message
-        else
+        elsif message.inbound?
           @inbound_messages << message
+        elsif message.outbound?
+          @outbound_messages << message
         end
       end
 
@@ -168,7 +172,7 @@ module Flamethrower
               when 200
                 message.set_ascii_image(http.response)
               else
-                message.image_converted = true
+                message.mark_failed!
               end
               sort_and_dispatch_message(message)
             end
@@ -206,7 +210,7 @@ module Flamethrower
             else
               ::FLAMETHROWER_LOGGER.debug "Failed to post to campfire API with code: #{http.response_header.status} body: #{http.response}"
               message.mark_failed!
-              @failed_messages << message
+              sort_and_dispatch_message(message)
             end
           end
         end

@@ -25,6 +25,10 @@ module Flamethrower
         @retry_at = Time.now + RETRY_SECONDS
       end
 
+      def failed?
+        @status == "failed"
+      end
+
       def image_urls
         if @body
           @body.scan(/(http:\/\/.+?\.(?:jpg|jpeg|gif|png))/).flatten
