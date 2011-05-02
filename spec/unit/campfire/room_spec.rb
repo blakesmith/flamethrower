@@ -385,6 +385,7 @@ describe Flamethrower::Campfire::Room do
       Time.stub(:now).and_return(Time.parse("9:00AM"))
       message = Flamethrower::Campfire::Message.new('type' => 'TextMessage', 'body' => 'Hello there', 'user' => @user, 'room' => @room, 'direction' => 'outbound')
       message.retry_at = Time.parse("9:00:01AM")
+      message.status = "failed"
       @room.failed_messages << message
       @room.requeue_failed_messages
       @room.outbound_messages.size.should == 1
@@ -395,6 +396,7 @@ describe Flamethrower::Campfire::Room do
       Time.stub(:now).and_return(Time.parse("9:00AM"))
       message = Flamethrower::Campfire::Message.new('type' => 'TextMessage', 'body' => 'Hello there', 'user' => @user, 'room' => @room, 'direction' => 'inbound')
       message.retry_at = Time.parse("9:00:01AM")
+      message.status = "failed"
       @room.failed_messages << message
       @room.requeue_failed_messages
       @room.inbound_messages.size.should == 1
@@ -405,10 +407,20 @@ describe Flamethrower::Campfire::Room do
       Time.stub(:now).and_return(Time.parse("9:00AM"))
       message = Flamethrower::Campfire::Message.new('type' => 'TextMessage', 'body' => 'Hello there', 'user' => @user, 'room' => @room, 'direction' => 'outbound')
       message.retry_at = Time.parse("8:59AM")
+      message.status = "failed"
       @room.failed_messages << message
       @room.requeue_failed_messages
       @room.outbound_messages.size.should == 0
       @room.failed_messages.size.should == 1
+    end
+
+    it "marks the message as pending when it requeues" do
+      Time.stub(:now).and_return(Time.parse("9:00AM"))
+      message = Flamethrower::Campfire::Message.new('type' => 'TextMessage', 'body' => 'Hello there', 'user' => @user, 'room' => @room, 'direction' => 'inbound')
+      message.mark_failed!
+      @room.failed_messages << message
+      @room.requeue_failed_messages
+      message.should be_pending
     end
   end
 

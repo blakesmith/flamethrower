@@ -233,6 +233,7 @@ module Flamethrower
       def requeue_failed_messages
         @failed_messages.each do |m| 
           if m.retry_at > Time.now
+            m.mark_pending!
             if m.outbound?
               @outbound_messages << m
             elsif m.inbound?

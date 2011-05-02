@@ -25,20 +25,16 @@ module Flamethrower
         @retry_at = Time.now + RETRY_SECONDS
       end
 
+      def mark_pending!
+        @status = "pending"
+      end
+
       def failed?
         @status == "failed"
       end
 
-      def image_urls
-        if @body
-          @body.scan(/(http:\/\/.+?\.(?:jpg|jpeg|gif|png))/).flatten
-        else
-          []
-        end
-      end
-
-      def has_images?
-        image_urls.size > 0
+      def pending?
+        @status == "pending"
       end
 
       def outbound?
@@ -51,6 +47,18 @@ module Flamethrower
 
       def needs_image_conversion?
         has_images? && !@image_converted
+      end
+
+      def image_urls
+        if @body
+          @body.scan(/(http:\/\/.+?\.(?:jpg|jpeg|gif|png))/).flatten
+        else
+          []
+        end
+      end
+
+      def has_images?
+        image_urls.size > 0
       end
 
       def set_ascii_image(str)
