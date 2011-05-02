@@ -151,13 +151,15 @@ module Flamethrower
       def sort_and_dispatch_message(message)
         if message.failed?
           @failed_messages << message
-        elsif !message.user
-          @users_to_fetch << message
-        elsif @server.server.ascii_conversion['enabled'] && message.needs_image_conversion?
-          @images_to_fetch << message
         elsif message.inbound?
-          @inbound_messages << message
-        elsif message.outbound?
+          if !message.user
+            @users_to_fetch << message
+          elsif @server.server.ascii_conversion['enabled'] && message.needs_image_conversion?
+            @images_to_fetch << message
+          else
+            @inbound_messages << message
+          end
+        else #outbound message
           @outbound_messages << message
         end
       end
