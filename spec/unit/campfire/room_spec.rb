@@ -225,13 +225,13 @@ describe Flamethrower::Campfire::Room do
         message = @room.inbound_messages.size.should == 0
       end
 
-      it "re-enqueues the message to fetch user info" do
+      it "marks the message as failed and puts it into failed messages" do
         stub_request(:get, "https://mydomain.campfirenow.com/users/734581.json").
           with(:headers => {'Authorization'=>['mytoken', 'x']}).
           to_return(:status => 400, :body => json_fixture("user"))
         @room.instance_variable_get("@users_to_fetch") << Flamethrower::Campfire::Message.new(JSON.parse(json_fixture("enter_message")))
         EM.run_block { @room.fetch_users }
-        message = @room.instance_variable_get("@users_to_fetch").size.should == 1
+        message = @room.instance_variable_get("@failed_messages").size.should == 1
       end
     end
   end

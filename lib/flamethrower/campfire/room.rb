@@ -191,6 +191,8 @@ module Flamethrower
               user = Flamethrower::Campfire::User.new(json['user'])
               message.user = user
               @users << user
+            else
+              message.mark_failed!
             end
             sort_and_dispatch_message(message)
           end
