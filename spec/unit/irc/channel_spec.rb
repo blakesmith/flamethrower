@@ -2,9 +2,9 @@ require File.join(File.dirname(__FILE__), "../../spec_helper")
 
 describe Flamethrower::Irc::Channel do
   before do
-    @server = Flamethrower::MockServer.new
+    @connection = Flamethrower::MockServer.new
     @room = Flamethrower::Campfire::Room.new("mydomain", "mytoken", {'name' => "flamethrower"})
-    @room.server = @server
+    @room.connection = @connection
     @channel = Flamethrower::Irc::Channel.new("#flamethrower", @room)
     @campfire_user = Flamethrower::Campfire::User.new('name' => "bob", 'id' => 734581)
     @irc_user = @campfire_user.to_irc
@@ -57,7 +57,7 @@ describe Flamethrower::Irc::Channel do
     it "doesn't send the message if the source is the current user" do
       message = Flamethrower::Campfire::Message.new('body' => 'Hello there', 'user' => @campfire_user, 'room' => @room, 'type' => 'TextMessage')
       @room.inbound_messages << message
-      @server.current_user = @campfire_user.to_irc
+      @connection.current_user = @campfire_user.to_irc
       @channel.retrieve_irc_messages.map(&:to_s).should be_empty
     end
   end

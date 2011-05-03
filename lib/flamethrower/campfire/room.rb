@@ -10,7 +10,7 @@ module Flamethrower
 
       attr_reader :stream, :token
       attr_writer :topic
-      attr_accessor :inbound_messages, :outbound_messages, :thread_messages, :number, :name, :users, :server
+      attr_accessor :inbound_messages, :outbound_messages, :thread_messages, :number, :name, :users, :connection
       attr_accessor :failed_messages, :joined
 
       def initialize(domain, token, params = {})
@@ -42,8 +42,8 @@ module Flamethrower
       end
 
       def send_info
-        @server.send_topic(to_irc)
-        @server.send_userlist(to_irc)
+        @connection.send_topic(to_irc)
+        @connection.send_userlist(to_irc)
       end
 
       def fetch_room_info
@@ -69,7 +69,7 @@ module Flamethrower
           user = new_users.detect {|new_user| new_user.number == old_user.number}
           if user
             unless old_user.name == user.name
-              @server.send_rename(old_user.to_irc.nickname, user.to_irc.nickname)
+              @connection.send_rename(old_user.to_irc.nickname, user.to_irc.nickname)
             end
           end
         end
@@ -106,7 +106,7 @@ module Flamethrower
           messages_to_send = to_irc.retrieve_irc_messages
           messages_to_send.each do |m|
             ::FLAMETHROWER_LOGGER.debug "Sending irc message #{m.to_s}"
-            @server.send_message(m.to_s)
+            @connection.send_message(m.to_s)
           end
         end
       end
@@ -154,7 +154,7 @@ module Flamethrower
         elsif message.inbound?
           if !message.user
             @users_to_fetch << message
-          elsif @server.server.ascii_conversion['enabled'] && message.needs_image_conversion?
+          elsif @connection.server.ascii_conversion['enabled'] && message.needs_image_conversion?
             @images_to_fetch << message
           else
             @inbound_messages << message
@@ -225,7 +225,7 @@ module Flamethrower
           until @inbound_messages.empty?
             message = @inbound_messages.pop
             next unless message
-            unless message.user.to_irc.nickname == @server.current_user.nickname
+            unless message.user.to_irc.nickname == @connection.current_user.nickname
               new_array << message
             end
           end

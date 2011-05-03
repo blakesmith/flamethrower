@@ -2,9 +2,9 @@ require File.join(File.dirname(__FILE__), "../../spec_helper")
 
 describe Flamethrower::Campfire::Room do
   before do
-    @server = Flamethrower::MockServer.new
+    @connection = Flamethrower::MockServer.new
     @room = Flamethrower::Campfire::Room.new("mydomain", "mytoken", "id" => 347348, "topic" => "some topic", "name" => "some name")
-    @room.server = @server
+    @room.connection = @connection
     @user = Flamethrower::Campfire::User.new('name' => "bob", 'id' => 489198)
     @user2 = Flamethrower::Campfire::User.new('name' => "bill", 'id' => 123456)
   end
@@ -143,8 +143,8 @@ describe Flamethrower::Campfire::Room do
       bob2.name = "Bob Hope"
       new_users = [blake2, bob2, bill]
 
-      @room.server.should_receive(:send_rename).with("blake", "Blake_Smith")
-      @room.server.should_receive(:send_rename).with("bob", "Bob_Hope")
+      @room.connection.should_receive(:send_rename).with("blake", "Blake_Smith")
+      @room.connection.should_receive(:send_rename).with("bob", "Bob_Hope")
       @room.resolve_renames(old_users, new_users)
     end
 
@@ -155,7 +155,7 @@ describe Flamethrower::Campfire::Room do
       old_users = [blake, bob, bill]
       new_users = [blake, bob]
 
-      @room.server.should_not_receive(:send_rename)
+      @room.connection.should_not_receive(:send_rename)
       @room.resolve_renames(old_users, new_users)
     end
   end
@@ -332,7 +332,7 @@ describe Flamethrower::Campfire::Room do
     end
 
     it "doesn't make the call to the image ascii service if the option is disabled" do
-      @room.server.server.ascii_conversion['enabled'] = false
+      @room.connection.server.ascii_conversion['enabled'] = false
       image_message = json_fixture("streaming_image_message")
       @room.stream.stub(:each_item).and_yield(image_message)
       @room.fetch_messages

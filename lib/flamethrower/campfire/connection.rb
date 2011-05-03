@@ -5,10 +5,10 @@ module Flamethrower
 
       include Flamethrower::Campfire::RestApi
 
-      def initialize(domain, token, server)
+      def initialize(domain, token, connection)
         @domain = domain
         @token = token
-        @server = server
+        @connection = connection
       end
 
       def fetch_my_user
@@ -17,10 +17,10 @@ module Flamethrower
           case http.response_header.status
           when 200
             json = JSON.parse(http.response)
-            old_user = @server.current_user.nickname
+            old_user = @connection.current_user.nickname
             new_user = Flamethrower::Campfire::User.new(json['user']).to_irc
-            @server.current_user = new_user
-            @server.send_rename(old_user, new_user.nickname)
+            @connection.current_user = new_user
+            @connection.send_rename(old_user, new_user.nickname)
           end
         end
       end
@@ -34,17 +34,17 @@ module Flamethrower
             json = JSON.parse(http.response)
             json['rooms'].each do |room|
               rooms << Room.new(@domain, @token, room).tap do |r|
-                r.server = @server
+                r.connection = @connection
               end
             end
-            @server.irc_channels = rooms.map(&:to_irc)
-            @server.send_channel_list
+            @connection.irc_channels = rooms.map(&:to_irc)
+            @connection.send_channel_list
           else
             ::FLAMETHROWER_LOGGER.debug http.response
           end
         end
         http.errback do
-          @server.send_message @server.reply(Flamethrower::Irc::Codes::RPL_MOTD, ":ERROR: Unable to fetch room list! Check your connection?")
+          @connection.send_message @connection.reply(Flamethrower::Irc::Codes::RPL_MOTD, ":ERROR: Unable to fetch room list! Check your connection?")
         end
       end
     end

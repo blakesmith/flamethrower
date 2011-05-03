@@ -10,7 +10,7 @@ module Flamethrower
     end
 
     def config
-      @server.server.ascii_conversion
+      @connection.server.ascii_conversion
     end
   end
 end
