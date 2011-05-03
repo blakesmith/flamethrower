@@ -6,7 +6,6 @@ module Flamethrower
         "https://#{@domain}.campfirenow.com"
       end
 
-      private
       def campfire_get(path)
         action_log("get", path, nil)
         full_path = host << path
