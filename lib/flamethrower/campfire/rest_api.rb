@@ -6,10 +6,6 @@ module Flamethrower
         "https://#{@domain}.campfirenow.com"
       end
 
-      def on_connection_error(action, path)
-        @connection.send_message @connection.reply(Flamethrower::Irc::Codes::RPL_MOTD, ":ERROR: Unable to make API call #{action.upcase} #{path}. Check your connection?")
-      end
-
       def campfire_get(path, args = {})
         action_log("get", path, nil)
         full_path = host << path
@@ -42,6 +38,10 @@ module Flamethrower
 
       def action_log(action, path, json)
         ::FLAMETHROWER_LOGGER.debug "Sending #{action.upcase} #{path} with #{json || 'no'} JSON"
+      end
+
+      def on_connection_error(action, path)
+        @connection.send_message @connection.reply(Flamethrower::Irc::Codes::RPL_MOTD, ":ERROR: Unable to make API call #{action.upcase} #{path}. Check your connection?")
       end
 
     end
