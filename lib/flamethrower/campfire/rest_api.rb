@@ -6,10 +6,16 @@ module Flamethrower
         "https://#{@domain}.campfirenow.com"
       end
 
-      def campfire_get(path)
+      def on_connection_error(action, path)
+        @connection.send_message @connection.reply(Flamethrower::Irc::Codes::RPL_MOTD, ":ERROR: Unable to make API call #{action.upcase} #{path}. Check your connection?")
+      end
+
+      def campfire_get(path, args = {})
         action_log("get", path, nil)
         full_path = host << path
-        EventMachine::HttpRequest.new(full_path).get :head => {'authorization' => [@token, 'x']}
+        http = EventMachine::HttpRequest.new(full_path).get :head => {'authorization' => [@token, 'x']}
+        http.errback { on_connection_error("get", path) }
+        http
       end
 
       def campfire_post(path, json=nil)
@@ -17,7 +23,9 @@ module Flamethrower
         full_path = host << path
         params = {:head => {'Content-Type' => 'application/json', 'authorization' => [@token, 'x']}}
         params[:body] = json if json
-        EventMachine::HttpRequest.new(full_path).post params
+        http = EventMachine::HttpRequest.new(full_path).post params
+        http.errback { on_connection_error("post", path) }
+        http
       end
 
       def campfire_put(path, json=nil)
@@ -25,7 +33,9 @@ module Flamethrower
         full_path = host << path
         params = {:head => {'Content-Type' => 'application/json', 'authorization' => [@token, 'x']}}
         params[:body] = json if json
-        EventMachine::HttpRequest.new(full_path).put params
+        http = EventMachine::HttpRequest.new(full_path).put params
+        http.errback { on_connection_error("put", path) }
+        http
       end
 
       private

@@ -57,7 +57,7 @@ describe Flamethrower::Campfire::Connection do
       stub_request(:get, "https://mydomain.campfirenow.com/rooms.json").
              with(:headers => {'Authorization'=>['mytoken', 'x']}).
              to_timeout
-      @connection.should_receive(:send_message).with(@connection.reply(Flamethrower::Irc::Codes::RPL_MOTD, ":ERROR: Unable to fetch room list! Check your connection?"))
+      @connection.should_receive(:send_message).with(@connection.reply(Flamethrower::Irc::Codes::RPL_MOTD, ":ERROR: Unable to make API call GET /rooms.json. Check your connection?"))
       EM.run_block { @campfire_connection.fetch_rooms }
       @connection.irc_channels.should == []
     end

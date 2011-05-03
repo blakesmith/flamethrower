@@ -79,6 +79,16 @@ describe Flamethrower::Campfire::Room do
       EM.run_block { @room.send_topic("some updated topic") }
       @room.topic.should == "some old topic"
     end
+
+    it "sends a motd error message if the send_topic call times out" do
+      stub_request(:put, "https://mydomain.campfirenow.com/room/347348.json").
+        with(:headers => {'Authorization'=>['mytoken', 'x'], 'Content-Type'=>'application/json'}).
+        to_timeout
+      @connection.should_receive(:send_message).with(@connection.reply(Flamethrower::Irc::Codes::RPL_MOTD, ":ERROR: Unable to make API call PUT /room/347348.json. Check your connection?"))
+      @room.instance_variable_set("@topic", "some old topic")
+      EM.run_block { @room.send_topic("some updated topic") }
+      @room.topic.should == "some old topic"
+    end
   end
 
   describe "#stop" do
@@ -249,6 +259,15 @@ describe Flamethrower::Campfire::Room do
       stub_request(:post, "https://mydomain.campfirenow.com/room/347348/join.json").
         with(:headers => {'Authorization'=>['mytoken', 'x'], 'Content-Type'=>'application/json'}).
         to_return(:status => 400)
+      EM.run_block { @room.join }
+      @room.joined.should be_false
+    end
+
+    it "sends a motd error message if the join call times out" do
+      stub_request(:post, "https://mydomain.campfirenow.com/room/347348/join.json").
+        with(:headers => {'Authorization'=>['mytoken', 'x'], 'Content-Type'=>'application/json'}).
+        to_timeout
+      @connection.should_receive(:send_message).with(@connection.reply(Flamethrower::Irc::Codes::RPL_MOTD, ":ERROR: Unable to make API call POST /room/347348/join.json. Check your connection?"))
       EM.run_block { @room.join }
       @room.joined.should be_false
     end

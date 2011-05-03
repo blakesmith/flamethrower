@@ -43,9 +43,6 @@ module Flamethrower
             ::FLAMETHROWER_LOGGER.debug http.response
           end
         end
-        http.errback do
-          @connection.send_message @connection.reply(Flamethrower::Irc::Codes::RPL_MOTD, ":ERROR: Unable to fetch room list! Check your connection?")
-        end
       end
     end
   end
