@@ -1,6 +1,6 @@
 module Flamethrower
-  class MockServer
-    include Flamethrower::Server
+  class MockConnection
+    include Flamethrower::Connection
 
     def send_data(msg)
     end

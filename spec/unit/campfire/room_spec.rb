@@ -2,7 +2,7 @@ require File.join(File.dirname(__FILE__), "../../spec_helper")
 
 describe Flamethrower::Campfire::Room do
   before do
-    @connection = Flamethrower::MockServer.new
+    @connection = Flamethrower::MockConnection.new
     @room = Flamethrower::Campfire::Room.new("mydomain", "mytoken", "id" => 347348, "topic" => "some topic", "name" => "some name")
     @room.connection = @connection
     @user = Flamethrower::Campfire::User.new('name' => "bob", 'id' => 489198)

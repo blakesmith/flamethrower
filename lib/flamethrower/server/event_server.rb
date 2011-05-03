@@ -1,6 +1,6 @@
 module Flamethrower
   class EventConnection < EventMachine::Connection
-    include Flamethrower::Server
+    include Flamethrower::Connection
 
     attr_accessor :server
 

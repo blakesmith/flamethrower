@@ -1,7 +1,7 @@
 $:.unshift File.join(File.dirname(__FILE__), "../lib")
 
 require 'flamethrower'
-require 'server/mock_server'
+require 'server/mock_connection'
 require 'webmock/rspec'
 require 'json'
 require 'time'

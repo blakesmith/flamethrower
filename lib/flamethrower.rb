@@ -23,6 +23,6 @@ require 'campfire/message'
 require 'campfire/connection'
 require 'campfire/room'
 
-require 'server'
+require 'connection'
 require 'server/event_server'
 require 'dispatcher'

@@ -1,5 +1,5 @@
 module Flamethrower
-  module Server
+  module Connection
     include Flamethrower::Irc::Commands
 
     attr_accessor :campfire_connection, :current_user, :dispatcher, :irc_channels

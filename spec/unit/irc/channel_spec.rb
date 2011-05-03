@@ -2,7 +2,7 @@ require File.join(File.dirname(__FILE__), "../../spec_helper")
 
 describe Flamethrower::Irc::Channel do
   before do
-    @connection = Flamethrower::MockServer.new
+    @connection = Flamethrower::MockConnection.new
     @room = Flamethrower::Campfire::Room.new("mydomain", "mytoken", {'name' => "flamethrower"})
     @room.connection = @connection
     @channel = Flamethrower::Irc::Channel.new("#flamethrower", @room)

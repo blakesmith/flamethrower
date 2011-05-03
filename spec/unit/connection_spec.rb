@@ -1,8 +1,8 @@
 require File.join(File.dirname(__FILE__), "../spec_helper")
 
-describe Flamethrower::Server do
+describe Flamethrower::Connection do
   before do
-    @connection = Flamethrower::MockServer.new
+    @connection = Flamethrower::MockConnection.new
     @connection.stub!(:send_data)
     @user = Flamethrower::Irc::User.new :username => 'user', :nickname => 'nick', :hostname => 'host', :realname => 'realname'
     @connection.current_user = @user
