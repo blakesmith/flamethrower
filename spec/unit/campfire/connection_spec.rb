@@ -53,10 +53,13 @@ describe Flamethrower::Campfire::Connection do
       @connection.irc_channels.should == []
     end
 
-    xit "sends a motd error message if unable to fetch room list" do
-      @campfire_connection.should_receive(:campfire_get).and_raise(SocketError) 
+    it "sends a motd error message if unable to fetch room list" do
+      stub_request(:get, "https://mydomain.campfirenow.com/rooms.json").
+             with(:headers => {'Authorization'=>['mytoken', 'x']}).
+             to_timeout
       @connection.should_receive(:send_message).with(@connection.reply(Flamethrower::Irc::Codes::RPL_MOTD, ":ERROR: Unable to fetch room list! Check your connection?"))
-      @campfire_connection.rooms.should == []
+      EM.run_block { @campfire_connection.fetch_rooms }
+      @connection.irc_channels.should == []
     end
   end
 
