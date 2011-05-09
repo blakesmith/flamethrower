@@ -98,9 +98,9 @@ module Flamethrower
 
       def poll
         unless dead?
+          requeue_failed_messages
           fetch_messages
           post_messages
-          requeue_failed_messages
           fetch_users
           fetch_images
           messages_to_send = to_irc.retrieve_irc_messages
