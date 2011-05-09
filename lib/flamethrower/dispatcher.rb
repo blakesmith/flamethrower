@@ -38,10 +38,10 @@ module Flamethrower
 
     def handle_user(message)
       username, hostname, servername, realname = message.parameters
-      connection.current_user.username = username unless connection.current_user.username
-      connection.current_user.hostname = hostname unless connection.current_user.hostname
-      connection.current_user.servername = servername unless connection.current_user.servername
-      connection.current_user.realname = realname unless connection.current_user.realname
+      connection.current_user.username ||= username
+      connection.current_user.hostname ||= hostname
+      connection.current_user.servername ||= servername
+      connection.current_user.realname ||= realname
       if connection.current_user.nick_set? && connection.current_user.user_set?
         connection.after_connect
       end
