@@ -60,6 +60,20 @@ module Flamethrower
             resolve_renames(old_users, @users)
             send_info unless @room_info_sent
             @room_info_sent = true
+            fetch_recent_messages
+          end
+        end
+      end
+
+      def fetch_recent_messages
+        http = campfire_get("/room/#{@number}/recent.json", :limit => 10)
+        http.callback do
+          case http.response_header.status
+          when 200
+            json = JSON.parse(http.response)
+            json['messages'].each do |json_message|
+              process_inbound_json_message(json_message)
+            end
           end
         end
       end
@@ -137,14 +151,7 @@ module Flamethrower
       def fetch_messages
         @stream.each_item do |item| 
           ::FLAMETHROWER_LOGGER.debug "Got json message #{item.inspect}"
-          params = JSON.parse(item)
-          params['user'] = @users.find {|u| u.number == params['user_id'] }
-          params['room'] = self
-          params['direction'] = 'inbound'
-          message = Flamethrower::Campfire::Message.new(params)
-          unless message.message_type == "TimestampMessage"
-            sort_and_dispatch_message(message)
-          end
+          process_inbound_json_message(JSON.parse(item))
         end
       end
 
@@ -266,6 +273,16 @@ module Flamethrower
           @images_to_fetch << message
         else
           @inbound_messages << message
+        end
+      end
+
+      def process_inbound_json_message(json_message)
+        json_message['user'] = @users.find {|u| u.number == json_message['user_id'] }
+        json_message['room'] = self
+        json_message['direction'] = 'inbound'
+        message = Flamethrower::Campfire::Message.new(json_message)
+        unless message.message_type == "TimestampMessage"
+          sort_and_dispatch_message(message)
         end
       end
 

@@ -120,6 +120,7 @@ describe Flamethrower::Campfire::Room do
       stub_request(:get, "https://mydomain.campfirenow.com/room/347348.json").
         with(:headers => {'Authorization'=>['mytoken', 'x']}).
         to_return(:status => 200, :body => json_fixture("room"))
+      @room.stub(:fetch_recent_messages)
     end
 
     it "retrieves a list of users and stores them as user objects" do
@@ -136,6 +137,24 @@ describe Flamethrower::Campfire::Room do
     it "makes the http request with a token in basic auth" do
       EM.run_block { @room.fetch_room_info }
       assert_requested(:get, "https://mydomain.campfirenow.com/room/347348.json") {|req| req.headers['Authorization'].should == ["mytoken", "x"]}
+    end
+
+    it "calls fetch_recent_messages after the room info has been sent" do
+      @room.should_receive(:fetch_recent_messages)
+      EM.run_block { @room.fetch_room_info }
+    end
+  end
+
+  describe "#fetch_recent_messages" do
+    before do
+      stub_request(:get, "https://mydomain.campfirenow.com/room/347348/recent.json?limit=10").
+        with(:headers => {'Authorization'=>['mytoken', 'x']}).
+        to_return(:status => 200, :body => json_fixture("recent_messages"))
+    end
+
+    it "retrieves the most recent 10 messages and sends them to the inbound message queue" do
+      EM.run_block { @room.fetch_recent_messages }
+      @room.instance_variable_get("@users_to_fetch").size.should == 7
     end
   end
 

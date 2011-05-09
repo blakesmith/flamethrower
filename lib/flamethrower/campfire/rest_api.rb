@@ -9,7 +9,9 @@ module Flamethrower
       def campfire_get(path, args = {})
         action_log("get", path, nil)
         full_path = host << path
-        http = EventMachine::HttpRequest.new(full_path).get :head => {'authorization' => [@token, 'x']}
+        http = EventMachine::HttpRequest.new(full_path).get(
+          :head => {'authorization' => [@token, 'x']},
+          :query => args)
         http.errback { on_connection_error("get", path) }
         http
       end
