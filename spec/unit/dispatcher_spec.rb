@@ -2,13 +2,13 @@ require File.join(File.dirname(__FILE__), "../spec_helper")
 
 describe Flamethrower::Dispatcher do
   before do
-    @server = Flamethrower::MockConnection.new(:log => Logger.new("/dev/null"))
+    @connection = Flamethrower::MockConnection.new(:log => Logger.new("/dev/null"))
     @room = Flamethrower::Campfire::Room.new('mydomain', 'mytoken', {'name' => 'a room', 'id' => 347348})
     @room.instance_variable_set("@stream", mock(:twitter_stream, :stop => nil))
     @channel = Flamethrower::Irc::Channel.new("#flamethrower", @room)
     @user = Flamethrower::Irc::User.new :username => "user", :nickname => "nick", :hostname => "host", :realname => "realname", :servername => "servername"
-    @server.irc_channels << @channel
-    @dispatcher = Flamethrower::Dispatcher.new(@server)
+    @connection.irc_channels << @channel
+    @dispatcher = Flamethrower::Dispatcher.new(@connection)
   end
 
   describe "#handle_message" do
@@ -29,10 +29,10 @@ describe Flamethrower::Dispatcher do
     it "sets the current session's user to the specified user" do
       message = Flamethrower::Irc::Message.new("USER guest tolmoon tolsun :Ronnie Reagan\r\n")
       @dispatcher.handle_message(message)
-      @dispatcher.server.current_user.username.should == "guest"
-      @dispatcher.server.current_user.hostname.should == "tolmoon"
-      @dispatcher.server.current_user.servername.should == "tolsun"
-      @dispatcher.server.current_user.realname.should == "Ronnie Reagan"
+      @dispatcher.connection.current_user.username.should == "guest"
+      @dispatcher.connection.current_user.hostname.should == "tolmoon"
+      @dispatcher.connection.current_user.servername.should == "tolsun"
+      @dispatcher.connection.current_user.realname.should == "Ronnie Reagan"
     end
 
     it "not set a second user request if a first has already been recieved" do
@@ -40,49 +40,49 @@ describe Flamethrower::Dispatcher do
       message2 = Flamethrower::Irc::Message.new("USER guest2 tolmoon2 tolsun2 :Ronnie Reagan2\r\n")
       @dispatcher.handle_message(message)
       @dispatcher.handle_message(message2)
-      @dispatcher.server.current_user.username.should == "guest"
-      @dispatcher.server.current_user.hostname.should == "tolmoon"
-      @dispatcher.server.current_user.servername.should == "tolsun"
-      @dispatcher.server.current_user.realname.should == "Ronnie Reagan"
+      @dispatcher.connection.current_user.username.should == "guest"
+      @dispatcher.connection.current_user.hostname.should == "tolmoon"
+      @dispatcher.connection.current_user.servername.should == "tolsun"
+      @dispatcher.connection.current_user.realname.should == "Ronnie Reagan"
     end
   end
 
   describe "#away" do
     it "respond with RPL_NOWAWAY when the user specifies an away message" do
-      @server.current_user = @user
+      @connection.current_user = @user
       message = Flamethrower::Irc::Message.new("AWAY :I'm away")
-      @dispatcher.server.should_receive(:send_message).with(":#{@user.hostname} 306 #{@user.nickname} :You have been marked as being away")
+      @dispatcher.connection.should_receive(:send_message).with(":#{@user.hostname} 306 #{@user.nickname} :You have been marked as being away")
       @dispatcher.handle_message(message)
-      @server.current_user.away_message.should == "I'm away"
+      @connection.current_user.away_message.should == "I'm away"
     end
 
     it "respond with RPL_UNAWAY when the user doesn't specify an away message" do
-      @server.current_user = @user
-      @server.current_user.away_message = "Currently away"
+      @connection.current_user = @user
+      @connection.current_user.away_message = "Currently away"
       message = Flamethrower::Irc::Message.new("AWAY :")
-      @dispatcher.server.should_receive(:send_message).with(":#{@user.hostname} 305 #{@user.nickname} :You are no longer marked as being away")
+      @dispatcher.connection.should_receive(:send_message).with(":#{@user.hostname} 305 #{@user.nickname} :You are no longer marked as being away")
       @dispatcher.handle_message(message)
-      @server.current_user.away_message.should == nil
+      @connection.current_user.away_message.should == nil
     end
   end
 
   describe "#topic" do
     before do
       @user = Flamethrower::Irc::User.new :username => "user", :nickname => "nick", :hostname => "host", :realname => "realname", :servername => "servername"
-      @server.current_user = @user
+      @connection.current_user = @user
     end
 
     context "retrieving the channel topic" do
       it "should display the channel topic" do
         message = Flamethrower::Irc::Message.new("TOPIC #flamethrower")
-        @dispatcher.server.should_receive(:send_topic).with(@channel)
+        @dispatcher.connection.should_receive(:send_topic).with(@channel)
         @dispatcher.handle_message(message)
       end
 
       it "responds with an error if the channel can't be found" do
         message = Flamethrower::Irc::Message.new("TOPIC #bogus")
-        @dispatcher.server.should_not_receive(:send_topic)
-        @dispatcher.server.should_receive(:send_message).with(":#{@user.hostname} 475")
+        @dispatcher.connection.should_not_receive(:send_topic)
+        @dispatcher.connection.should_receive(:send_message).with(":#{@user.hostname} 475")
         @dispatcher.handle_message(message)
       end
     end
@@ -93,7 +93,7 @@ describe Flamethrower::Dispatcher do
          with(:headers => {'Authorization'=>['mytoken', 'x'], 'Content-Type'=>'application/json'}).
          to_return(:status => 200, :body => json_fixture("room_update"))
         message = Flamethrower::Irc::Message.new("TOPIC #flamethrower :some awesome topic")
-        @dispatcher.server.should_receive(:send_topic).with(@channel)
+        @dispatcher.connection.should_receive(:send_topic).with(@channel)
         EM.run_block { @dispatcher.handle_message(message) }
         @channel.topic.should == "some awesome topic"
       end
@@ -103,7 +103,7 @@ describe Flamethrower::Dispatcher do
   describe "#who" do
     it "responds with a who list" do
       message = Flamethrower::Irc::Message.new("WHO #flamethrower\r\n")
-      @dispatcher.server.should_receive(:send_who).with(@channel)
+      @dispatcher.connection.should_receive(:send_who).with(@channel)
       @dispatcher.handle_message(message)
     end
   end
@@ -111,25 +111,25 @@ describe Flamethrower::Dispatcher do
   describe "#mode" do
     before do
       @user = Flamethrower::Irc::User.new :username => "user", :nickname => "nick", :hostname => "host", :realname => "realname", :servername => "servername"
-      @server.current_user = @user
+      @connection.current_user = @user
     end
 
     context "channel mode" do
       it "responds to mode with a static channel mode" do
         message = Flamethrower::Irc::Message.new("MODE #flamethrower\r\n")
-        @dispatcher.server.should_receive(:send_channel_mode).with(@channel)
+        @dispatcher.connection.should_receive(:send_channel_mode).with(@channel)
         @dispatcher.handle_message(message)
       end
 
       it "responds with the user mode if the mode isn't for a channel" do
         message = Flamethrower::Irc::Message.new("MODE #{@user.nickname} +i\r\n")
-        @dispatcher.server.should_receive(:send_user_mode)
+        @dispatcher.connection.should_receive(:send_user_mode)
         @dispatcher.handle_message(message)
       end
 
       it "responds with unknown command if the mode is neither a server nor the current user" do
         message = Flamethrower::Irc::Message.new("MODE foo\r\n")
-        @dispatcher.server.should_receive(:send_message).with(":#{@user.hostname} 421")
+        @dispatcher.connection.should_receive(:send_message).with(":#{@user.hostname} 421")
         @dispatcher.handle_message(message)
       end
     end
@@ -139,7 +139,7 @@ describe Flamethrower::Dispatcher do
     it "sets the current session's user nickname to the specified nick" do
       message = Flamethrower::Irc::Message.new("NICK WiZ\r\n")
       @dispatcher.handle_message(message)
-      @dispatcher.server.current_user.nickname.should == "WiZ"
+      @dispatcher.connection.current_user.nickname.should == "WiZ"
     end
   end
 
@@ -149,7 +149,7 @@ describe Flamethrower::Dispatcher do
         message = Flamethrower::Irc::Message.new("PRIVMSG #test :Hello.\r\n")
         room = Flamethrower::Campfire::Room.new("mydomain", "mytoken", {'name' => "test"})
         irc_channel = room.to_irc
-        @dispatcher.server.irc_channels << irc_channel
+        @dispatcher.connection.irc_channels << irc_channel
         @dispatcher.handle_message(message)
         room.outbound_messages.size.should == 1
       end
@@ -158,7 +158,7 @@ describe Flamethrower::Dispatcher do
         message = Flamethrower::Irc::Message.new("PRIVMSG #test :Hello.\r\n")
         room = Flamethrower::Campfire::Room.new("mydomain", "mytoken", {'name' => "test"})
         irc_channel = room.to_irc
-        @dispatcher.server.irc_channels << irc_channel
+        @dispatcher.connection.irc_channels << irc_channel
         @dispatcher.handle_message(message)
         campfire_message = room.outbound_messages.pop
         campfire_message.body.should == "Hello."
@@ -171,7 +171,7 @@ describe Flamethrower::Dispatcher do
   describe "#ping" do
     it "responds with pong of the same ping parameters" do
       message = Flamethrower::Irc::Message.new("PING :something\r\n")
-      @server.should_receive(:send_message).with("PONG :something")
+      @connection.should_receive(:send_message).with("PONG :something")
       @dispatcher.handle_message(message)
     end
   end
@@ -189,17 +189,17 @@ describe Flamethrower::Dispatcher do
     it "sends a part message with your current user's name" do
       EventMachine.stub(:cancel_timer)
       user = Flamethrower::Irc::User.new :username => "user", :nickname => "nick", :hostname => "host", :realname => "realname", :servername => "servername"
-      @server.current_user = user
+      @connection.current_user = user
       message = Flamethrower::Irc::Message.new("PART #flamethrower")
-      @server.should_receive(:send_message).with(":#{user.to_s} PART #flamethrower")
+      @connection.should_receive(:send_message).with(":#{user.to_s} PART #flamethrower")
       @dispatcher.handle_message(message)
     end
 
     it "responds with ERR_BADCHANNELKEY a channel that doesn't exist" do
       user = Flamethrower::Irc::User.new :username => "user", :nickname => "nick", :hostname => "host", :realname => "realname", :servername => "servername"
-      @server.current_user = user
+      @connection.current_user = user
       message = Flamethrower::Irc::Message.new("PART #foobar")
-      @server.should_receive(:send_message).with(":#{user.hostname} 475")
+      @connection.should_receive(:send_message).with(":#{user.hostname} 475")
       @dispatcher.handle_message(message)
     end
   end
@@ -229,7 +229,7 @@ describe Flamethrower::Dispatcher do
 
     it "adds the current user to the channel" do
       user = Flamethrower::Irc::User.new :username => "user", :nickname => "nick", :hostname => "host", :realname => "realname", :servername => "servername"
-      @server.current_user = user
+      @connection.current_user = user
       message = Flamethrower::Irc::Message.new("JOIN #flamethrower\r\n")
       @dispatcher.handle_message(message)
       @channel.users.should include(user)
@@ -237,11 +237,11 @@ describe Flamethrower::Dispatcher do
 
     it "responds with ERR_BADCHANNELKEY a channel that doesn't exist" do
       user = Flamethrower::Irc::User.new :username => "user", :nickname => "nick", :hostname => "host", :realname => "realname", :servername => "servername"
-      @server.current_user = user
+      @connection.current_user = user
       message = Flamethrower::Irc::Message.new("JOIN #foobar\r\n")
-      @server.should_receive(:send_message).with(":#{user.hostname} 475")
-      @server.should_not_receive(:send_topic)
-      @server.should_not_receive(:send_userlist)
+      @connection.should_receive(:send_message).with(":#{user.hostname} 475")
+      @connection.should_not_receive(:send_topic)
+      @connection.should_not_receive(:send_userlist)
       @dispatcher.handle_message(message)
     end
 
@@ -260,13 +260,13 @@ describe Flamethrower::Dispatcher do
 
     describe "nick sent first" do
       it "sends the motd, join" do
-        @dispatcher.server.should_receive(:after_connect)
+        @dispatcher.connection.should_receive(:after_connect)
         @dispatcher.handle_message(@nick_message)
         @dispatcher.handle_message(@user_message)
       end
 
       it "doesn't send after_connect if only the nick has been sent" do
-        @dispatcher.server.should_not_receive(:after_connect)
+        @dispatcher.connection.should_not_receive(:after_connect)
         @dispatcher.handle_message(@nick_message)
       end
 
@@ -274,13 +274,13 @@ describe Flamethrower::Dispatcher do
 
     describe "user sent first" do
       it "sends the motd" do
-        @dispatcher.server.should_receive(:after_connect)
+        @dispatcher.connection.should_receive(:after_connect)
         @dispatcher.handle_message(@user_message)
         @dispatcher.handle_message(@nick_message)
       end
 
       it "doesn't send after_connect if only the nick has been sent" do
-        @dispatcher.server.should_not_receive(:after_connect)
+        @dispatcher.connection.should_not_receive(:after_connect)
         @dispatcher.handle_message(@user_message)
       end
 
