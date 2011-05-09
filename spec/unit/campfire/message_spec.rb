@@ -105,6 +105,16 @@ describe Flamethrower::Campfire::Message do
       @message.body = "check this out: http://example.com/kitties.png"
       @message.image_urls.should == ["http://example.com/kitties.png"]
     end
+
+    it "supports upcased image extensions" do
+      @message.body = "check this out: http://example.com/kitties.PNG"
+      @message.image_urls.should == ["http://example.com/kitties.PNG"]
+    end
+
+    it "supports https image links" do
+      @message.body = "check this out: https://example.com/kitties.png"
+      @message.image_urls.should == ["https://example.com/kitties.png"]
+    end
   end
 
   describe "#has_images?" do
