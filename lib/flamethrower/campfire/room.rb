@@ -148,22 +148,6 @@ module Flamethrower
         end
       end
 
-      def sort_and_dispatch_message(message)
-        if message.failed?
-          @failed_messages << message
-        elsif message.inbound?
-          if !message.user
-            @users_to_fetch << message
-          elsif @connection.server.ascii_conversion['enabled'] && message.needs_image_conversion?
-            @images_to_fetch << message
-          else
-            @inbound_messages << message
-          end
-        else #outbound message
-          @outbound_messages << message
-        end
-      end
-
       def fetch_images
         until @images_to_fetch.empty?
           message = @images_to_fetch.pop
@@ -264,6 +248,26 @@ module Flamethrower
       end
 
       private
+
+      def sort_and_dispatch_message(message)
+        if message.failed?
+          @failed_messages << message
+        elsif message.inbound?
+          sort_and_dispatch_inbound_message(message)
+        else
+          @outbound_messages << message
+        end
+      end
+
+      def sort_and_dispatch_inbound_message(message)
+        if !message.user
+          @users_to_fetch << message
+        elsif @connection.server.ascii_conversion['enabled'] && message.needs_image_conversion?
+          @images_to_fetch << message
+        else
+          @inbound_messages << message
+        end
+      end
 
       def translate_nicknames(message_body)
         @users.each do |user|
