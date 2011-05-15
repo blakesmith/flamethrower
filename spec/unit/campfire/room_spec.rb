@@ -225,9 +225,8 @@ describe Flamethrower::Campfire::Room do
     end
 
     it "fetches using the 'user_id' field if a streaming message" do
-      stub_request(:get, "https://mytoken:x@mydomain.campfirenow.com/users/734581.json").to_return(:body => json_fixture("user"), :status => 200)
       @room.instance_variable_get("@users_to_fetch") << Flamethrower::Campfire::Message.new(JSON.parse(json_fixture("enter_message")))
-      @room.should_receive(:campfire_get).with("/users/734581.json").and_return(mock(:post, :callback => nil))
+      @room.should_receive(:campfire_get).with("/users/734581.json").and_return(mock(:get, :callback => nil))
       EM.run_block { @room.fetch_users }
     end
 

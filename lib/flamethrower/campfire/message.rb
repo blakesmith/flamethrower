@@ -9,7 +9,7 @@ module Flamethrower
         @body = params['body']
         @user = params['user']
         @room = params['room']
-        @user_id = params['user_id']
+        @user_id = set_user_id(params)
         @message_type = params['type']
         @direction = params['direction']
         @status = "pending"
@@ -93,6 +93,18 @@ module Flamethrower
           array << ":#{@user.to_irc.to_s} PRIVMSG #{@room.to_irc.name} :#{line}"
         end
         message.join("\r\n")
+      end
+
+      def set_user_id(params)
+        if params['user_id']
+          params['user_id']
+        elsif params['user'].is_a?(User)
+          params['user'].number
+        elsif params['user'] && params['user'].is_a?(Hash)
+          params['user']['id']
+        else
+          nil
+        end
       end
     end
   end
