@@ -58,9 +58,11 @@ module Flamethrower
               @users << Flamethrower::Campfire::User.new(user)
             end
             resolve_renames(old_users, @users)
-            send_info unless @room_info_sent
+            unless @room_info_sent
+              send_info
+              fetch_recent_messages
+            end
             @room_info_sent = true
-            fetch_recent_messages
           end
         end
       end

@@ -139,8 +139,15 @@ describe Flamethrower::Campfire::Room do
       assert_requested(:get, "https://mydomain.campfirenow.com/room/347348.json") {|req| req.headers['Authorization'].should == ["mytoken", "x"]}
     end
 
-    it "calls fetch_recent_messages after the room info has been sent" do
+    it "calls fetch_recent_messages if the room_info_set is false" do
+      @room.instance_variable_set("@room_info_sent", false)
       @room.should_receive(:fetch_recent_messages)
+      EM.run_block { @room.fetch_room_info }
+    end
+
+    it "doesn't call fetch_recent_messages if the room_info_sent = true" do
+      @room.instance_variable_set("@room_info_sent", true)
+      @room.should_not_receive(:fetch_recent_messages)
       EM.run_block { @room.fetch_room_info }
     end
   end
