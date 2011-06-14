@@ -22,6 +22,7 @@ begin
     gemspec.add_dependency('json')
     gemspec.add_dependency('em-http-request')
     gemspec.add_dependency('twitter-stream')
+    gemspec.add_dependency('daemons')
   end
 rescue LoadError
   puts "Jeweler not available. Install it with: gem install jeweler"
