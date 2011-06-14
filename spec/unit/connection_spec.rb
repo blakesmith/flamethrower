@@ -42,7 +42,7 @@ describe Flamethrower::Connection do
       msg = Flamethrower::Irc::Message.new(incoming)
       Flamethrower::Irc::Message.should_receive(:new).with(incoming).and_return(msg)
       @connection.dispatcher.should_receive(:handle_message).with(msg)
-      @connection.receive_data(incoming)
+      @connection.receive_data("#{incoming}\r\n")
     end
   end
 
