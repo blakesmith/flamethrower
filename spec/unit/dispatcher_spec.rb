@@ -64,6 +64,15 @@ describe Flamethrower::Dispatcher do
       @dispatcher.handle_message(message)
       @connection.current_user.away_message.should == nil
     end
+
+    it "response with RPL_UNAWAY when the away message has no colon" do
+      @connection.current_user = @user
+      @connection.current_user.away_message = "Currently away"
+      message = Flamethrower::Irc::Message.new("AWAY")
+      @dispatcher.connection.should_receive(:send_message).with(":#{@user.hostname} 305 #{@user.nickname} :You are no longer marked as being away")
+      @dispatcher.handle_message(message)
+      @connection.current_user.away_message.should == nil
+    end
   end
 
   describe "#topic" do

@@ -86,7 +86,7 @@ module Flamethrower
 
     def handle_away(message)
       away_message = message.parameters.first
-      if away_message.empty?
+      if !away_message || away_message.empty?
         connection.current_user.away_message = nil
         connection.send_unaway
       else
