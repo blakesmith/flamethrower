@@ -25,8 +25,8 @@ module Flamethrower
     def receive_data(msg)
       @data ||= ::BufferedTokenizer.new("\r\n")
       @data.extract(msg).each do |message|
-        dispatcher.handle_message(Flamethrower::Irc::Message.new(message))
         ::FLAMETHROWER_LOGGER.debug "<< #{message}"
+        dispatcher.handle_message(Flamethrower::Irc::Message.new(message))
       end
     end
 
