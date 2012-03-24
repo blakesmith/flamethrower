@@ -81,6 +81,7 @@ module Flamethrower
         channel.users << connection.current_user
         room.join
         room.start
+        connection.send_join(connection.current_user, channel)
       end
     end
 

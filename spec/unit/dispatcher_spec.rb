@@ -254,6 +254,15 @@ describe Flamethrower::Dispatcher do
       @dispatcher.handle_message(message)
     end
 
+    it "sends a join message with your current user's name" do
+      EventMachine.stub(:cancel_timer)
+      user = Flamethrower::Irc::User.new :username => "user", :nickname => "nick", :hostname => "host", :realname => "realname", :servername => "servername"
+      @connection.current_user = user
+      message = Flamethrower::Irc::Message.new("JOIN #flamethrower")
+      @connection.should_receive(:send_message).with(":#{user.to_s} JOIN #flamethrower")
+      @dispatcher.handle_message(message)
+    end
+
     it "sends a join command to the API" do
       message = Flamethrower::Irc::Message.new("JOIN #flamethrower\r\n")
       @room.should_receive(:join)

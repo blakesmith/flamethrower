@@ -11,6 +11,7 @@ module Flamethrower
     end
 
     def after_connect
+      send_welcome
       send_motd
       populate_irc_channels
       populate_my_user

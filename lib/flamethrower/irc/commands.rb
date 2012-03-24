@@ -3,10 +3,13 @@ module Flamethrower
     module Commands
       include Flamethrower::Irc::Codes
 
+      def send_welcome
+        send_message reply(RPL_WLCM, ":Welcome to Flamethrower")
+      end
+
       def send_motd
         send_messages do |messages|
           messages << reply(RPL_MOTDSTART, ":MOTD")
-          messages << reply(RPL_MOTD, ":Welcome to Flamethrower")
           messages << reply(RPL_MOTD, ":Fetching channel list from campfire...")
         end
       end
@@ -64,6 +67,10 @@ module Flamethrower
 
       def send_user_mode
         send_message reply(RPL_UMODEIS, @current_user.mode)
+      end
+
+      def send_join(user, channel)
+        send_message ":#{user.to_s} JOIN #{channel.name}"
       end
 
       def send_part(user, channel)
