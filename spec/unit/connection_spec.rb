@@ -53,6 +53,13 @@ describe Flamethrower::Connection do
         to_return(:status => 200, :body => json_fixture("rooms"))
     end
 
+    it "sends welcome" do
+      @connection.stub(:populate_irc_channels)
+      @connection.stub(:populate_my_user)
+      @connection.should_receive(:send_welcome)
+      @connection.after_connect
+    end
+
     it "sends motd" do
       @connection.stub(:populate_irc_channels)
       @connection.stub(:populate_my_user)
@@ -82,10 +89,13 @@ describe Flamethrower::Connection do
   end
 
   describe "IRCcommands" do
+    it "should have a first message" do
+      @connection.send_welcome.should == ":host 001 nick :Welcome to Flamethrower"
+    end
+
     it "should have the correct MOTD format" do
       @connection.send_motd.should == [
         ":host 375 nick :MOTD",
-        ":host 372 nick :Welcome to Flamethrower",
         ":host 372 nick :Fetching channel list from campfire..."
       ]
     end

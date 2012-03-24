@@ -1,6 +1,7 @@
 module Flamethrower
   module Irc
     module Codes
+      RPL_WLCM = '001'
       RPL_UMODEIS = 221
       RPL_UNAWAY = 305
       RPL_NOWAWAY = 306
