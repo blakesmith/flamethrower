@@ -141,6 +141,25 @@ describe Flamethrower::Campfire::Message do
     end
   end
 
+  describe "#needs_upload_url?" do
+    it "returns true if the message is an UploadMessage and the url is empty" do
+      @message.message_type = "UploadMessage"
+      @message.url = nil
+      @message.should be_needs_upload_url
+    end
+
+    it "returns false if the message is not an UploadMessage" do
+      @message.message_type = "TextMessage"
+      @message.should_not be_needs_upload_url
+    end
+
+    it "returns false if the url is already set" do
+      @message.message_type = "UploadMessage"
+      @message.url = "http://example.com"
+      @message.should_not be_needs_upload_url
+    end
+  end
+
   describe "#mark_delivered!" do
     it "sets the status to delivered" do
       @message.status.should_not == "delivered"
