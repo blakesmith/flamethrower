@@ -221,6 +221,9 @@ describe Flamethrower::Campfire::Room do
     end
   end
 
+#  describe "#upload_images" do
+#  done
+
   describe "#fetch_users" do
     it "makes a call to the campfire api to fetch user information" do
       stub_request(:get, "https://mydomain.campfirenow.com/users/734581.json").
@@ -383,6 +386,14 @@ describe Flamethrower::Campfire::Room do
       @room.instance_variable_get("@users_to_fetch").size.should == 0
       @room.instance_variable_get("@images_to_fetch").size.should == 0
       @room.instance_variable_get("@inbound_messages").size.should == 1
+    end
+
+    it "puts upload messages into the uploads_to_fetch queue" do
+      upload_message = json_fixture("upload_message")
+      @room.stream.stub(:each_item).and_yield(upload_message)
+      @room.fetch_messages
+      @room.instance_variable_get("@inbound_messages").size.should == 0
+      @room.instance_variable_get("@uploads_to_fetch").size.should == 1
     end
   end
 

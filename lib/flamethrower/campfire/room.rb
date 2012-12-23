@@ -20,6 +20,7 @@ module Flamethrower
         @outbound_messages = Queue.new
         @users_to_fetch = Queue.new
         @images_to_fetch = Queue.new
+        @uploads_to_fetch = Queue.new
         @failed_messages = []
         @number = params['id']
         @name = params['name']
@@ -119,6 +120,7 @@ module Flamethrower
           post_messages
           fetch_users
           fetch_images
+          fetch_uploads
           messages_to_send = to_irc.retrieve_irc_messages
           messages_to_send.each do |m|
             ::FLAMETHROWER_LOGGER.debug "Sending irc message #{m.to_s}"
@@ -171,6 +173,35 @@ module Flamethrower
               end
               sort_and_dispatch_message(message)
             end
+          end
+        end
+      end
+
+      def fetch_uploads
+        if @uploads_to_fetch.empty?
+          return
+        end
+
+        http = campfire_get("/room/#{@number}/uploads.json")
+        http.callback do
+          case http.response_header.status
+          when 200
+            json = JSON.parse(http.response)
+          else
+            return
+          end
+
+          until @uploads_to_fetch.empty?
+            message = @uploads_to_fetch.pop
+            json['uploads'].each do |upload|
+              if message.matching_upload(upload)
+                break
+              end
+            end
+            # We fall off the end of the loop if we didn't find a matching
+            # upload. There's not much we can do, and message.to_irc
+            # will complain in its generated message accordingly.
+            sort_and_dispatch_message(message)
           end
         end
       end
@@ -273,6 +304,8 @@ module Flamethrower
           @users_to_fetch << message
         elsif @connection.server.ascii_conversion['enabled'] && message.needs_image_conversion?
           @images_to_fetch << message
+        elsif message.needs_upload_url?
+          @uploads_to_fetch << message
         else
           @inbound_messages << message
         end

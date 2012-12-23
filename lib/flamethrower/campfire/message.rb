@@ -1,7 +1,7 @@
 module Flamethrower
   module Campfire
     class Message
-      attr_accessor :body, :user, :room, :direction, :message_type, :status, :retry_at, :image_converted, :user_id
+      attr_accessor :body, :user, :room, :direction, :message_type, :status, :retry_at, :image_converted, :user_id, :tstamp, :url, :content_type
 
       RETRY_SECONDS = 15
 
@@ -11,6 +11,7 @@ module Flamethrower
         @room = params['room']
         @user_id = set_user_id(params)
         @message_type = params['type']
+        @tstamp = params['created_at']
         @direction = params['direction']
         @status = "pending"
         @image_converted = false
@@ -49,6 +50,10 @@ module Flamethrower
         has_images? && !@image_converted
       end
 
+      def needs_upload_url?
+        @message_type == "UploadMessage" && !@url
+      end
+
       def image_urls
         if @body
           @body.scan(/(https?:\/\/.+?\.(?:jpg|jpeg|gif|png))/i).flatten
@@ -79,10 +84,26 @@ module Flamethrower
           irc_string = ":#{@user.to_irc.to_s} PART #{@room.to_irc.name}"
         when "PasteMessage"
           irc_string = format_paste_message
+        when "UploadMessage"
+          if !@url
+            irc_string = ":#{@user.to_irc.to_s} PRIVMSG #{@room.to_irc.name} :Couldn't fetch full upload URL for #{@body}"
+          else
+            irc_string = ":#{@user.to_irc.to_s} PRIVMSG #{@room.to_irc.name} :#{@url} (#{@content_type})"
+          end
         else
           return
         end
         Flamethrower::Irc::Message.new(irc_string)
+      end
+
+      def matching_upload(upload)
+        if upload['created_at'] == @tstamp && upload['name'] == @body
+          @url = upload['full_url']
+          @content_type = upload['content_type']
+          true
+        else
+          false
+        end
       end
 
       private
