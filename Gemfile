@@ -1,4 +1,4 @@
-source :gemcutter
+source 'https://rubygems.org'
 
 gem 'eventmachine'
 gem 'twitter-stream'
