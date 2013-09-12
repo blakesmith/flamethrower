@@ -80,6 +80,8 @@ module Flamethrower
           irc_string = ":#{@user.to_irc.to_s} PART #{@room.to_irc.name}"
         when "PasteMessage"
           irc_string = format_paste_message
+        when "UploadMessage"
+          irc_string = format_upload_message
         else
           return
         end
@@ -94,6 +96,18 @@ module Flamethrower
           array << ":#{@user.to_irc.to_s} PRIVMSG #{@room.to_irc.name} :#{line}"
         end
         message.join("\r\n")
+      end
+
+      def format_upload_message
+        upload_url = [
+          @room.host,
+          'room',
+          room.number, 
+          'uploads',
+          id,
+          @body
+        ].join('/')
+        ":#{@user.to_irc.to_s} PRIVMSG #{@room.to_irc.name} :#{upload_url}"
       end
 
       def set_user_id(params)

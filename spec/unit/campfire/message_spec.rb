@@ -2,7 +2,7 @@ require File.join(File.dirname(__FILE__), "../../spec_helper")
 
 describe Flamethrower::Campfire::Message do
   before do
-    @room = Flamethrower::Campfire::Room.new("mydomain", "mytoken", {'name' => "flamethrower"})
+    @room = Flamethrower::Campfire::Room.new("mydomain", "mytoken", {'name' => "flamethrower", 'id' => 73541})
     @channel = Flamethrower::Irc::Channel.new("#flamethrower", @room)
     @campfire_user = Flamethrower::Campfire::User.new('name' => "bob", 'id' => 734581)
     @room.users << @campfire_user
@@ -71,6 +71,15 @@ describe Flamethrower::Campfire::Message do
       expected << ":#{@irc_user.to_s} PRIVMSG #{@channel.name} :\tpoint one\r\n"
       expected << ":#{@irc_user.to_s} PRIVMSG #{@channel.name} :\tpoint two\r\n"
       expected << ":#{@irc_user.to_s} PRIVMSG #{@channel.name} :point three"
+      message.to_irc.to_s.should == expected
+    end
+
+    it "makes an UploadMessage into a URL" do
+      json = JSON.parse(json_fixture('upload_message'))
+      message = Flamethrower::Campfire::Message.new(json)
+      message.user = @campfire_user
+      message.room = @room
+      expected = ":#{@irc_user.to_s} PRIVMSG #{@channel.name} :https://mydomain.campfirenow.com/room/73541/uploads/298466819/Steak.jpeg"
       message.to_irc.to_s.should == expected
     end
   end
